@@ -5,6 +5,10 @@ import Name from '../screens/Onboarding/Name';
 import Interests from '../screens/Onboarding/Interests';
 import Sucess from '../screens/Onboarding/Sucess';
 import {View, Text} from 'react-native';
+import Waitlist from '../screens/Waitlist/Waitlist';
+
+
+
 const Onboarding = createNativeStackNavigator();
 
 export default function OnboardingStack() {
@@ -43,6 +47,13 @@ export default function OnboardingStack() {
       <Onboarding.Screen
         name="Sucess"
         component={Sucess}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Onboarding.Screen
+        name="Waitlist"
+        component={Waitlist}
         options={{
           headerShown: false,
         }}

@@ -1,14 +1,44 @@
-import React from 'react';
-import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
+  FlatList,
+} from 'react-native';
 import {RegularBoldText} from '../../components/Texts';
 import {NormalButton} from '../../components/Buttons';
 import EmptyCreatePost from '../../assets/images/assets/EmptyCreatePost.svg';
 import {useDispatch} from 'react-redux';
 import SucessLogo from '../../assets/images/assets/SucessLogo.svg';
-import {NavigateToCreate} from '../../redux/actions';
+import {NavigateToCreate} from '../../store/actions';
 import Post from '../../components/Utility/Post';
 import AppHeader from '../../components/Utility/AppHeader';
+import {useSelector} from 'react-redux';
+import {getPosts} from '../../store/actions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+//GetPostsReducer
 function Explore() {
+  var posts = useSelector(state => state.GetPostsReducer.posts);
+  var loading = useSelector(state => state.GetPostsReducer.loading);
+  var error = useSelector(state => state.GetPostsReducer.error);
+  const dispatch = useDispatch();
+
+  console.log('===========================');
+  console.log('loading', loading, 'error', error);
+
+  const [user, setUser] = useState(null);
+
+  const _getPosts = async () => {
+    dispatch(getPosts());
+  };
+
+  useEffect(() => {
+    _getPosts();
+  }, []);
+
   const postCount = 0;
   const Postdata = {
     userName: 'Linda',
@@ -16,52 +46,42 @@ function Explore() {
     description:
       'I’m at Nick’s Pub for happy hour, and would love to make some new friends while i’m here. Open to going anywhere nearby.',
   };
-  if (postCount === 0) {
+  if (loading == true) {
+    return (
+      <View
+        style={{flex: 1, justifyContent: 'center', backgroundColor: 'white'}}>
+        <ActivityIndicator size="large" color="#44BFBA" />
+      </View>
+    );
+  } else if (posts.length > 0 && loading == false) {
+    return (
+      <View style={styles.container}>
+        {/* <ScrollView>
+       
+        <Post
+          userName={Postdata.userName}
+          title={Postdata.title}
+          description={Postdata.description}
+        />
+      </ScrollView> */}
+        <View style={{}}>
+          <FlatList
+            data={posts}
+            keyExtractor={item => item.id}
+            renderItem={({item}) => (
+              <Post
+                userName={item.userName}
+                title={item.headline}
+                description={item.description}
+              />
+            )}
+          />
+        </View>
+      </View>
+    );
+  } else {
     return <NoPost />;
   }
-  return (
-    <View style={styles.container}>
-      <ScrollView>
-      <AppHeader />
-        <Post
-          userName={Postdata.userName}
-          title={Postdata.title}
-          description={Postdata.description}
-        />
-
-        <Post
-          userName={Postdata.userName}
-          title={Postdata.title}
-          description={Postdata.description}
-        />
-        <Post
-          userName={Postdata.userName}
-          title={Postdata.title}
-          description={Postdata.description}
-        />
-        <Post
-          userName={Postdata.userName}
-          title={Postdata.title}
-          description={Postdata.description}
-        />
-        <Post
-          userName={Postdata.userName}
-          title={Postdata.title}
-          description={Postdata.description}
-        />
-        <Post
-          userName={Postdata.userName}
-          title={Postdata.title}
-          description={Postdata.description}
-        />
-        <Post
-          userName={Postdata.userName}
-          title={Postdata.title}
-          description={Postdata.description}
-        />
-      </ScrollView>
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
@@ -83,20 +103,19 @@ function NoPost() {
 
   return (
     <View style={styles.container}>
-     <AppHeader moreStyles={{flex:0.14}} />
       <View
         style={{
           //height: 300,
           marginTop: 90,
           marginHorizontal: 16,
-          justifyContent: 'center', 
-          
+          justifyContent: 'center',
+
           flex: 1,
           alignItems: 'center',
         }}>
         <EmptyCreatePost witdth="100%" />
       </View>
-      <View style={{flex: 0.8 ,}}>
+      <View style={{flex: 0.8}}>
         <RegularBoldText
           content="No hangouts yet? Be the first to post!"
           moreStyles={{textAlign: 'center'}}

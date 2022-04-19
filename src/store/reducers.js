@@ -1,0 +1,113 @@
+//const initialState  = {email: '', password: '', error: '', loading: false, user: null, token: null};
+import {
+  LOGIN,
+  LOGOUT,
+  OPEN_CREATE_POST_NAV,
+  CLOSE_CREATE_POST_NAV,
+  GET_POSTS,
+  GET_POSTS_LOADING,
+  GET_POSTS_ERROR,
+  CREATE_POST,
+  CREATE_POST_LOADING,
+  CREATE_POST_ERROR,
+} from './actionTypes';
+
+const authInitialState = {
+  userId: undefined,
+};
+export function AuthReducer(state = authInitialState, action) {
+  switch (action.type) {
+    case LOGIN:
+      return {
+        ...state,
+        userId: action.payload.id,
+      };
+    case LOGOUT:
+      return {
+        ...state,
+        userId: null,
+      };
+
+    default:
+      return state;
+  }
+}
+
+const navInitilaState = {
+  create: false,
+};
+
+export function NavReducer(state = navInitilaState, action) {
+  switch (action.type) {
+    case OPEN_CREATE_POST_NAV:
+      return {
+        ...state,
+        create: action.payload.create,
+      };
+    case CLOSE_CREATE_POST_NAV:
+      return {
+        ...state,
+        create: action.payload.create,
+      };
+    default:
+      return state;
+  }
+}
+const getPostInitialState = {
+  posts: [],
+  loading: false,
+};
+export function GetPostsReducer(state = getPostInitialState, action) {
+  switch (action.type) {
+    case GET_POSTS:
+      return {
+        ...state,
+        posts: action.payload.posts,
+        loading: action.payload.loading,
+      };
+    case GET_POSTS_LOADING:
+      return {
+        ...state,
+        loading: action.payload.loading,
+      };
+    case GET_POSTS_ERROR:
+      return {
+        ...state,
+        error: action.payload.error,
+        loading: action.payload.loading,
+      };
+    default:
+      return state;
+  }
+}
+
+const createPostInitialState = {
+  ref: null,
+  loading: false,
+};
+
+export function CreatePostsReducer(state = createPostInitialState, action) {
+  switch (action.type) {
+    case CREATE_POST:
+      return {
+        ...state,
+        ref: action.payload.ref,
+        loading: action.payload.loading,
+      };
+    case CREATE_POST_LOADING:
+      return {
+        ...state,
+        ref: action.payload.ref,
+        loading: action.payload.loading,
+      };
+    case CREATE_POST_ERROR:
+      return {
+        ...state,
+        ref: action.payload.ref,
+        error: action.payload.error,
+        loading: action.payload.loading,
+      };
+    default:
+      return state;
+  }
+}

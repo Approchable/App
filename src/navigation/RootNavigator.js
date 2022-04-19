@@ -8,9 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import WelcomeStack from './WelcomeNavigator';
 import CreateNavigator from './CreateNavigator';
 import {Provider, useSelector} from 'react-redux';
-import {store} from '../redux/index';
+import {store} from '../store/index';
 import {useDispatch} from 'react-redux';
-import {Init, login} from '../redux/actions';
+import {Init, login} from '../store/actions';
 import CreateStack from './CreateNavigator';
 import BottomTabNavigator from './BottomTabNavigator';
 import {
@@ -20,15 +20,16 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
+import { verifyToken } from '../store/WaitList/Waitlist';
 // import { createAppContainer, createSwitchNavigator } from '@react-navigation';
 
-function OnboardingNavigator({userToken}) {
+function OnboardingNavigator({userToken , isCorrectToken}) {
   console.log('userToken in onboarding', userToken);
-  
+
   if (userToken === undefined) {
     return (
       <View style={{flex: 1, justifyContent: 'center'}}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color="#44BFBA" />
       </View>
     );
   }
@@ -44,7 +45,7 @@ function AppNavigator() {
 
   return (
     <NavigationContainer>
-      {create === true ? <CreateStack /> : <BottomTabNavigator />} 
+      {create === true ? <CreateStack /> : <BottomTabNavigator />}
     </NavigationContainer>
   );
 }
@@ -53,17 +54,11 @@ export default function RootNavigator() {
   //const [userToken , setUserToken] = useState(null);
   const [appReady, setAppReady] = useState(false);
 
-  // const userToken = useSelector(state => {
-  //   console.log(state);
-  //   // setUserToken(state.AuthReducer.userToken);
-  //   return state.AuthReducer.userToken;
-  //AuthReducer.userToken
 
-  // });
-
-  // var userToken = useSelector(state => state.AuthReducer.userToken);
 
   var userToken = useSelector(state => state.AuthReducer.userId);
+  var isCorrectWaitListCode = useSelector(state => state.WaitlistReducer.isCorrectToken);
+  console.log(isCorrectWaitListCode , "code waitlist reducer");
   // userToken = null
   console.log('user', userToken);
 
@@ -73,8 +68,23 @@ export default function RootNavigator() {
     dispatch(Init());
   };
 
+  const verifyWaitListCode = async () => {
+    try {
+      var correctToken = await AsyncStorage.getItem('WaitlistToken');
+     
+      console.log('===================correctToken===============', correctToken);
+      if (correctToken !== null) {
+        dispatch(verifyToken(correctToken));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+   
+
   useEffect(() => {
     checkForUserThroughredux();
+     verifyWaitListCode();
   });
 
   const checkUserCredentials = async () => {
@@ -90,19 +100,11 @@ export default function RootNavigator() {
     }
   };
 
-  // if (!appReady) {
-  //   return (
-  //     <AppLoading
-  //       startAsync={checkUserCredentials}
-  //       onFinish={() => setAppReady(true)}
-  //       onError={console.warn}
-  //     />
-  //   );
-  // }
-  if (userToken === null || userToken === undefined) {
-    return <OnboardingNavigator userToken={userToken} />;
-  } else {
+
+  if (userToken !== undefined && userToken !== null) {
+    // if (isCorrectWaitListCode == true){
     return <AppNavigator />;
+  } else {
+    return <OnboardingNavigator userToken={userToken}  />;
   }
 }
-

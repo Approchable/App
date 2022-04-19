@@ -7,7 +7,7 @@ import CategoryItem from '../../components/CategoryItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {ActivityIndicator} from 'react-native';
-import { logout } from '../../redux/actions';
+import {logout} from '../../store/actions';
 const CategorieArr = [
   'Self development',
   'Creativity',
@@ -26,15 +26,19 @@ export default function Profile() {
     setUser(currUser);
   };
   const _deleteAccount = async () => {
-      console.log ("deleting user")
-      dispatch(logout());
+    console.log('deleting user');
+    dispatch(logout());
   };
 
   useEffect(() => {
     _retriveUser();
   }, []);
 
-  return user ? <UserExists user={user} deleteUser = {_deleteAccount} /> : <NoUser />;
+  return user ? (
+    <UserExists user={user} deleteUser={_deleteAccount} />
+  ) : (
+    <NoUser />
+  );
 }
 
 function NoUser() {
@@ -45,11 +49,10 @@ function NoUser() {
   );
 }
 
-function UserExists({user , deleteUser}) {
+function UserExists({user, deleteUser}) {
   return (
     <View style={{...styles.container}}>
-      <AppHeader moreStyles={{flex: 0.1}} />
-      <View style={{flex: '1', marginHorizontal: 16 ,marginTop: 20}}>
+      <View style={{flex: '1', marginHorizontal: 16, marginTop: 20}}>
         <HeaderText content={user.name} moreStyles={{fontSize: 27}} />
         <HeaderText content="Interests" moreStyles={{fontSize: 18}} />
         <View style={{flexWrap: 'wrap', flexDirection: 'row', marginLeft: -5}}>
@@ -57,6 +60,7 @@ function UserExists({user , deleteUser}) {
             <CategoryItem
               content={person}
               width={width}
+              onPress={() => null}
               moreStyles={{
                 backgroundColor: 'white',
                 borderRadius: 5,
@@ -67,7 +71,6 @@ function UserExists({user , deleteUser}) {
                 borderWidth: 1,
                 borderColor: '#E5E5E5',
               }}
-            
             />
           ))}
         </View>

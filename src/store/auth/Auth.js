@@ -1,16 +1,20 @@
-import {
-  LOGIN,
-  LOGOUT,
-  OPEN_CREATE_POST_NAV,
-  CLOSE_CREATE_POST_NAV,
-} from './actionTypes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { deleteUserData } from '../../firebase';
+import {deleteUserData, writeUserData} from '../..//../firebase';
+
+// actions types
+
+export const LOGIN = 'LOGIN';
+export const LOGOUT = 'LOGOUT';
+export const LOGIN_LOADING = 'LOGIN_LOADING';
+
+//actions
+
 export const Init = () => {
   console.log('Initing user....');
   return async dispatch => {
     try {
       var data = await AsyncStorage.getItem('user');
+
       data = JSON.parse(data);
       console.log('user found', data);
       if (data === null || data === undefined) {
@@ -38,8 +42,8 @@ export const Init = () => {
 export const login = data => {
   return async dispatch => {
     try {
-     
       await AsyncStorage.setItem('user', JSON.stringify(data));
+      await writeUserData(data.id, data);
       dispatch({
         type: LOGIN,
         payload: {
@@ -56,8 +60,10 @@ export const logout = () => {
   return async dispatch => {
     try {
       var user = await AsyncStorage.getItem('user');
+
       user = JSON.parse(user);
       await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('WaitlistToken');
       deleteUserData(user.id);
       dispatch({
         type: LOGOUT,
@@ -71,25 +77,25 @@ export const logout = () => {
   };
 };
 
-export const NavigateToCreate = () => {
-  console.log('navigating to create');
-  return dispatch => {
-    dispatch({
-      type: OPEN_CREATE_POST_NAV,
-      payload: {
-        create: true,
-      },
-    });
-  };
-};
+//reducers
 
-export const NaviagteOutOfCreate = () => {
-  return dispatch => {
-    dispatch({
-      type: CLOSE_CREATE_POST_NAV,
-      payload: {
-        create: false,
-      },
-    });
-  };
+const authInitialState = {
+  userId: undefined,
 };
+export function AuthReducer(state = authInitialState, action) {
+  switch (action.type) {
+    case LOGIN:
+      return {
+        ...state,
+        userId: action.payload.id,
+      };
+    case LOGOUT:
+      return {
+        ...state,
+        userId: null,
+      };
+
+    default:
+      return state;
+  }
+}

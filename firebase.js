@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 // import * as firebase from "firebase"
 import {initializeApp} from 'firebase/app';
-import {getFirestore, collection, getDocs} from 'firebase/firestore';
+import {getFirestore, collection, getDocs, addDoc, doc} from 'firebase/firestore';
 import {getDatabase, ref, set} from 'firebase/database';
 // import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 // TODO: Add SDKs for Firebase products that you want to use
@@ -23,9 +23,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
 // const db = getFirestore(app);
+const fireStore = getFirestore(app);
 
 // console.log("test")
-
 
 function writeDatatoRdb(path, data) {
   const db = getDatabase();
@@ -56,6 +56,67 @@ export function deleteUserData(id) {
       console.log(error, ' deleting user ');
     });
 }
+
+export async function sendPostToFireStore(postObject) {
+  const collectionRef = collection(fireStore, 'posts');
+  try {
+    
+    const docRef = await addDoc(collectionRef, postObject);
+    return docRef;
+    console.log(docRef)
+  } catch (error) {
+    console.log('Error sending posts to firebase ', error);
+    return null;
+  }
+}
+
+export async function getPostsFromFireStore() {
+  const collectionRef = collection(fireStore, 'posts');
+  try {
+    const querySnapshot = await getDocs(collectionRef);
+    const data = querySnapshot.docs.map(doc => doc.data());
+   
+    return data;
+  } catch (error) {
+    console.log('Error getting posts from firebase ', error);
+    return null;
+  }
+}
+
+export async function verifyCredentialsFromFireStore(postId) {
+  return true;
+}
+
+// export async function writingtestToFireStore() {
+//   const collectionRef = collection(fireStore, 'posts');
+//   try {
+//     const testPostObject = {
+//       title: 'ebuka title',
+//       description: 'test description',
+//       imageUrl: 'test image url',
+//     };
+//     const docRef = await addDoc(collectionRef, testPostObject);
+//     return docRef;
+//   } catch (error) {
+//     console.log('error testing firstore-writing with this error: ', error);
+//     return null;
+//   }
+// }
+
+export async function readingtestToFireStore() {
+  const collectionRef = collection(fireStore, 'posts');
+  try {
+    const querySnapshot = await getDocs(collectionRef);
+    const data = querySnapshot.docs.map(doc => doc.data());
+   
+    return data;
+  } catch (error) {
+    console.log('error testing firstore-reading with this error: ', error);
+    return null;
+  }
+}
+
+// writingtestToFireStore();
 
 // writeUserData("testID" , "testName", "testEmail", "testImageUrl");
 

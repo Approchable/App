@@ -13,18 +13,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useState, useContext} from 'react';
 import {UserContext, UserProvider} from './src/context/UserContext';
 import {Provider, useSelector} from 'react-redux';
-import {store} from './src/redux/index';
+import AppHeader from './src/components/Utility/AppHeader';
+import {store} from './src/store/index';
+import Waitlist from './src/screens/Waitlist/Waitlist';
+import CreatePost2 from './src/screens/Create/CreatePost2';
+import CreatePost3 from './src/screens/Create/CreatePost3';
 
 export default function App() {
   return (
     <Provider store={store}>
       <UserProvider>
         <CategoryProvider>
-          <MyStatusBar backgroundColor="white" />
+        <MyStatusBar backgroundColor="white" />
+        <AppHeader moreStyles={{flex: 0.1 }} />
           <SafeAreaProvider>
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={{...styles.container ,  height:40}}>
               <View style={{...styles.container}}>
                 <RootNavigator />
+
+              {/* <CreatePost3/> */}
+              
               </View>
             </SafeAreaView>
           </SafeAreaProvider>

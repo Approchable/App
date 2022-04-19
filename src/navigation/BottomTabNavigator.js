@@ -45,7 +45,7 @@ export default function BottomTabNavigator() {
       inactiveColor="#D3D3D3"
       barStyle={{
         height: 70,
-        marginHorizontal: 60,
+        // marginHorizontal: 60,
         elevation: 0,
         shadowColor: '#000000',
         shadowOffset: {width: 0, height: 0}, // change this for more shadow

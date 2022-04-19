@@ -10,7 +10,7 @@ export default function Post({userName, title, description}) {
       <View
         style={{
           borderBottomColor: '#696969',
-          borderBottomWidth: 0.5,
+          borderBottomWidth: 0.3,
         }}
       />
     </View>
