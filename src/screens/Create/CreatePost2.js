@@ -1,22 +1,94 @@
-import {View, Text, StyleSheet, ScrollView, TextInput} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
-import {NormalButton} from '../../components/Buttons';
+import {NormalButton, TextButton} from '../../components/Buttons';
 import {NaviagteOutOfCreate, createPosts} from '../../store/actions';
 import {useDispatch} from 'react-redux';
 import {HeaderText, RegularText, RegularBoldText} from '../../components/Texts';
 import {NormalTextField} from '../../components/TextField';
 import AppHeader from '../../components/Utility/AppHeader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import * as Location from 'expo-location';
+
 export default function CreatePost2({navigation, route}) {
+  const selectedStartTime = 'start';
+  const selectedEndTime = 'end';
+
   const dispatch = useDispatch();
+
   const [description, setDescription] = useState(null);
   const [buttonActive, setButtonActive] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
+  const [startDateTime , setStartDateTime] = useState(null);
+  const [endDateTime , setEndDateTime] = useState(null);
+  const [startTime, setStartTime] = useState('00:00');
+  const [endTime, setEndTime] = useState('00:00');
+  const [location, setLocation] = useState(null);
+  const [addressResult, setAddressResult] = useState(null);
 
   // const {headline} = route.params;
   // console.log('headline', headline);
+  // const startTime = new Date();
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const showEndTimePicker = () => {
+    setEndTimePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const hideEndDatePicker = () => {
+    setEndTimePickerVisibility(false);
+  };
+
+  const handleConfirm = date => {
+
+   
+    const hoursAndMinutes = getHoursandMinutes(date);
+    setStartDateTime(date);
+    setStartTime(hoursAndMinutes);
+    hideDatePicker();
+  };
+
+  const handleEndConfirm = date => {
+    if(date <= startDateTime){
+      Alert.alert('Error', 'End time must be after start time');
+      return;
+    }
+
+    const hoursAndMinutes = getHoursandMinutes(date);
+    setEndTime(hoursAndMinutes);
+    setEndDateTime(date);
+    hideEndDatePicker();
+  };
+
+  const getHoursandMinutes = date => {
+    var hoursAndMinutes = date.getHours() + ':' + date.getMinutes();
+    if (date.getHours() < 10) {
+      hoursAndMinutes = '0' + hoursAndMinutes;
+    }
+    console.log('Time with hours and minutes', hoursAndMinutes);
+    return hoursAndMinutes;
+  };
 
   useEffect(() => {
     _checkDescription();
+    getLocationAndTurnToAdress();
   }, [description]);
 
   const _checkDescription = () => {
@@ -30,6 +102,26 @@ export default function CreatePost2({navigation, route}) {
     } else {
       setButtonActive(true);
     }
+  };
+
+  const getLocationAndTurnToAdress = async () => {
+    console.log('getting location');
+
+    let {status} = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      setErrorMsg('Permission to access location was denied');
+      Alert.alert('Error', 'Permission to access location was denied');
+      return;
+    }
+
+    let locationResult = await Location.getCurrentPositionAsync({});
+    console.log('location', locationResult);
+    setLocation(locationResult);
+    let addressResult = await Location.reverseGeocodeAsync(
+      locationResult.coords,
+    );
+    console.log('addressResult', addressResult);
+    setAddressResult(String(addressResult[0].name));
   };
 
   const closeCreateTest = navigation => {
@@ -71,13 +163,97 @@ export default function CreatePost2({navigation, route}) {
             onChangeText={text => setDescription(text)}
           />
           <RegularBoldText content="Location" />
-          <NormalTextField
-            placeholder="Required"
-            moreStyles={{marginTop: -28}}
-            onChangeText={text => setDescription(text)}
+          {addressResult === null ? (
+            <ActivityIndicator size="large" color="#44BFBA" />
+          ) : (
+            <NormalTextField
+              placeholder="Required"
+              value={addressResult}
+              moreStyles={{marginTop: -28}}
+              onChangeText={text => setAddressResult(text)}
+            />
+          )}
+
+          <RegularBoldText
+            content="Time of hangout*"
+            moreStyles={{marginTop: 15, marginBottom: 10}}
           />
-          <RegularBoldText content="Time of hangout" />
-          <TimeHangout />
+          <View
+            style={{
+              flexDirection: 'row',
+            }}>
+            <TouchableOpacity
+              onPress={() => showDatePicker()}
+              style={{
+                width: 66,
+                height: 44,
+                backgroundColor: 'white',
+                borderColor: '#ECEEF2',
+                borderWidth: 1,
+                borderRadius: 10,
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  fontSize: 14,
+                  color: '#030E01',
+                  fontWeight: 'bold',
+                }}>
+                {startTime}
+              </Text>
+            </TouchableOpacity>
+
+            <View
+              style={{
+                marginHorizontal: 15,
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#696969',
+              }}>
+              <Text>-</Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={() => showEndTimePicker()}
+              style={{
+                width: 66,
+                height: 44,
+                backgroundColor: 'white',
+                borderColor: '#ECEEF2',
+                borderWidth: 1,
+                borderRadius: 10,
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  fontSize: 14,
+                  color: '#030E01',
+                  fontWeight: 'bold',
+                }}>
+                {endTime}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="time"
+            onConfirm={handleConfirm}
+            onCancel={hideDatePicker}
+          />
+
+          <DateTimePickerModal
+            isVisible={isEndTimePickerVisible}
+            mode="time"
+            onConfirm={handleEndConfirm}
+            onCancel={hideEndDatePicker}
+          />
 
           <RegularBoldText content="Screening question (optional):" />
           <RegularText
@@ -100,7 +276,9 @@ export default function CreatePost2({navigation, route}) {
           }}>
           <NormalButton
             text="Next"
-            onPress={() => (buttonActive ? navigation.navigate('CreatePost3') : null)}
+            onPress={() =>
+              buttonActive ? navigation.navigate('CreatePost3') : null
+            }
             inActive={buttonActive}
             hollow
             moreStyles={{

@@ -30,7 +30,7 @@ export default function App() {
             <SafeAreaView style={{...styles.container ,  height:40}}>
               <View style={{...styles.container}}>
                 <RootNavigator />
-
+                {/* <CreatePost2/> */}
               {/* <CreatePost3/> */}
               
               </View>

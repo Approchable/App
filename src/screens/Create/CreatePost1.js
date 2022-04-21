@@ -7,26 +7,13 @@ import {HeaderText, RegularText, RegularBoldText} from '../../components/Texts';
 import {NormalTextField} from '../../components/TextField';
 import AppHeader from '../../components/Utility/AppHeader';
 import CategoryItem from '../../components/CategoryItem';
+
 export default function CreatePost1({navigation}) {
+
   const dispatch = useDispatch();
   const [headline, setHeadline] = useState(null);
   const [buttonActive, setButtonActive] = useState(false);
-
-  const handlePressedCategories = () => {
-
-  }
-
-  const _checkHeadline = () => {
-    if (headline === null || headline === undefined || headline === '') {
-      setButtonActive(false);
-    } else {
-      setButtonActive(true);
-    }
-  };
-
-  useEffect(() => {
-    _checkHeadline();
-  });
+  const [selectedInterest, setSelectedInteres] = useState([]);
 
   const interests = [
     'adventure & exploration',
@@ -44,8 +31,40 @@ export default function CreatePost1({navigation}) {
     'sports & recreation',
     'technology & science',
   ];
-  const width = (Dimensions.get('window').width - 36) / 3.5;
 
+  const handlePressedCategories = () => {};
+
+  const _checkHeadline = () => {
+    if (
+      (headline !== null || headline !== undefined || headline !== '') &&
+      selectedInterest.length > 0
+    ) {
+      setButtonActive(true);
+    } else {
+      setButtonActive(false);
+    }
+  };
+
+  useEffect(() => {
+    _checkHeadline();
+  });
+
+  const handleSelectingItems = item => {
+    console.log('selectedInterestes', selectedInterest);
+    if (selectedInterest.includes(item)) {
+      //remove item from selectedInterestes
+      const result = selectedInterest.filter(word => word !== item);
+
+      setSelectedInteres(result);
+    } else {
+      //add item to selectedInterestes
+      setSelectedInteres([...selectedInterest, item]);
+    }
+
+    _checkHeadline();
+  };
+
+  const width = (Dimensions.get('window').width - 36) / 3.5;
 
   return (
     <ScrollView style={styles.container}>
@@ -74,16 +93,15 @@ export default function CreatePost1({navigation}) {
               <CategoryItem
                 content={item}
                 width={width}
-                onPress={() => console.log('pressed')}
+                onPress={() => handleSelectingItems(item)}
                 moreStyles={{
-                 
                   borderRadius: 5,
                   height: 50,
                   margin: 5,
                   width: null,
                   paddingHorizontal: 10,
                   borderWidth: 1,
-                   borderColor: '#E5E5E5',
+                  borderColor: '#E5E5E5',
                 }}
               />
             ))}
@@ -96,7 +114,7 @@ export default function CreatePost1({navigation}) {
             marginHorizontal: 16,
             justifyContent: 'flex-end',
             marginBottom: 20,
-            marginTop: 40
+            marginTop: 40,
           }}>
           <NormalButton
             text="Next"

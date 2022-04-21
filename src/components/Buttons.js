@@ -10,6 +10,18 @@ import {SocialIcon} from 'react-native-elements';
 import {GoogleIcon, AppleIcon} from './Utility/Icons';
 import {RegularText, SmallerText} from './Texts';
 
+export function TextButton({text , onPress}) {
+  return (
+    <TouchableOpacity style={{padding: 0 , }} onPress={onPress} >
+      <Text style = {{
+       color: "#44BFBA",
+      fontSize: 16,
+      fontWeight: "bold",
+      }}>{text}</Text>
+    </TouchableOpacity>
+  );
+}
+
 export function NormalButton({text, hollow, moreStyles, onPress, inActive}) {
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,

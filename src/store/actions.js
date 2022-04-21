@@ -100,6 +100,7 @@ export const NavigateToCreate = () => {
 };
 
 export const NaviagteOutOfCreate = () => {
+  
   return dispatch => {
     dispatch({
       type: CLOSE_CREATE_POST_NAV,

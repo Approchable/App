@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "ApproachableNative",
+    "userInterfaceStyle": "automatic",
     "slug": "ApproachableNative",
     "plugins": [
       [
