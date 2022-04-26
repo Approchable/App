@@ -58,9 +58,9 @@ export default function RootNavigator() {
 
   var userToken = useSelector(state => state.AuthReducer.userId);
   var isCorrectWaitListCode = useSelector(state => state.WaitlistReducer.isCorrectToken);
-  console.log(isCorrectWaitListCode , "code waitlist reducer");
+  //console.log(isCorrectWaitListCode , "code waitlist reducer");
   // userToken = null
-  console.log('user', userToken);
+ // console.log('user', userToken);
 
   const dispatch = useDispatch();
 
@@ -72,7 +72,7 @@ export default function RootNavigator() {
     try {
       var correctToken = await AsyncStorage.getItem('WaitlistToken');
      
-      console.log('===================correctToken===============', correctToken);
+      //console.log('===================correctToken===============', correctToken);
       if (correctToken !== null) {
         dispatch(verifyToken(correctToken));
       }

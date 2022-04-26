@@ -7,9 +7,9 @@ import {HeaderText, RegularText, RegularBoldText} from '../../components/Texts';
 import {NormalTextField} from '../../components/TextField';
 import AppHeader from '../../components/Utility/AppHeader';
 import CategoryItem from '../../components/CategoryItem';
+import {addToPostObject} from '..//../store//posts//posts';
 
 export default function CreatePost1({navigation}) {
-
   const dispatch = useDispatch();
   const [headline, setHeadline] = useState(null);
   const [buttonActive, setButtonActive] = useState(false);
@@ -32,7 +32,19 @@ export default function CreatePost1({navigation}) {
     'technology & science',
   ];
 
-  const handlePressedCategories = () => {};
+  const finishCreatePost1 = () => {
+
+    const data = {
+      headline: headline || '',
+      selectedInterest: selectedInterest || [],
+
+    }
+    dispatch(addToPostObject(data));
+
+    navigation.navigate('CreatePost2', {
+      headline: headline,
+    })
+  };
 
   const _checkHeadline = () => {
     if (
@@ -50,7 +62,7 @@ export default function CreatePost1({navigation}) {
   });
 
   const handleSelectingItems = item => {
-    console.log('selectedInterestes', selectedInterest);
+   
     if (selectedInterest.includes(item)) {
       //remove item from selectedInterestes
       const result = selectedInterest.filter(word => word !== item);
@@ -118,13 +130,7 @@ export default function CreatePost1({navigation}) {
           }}>
           <NormalButton
             text="Next"
-            onPress={() =>
-              buttonActive
-                ? navigation.navigate('CreatePost2', {
-                    headline: headline,
-                  })
-                : null
-            }
+            onPress={() => (buttonActive ? finishCreatePost1() : null)}
             inActive={buttonActive}
             hollow
           />

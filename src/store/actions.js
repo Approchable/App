@@ -14,18 +14,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   deleteUserData,
   getPostsFromFireStore,
-  sendPostToFireStore,
+ 
   writeUserData,
 
 } from '../../firebase';
 
+import {  sendPostToFireStore } from '../../FirebaseFireStore';
+
 export const Init = () => {
-  console.log('Initing user....');
+  //console.log('Initing user....');
   return async dispatch => {
     try {
       var data = await AsyncStorage.getItem('user');
       data = JSON.parse(data);
-      console.log('user found', data);
+     // console.log('user found', data);
       if (data === null || data === undefined) {
         dispatch({
           type: LOGIN,

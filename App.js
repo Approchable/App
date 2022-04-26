@@ -18,21 +18,20 @@ import {store} from './src/store/index';
 import Waitlist from './src/screens/Waitlist/Waitlist';
 import CreatePost2 from './src/screens/Create/CreatePost2';
 import CreatePost3 from './src/screens/Create/CreatePost3';
+import {testStorage} from './FirebaseStorage';
+
 
 export default function App() {
   return (
     <Provider store={store}>
       <UserProvider>
         <CategoryProvider>
-        <MyStatusBar backgroundColor="white" />
-        <AppHeader moreStyles={{flex: 0.1 }} />
+          <MyStatusBar backgroundColor="white" />
+          <AppHeader moreStyles={{flex: 0.1}} />
           <SafeAreaProvider>
-            <SafeAreaView style={{...styles.container ,  height:40}}>
+            <SafeAreaView style={{...styles.container, height: 40}}>
               <View style={{...styles.container}}>
                 <RootNavigator />
-                {/* <CreatePost2/> */}
-              {/* <CreatePost3/> */}
-              
               </View>
             </SafeAreaView>
           </SafeAreaProvider>

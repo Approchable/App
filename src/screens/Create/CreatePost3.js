@@ -15,18 +15,39 @@ import {NormalButton} from '../../components/Buttons';
 import * as ImagePicker from 'expo-image-picker';
 import {NaviagteOutOfCreate, createPosts} from '../../store/actions';
 import {Camera} from 'expo-camera';
-import {useDispatch} from 'react-redux';
+import {useDispatch , useSelector} from 'react-redux';
+import {addToPostObject} from '..//../store//posts//posts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
 export default function CreatePost3({navigation}) {
   const [buttonActive, setButtonActive] = useState(false);
-
   const [image, setImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
+  var prevPostObject = useSelector(state => state.postsReducer)
 
-  const pullUpCamera = async () => {};
+  const finsihCreatePost3 = async () => {
+    var user = await AsyncStorage.getItem('user');
+    user = JSON.parse(user);
+    const data = {
+      localImageUrl: image || '',
+      user : user,
+
+    };
+    const newPostObject = {
+      ...prevPostObject,
+      ...data,
+    }
+
+    // dispatch(addToPostObject(data));
+    // console.log(postObject)
+    console.log("================================================================")
+    console.log ("newPostObject", newPostObject)
+    dispatch(createPosts(newPostObject));
+    navigation.navigate('Explore');
+  };
 
   const pickImage = async () => {
     if (Platform.OS === 'android') {
@@ -49,7 +70,7 @@ export default function CreatePost3({navigation}) {
     if (!result.cancelled) {
       setImage(result.uri);
     }
-    setModalVisible(false)
+    setModalVisible(false);
   };
 
   const openCamera = async () => {
@@ -60,7 +81,7 @@ export default function CreatePost3({navigation}) {
     }
     const result = await ImagePicker.launchCameraAsync();
     setImage(result.uri);
-    setModalVisible(false)
+    setModalVisible(false);
   };
 
   const ButtonModalItems = [
@@ -127,7 +148,7 @@ export default function CreatePost3({navigation}) {
               borderRadius: 5,
               marginTop: 30,
               height: 250,
-              spectRatio: 1,
+             
             }}
           />
         )}
@@ -149,7 +170,11 @@ export default function CreatePost3({navigation}) {
             </Text>
           </TouchableOpacity>
         )}
-        <ButtonModal visible={modalVisible} items={ButtonModalItems}  onCancel = {  () => setModalVisible(false)}/>
+        <ButtonModal
+          visible={modalVisible}
+          items={ButtonModalItems}
+          onCancel={() => setModalVisible(false)}
+        />
         <View
           style={{
             flex: 1,
@@ -159,7 +184,7 @@ export default function CreatePost3({navigation}) {
           }}>
           <NormalButton
             text="Post"
-            onPress={() => (image !== null ? post() : null)}
+            onPress={() => (image !== null ? finsihCreatePost3() : null)}
             inActive={image !== null}
             hollow
             moreStyles={{
@@ -172,8 +197,7 @@ export default function CreatePost3({navigation}) {
   );
 }
 
-const ButtonModal = ({visible, items ,onCancel}) => {
- 
+const ButtonModal = ({visible, items, onCancel}) => {
   return (
     <Modal visible={visible} transparent animationType="slide">
       <ModalBarTop />
@@ -186,7 +210,7 @@ const ButtonModal = ({visible, items ,onCancel}) => {
           style={{
             fontSize: 20,
             fontWeight: 'bold',
-            PaddingVertical: 10,
+
             marginBottom: 20,
             marginTop: 14,
             marginLeft: 16,
@@ -222,7 +246,7 @@ const ButtonModal = ({visible, items ,onCancel}) => {
             inActive={true}
             hollow={false}
             moreStyles={{
-              
+              marginBottom: 40,
             }}
           />
         </View>

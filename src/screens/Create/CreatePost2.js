@@ -17,6 +17,7 @@ import {NormalTextField} from '../../components/TextField';
 import AppHeader from '../../components/Utility/AppHeader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import {addToPostObject} from '..//../store//posts//posts';
 import * as Location from 'expo-location';
 
 export default function CreatePost2({navigation, route}) {
@@ -29,16 +30,32 @@ export default function CreatePost2({navigation, route}) {
   const [buttonActive, setButtonActive] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
-  const [startDateTime , setStartDateTime] = useState(null);
-  const [endDateTime , setEndDateTime] = useState(null);
+  const [startDateTime, setStartDateTime] = useState(null);
+  const [endDateTime, setEndDateTime] = useState(null);
   const [startTime, setStartTime] = useState('00:00');
   const [endTime, setEndTime] = useState('00:00');
   const [location, setLocation] = useState(null);
   const [addressResult, setAddressResult] = useState(null);
+  const [screeningQuestion , setScreeningQuestion] = useState(null);
 
   // const {headline} = route.params;
   // console.log('headline', headline);
   // const startTime = new Date();
+
+  const finishCreatePost2 = () => {
+    const data = {
+      description: description || '',
+      startDateTime: startDateTime || '',
+      endDateTime: endDateTime  || '',
+      startTime: startTime || '',
+      endTime: endTime || '', 
+      location: location || {},
+      addressResult: addressResult || '',
+      screeningQuestion: screeningQuestion || '',
+    };
+    dispatch(addToPostObject(data));
+    navigation.navigate('CreatePost3')
+  }
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -57,8 +74,6 @@ export default function CreatePost2({navigation, route}) {
   };
 
   const handleConfirm = date => {
-
-   
     const hoursAndMinutes = getHoursandMinutes(date);
     setStartDateTime(date);
     setStartTime(hoursAndMinutes);
@@ -66,7 +81,7 @@ export default function CreatePost2({navigation, route}) {
   };
 
   const handleEndConfirm = date => {
-    if(date <= startDateTime){
+    if (date <= startDateTime) {
       Alert.alert('Error', 'End time must be after start time');
       return;
     }
@@ -105,7 +120,7 @@ export default function CreatePost2({navigation, route}) {
   };
 
   const getLocationAndTurnToAdress = async () => {
-    console.log('getting location');
+    // console.log('getting location');
 
     let {status} = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -115,12 +130,12 @@ export default function CreatePost2({navigation, route}) {
     }
 
     let locationResult = await Location.getCurrentPositionAsync({});
-    console.log('location', locationResult);
+    // console.log('location', locationResult);
     setLocation(locationResult);
     let addressResult = await Location.reverseGeocodeAsync(
       locationResult.coords,
     );
-    console.log('addressResult', addressResult);
+    // console.log('addressResult', addressResult);
     setAddressResult(String(addressResult[0].name));
   };
 
@@ -240,13 +255,15 @@ export default function CreatePost2({navigation, route}) {
               </Text>
             </TouchableOpacity>
           </View>
-
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="time"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-          />
+          
+          {isDatePickerVisible == true && (
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="time"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+            />
+          )}
 
           <DateTimePickerModal
             isVisible={isEndTimePickerVisible}
@@ -263,7 +280,7 @@ export default function CreatePost2({navigation, route}) {
           <NormalTextField
             placeholder="Add a question"
             moreStyles={{marginTop: -28}}
-            onChangeText={text => setDescription(text)}
+            onChangeText={text => setScreeningQuestion(text)}
           />
         </View>
 
@@ -277,7 +294,7 @@ export default function CreatePost2({navigation, route}) {
           <NormalButton
             text="Next"
             onPress={() =>
-              buttonActive ? navigation.navigate('CreatePost3') : null
+              buttonActive ? finishCreatePost2() : null
             }
             inActive={buttonActive}
             hollow

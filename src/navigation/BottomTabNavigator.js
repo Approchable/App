@@ -77,7 +77,7 @@ export default function BottomTabNavigator() {
 }
 
 const TabButton = props => {
-  console.log('props', props);
+ 
   const {item, onPress} = props;
   const focused = props.focused;
   const viewRef = useRef(null);
@@ -114,7 +114,7 @@ const TabButton = props => {
 };
 
 const getColor = (route, focused) => {
-  console.log('  route', route);
+ 
   if (route === 'Create') {
     return '#44BFBA';
   } else {
