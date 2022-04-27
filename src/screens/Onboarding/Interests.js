@@ -22,7 +22,7 @@ import {UserContext, UserProvider} from '../../context/UserContext';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import {useDispatch} from 'react-redux';
-import {login} from '../../redux/actions';
+import {login} from '../../store/actions';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -43,24 +43,27 @@ export default function Interests({navigation, route}) {
 
   const width = (Dimensions.get('window').width - 36) / 3.5;
   const CategorieArr = [
-    'Self development',
-    'Creativity',
-    'Music',
-    'Sports',
-    ' Games',
-    'Food',
-    'Photography',
-    'Dancing',
-    'Lofi Music',
-    'Pizza',
-    'Coding',
-    'Coffee',
+    'adventure & exploration',
+    'arts & culture',
+    'career & business',
+    'creativity',
+    'entertainment',
+    'food & drink',
+    'health & fitness',
+    'night out',
+    'outdoors',
+    'pets & animals',
+    'religion & spirituality',
+    'studying & co-work',
+    'sports & recreation',
+    'technology & science',
   ];
   const [categories, setCategories] = useContext(CategorieContext);
 
   const handlePressCategories = newVal => {
     console.log(newVal);
-    console.log(categories);
+    console.log("categories",categories);
+    
 
     setCategories([...categories, newVal]);
   };
@@ -78,6 +81,7 @@ export default function Interests({navigation, route}) {
   };
 
   const handleSavingUser = async () => {
+    console.log("categoriessssss" , categories)
     // save user interest and expo token to firebase as well
     registerForPushNotificationsAsync().then(token => {
       setExpoPushToken(token);
@@ -105,22 +109,10 @@ export default function Interests({navigation, route}) {
         console.log(finalResult, 'google');
         finalId = finalResult.id;
       }
-
       finalResult['interests'] = categories;
 
-      dispatch(login(finalResult));
-
-      // AsyncStorage.setItem('user', JSON.stringify(finalResult))
-      //   .then(() => {
-      //     console.log('user saved');
-      //     setUser(finalResult);
-      //     writeUserData(finalId, finalResult);
-      //   })
-      //   .catch(err => {
-      //     //handle error with UI error
-      //     console.log('error saving user', err);
-      //     setUser(null);
-      //   });
+      navigation.navigate('Waitlist' , finalResult);
+ 
     });
   };
   useEffect(() => {
@@ -175,11 +167,11 @@ export default function Interests({navigation, route}) {
         }}>
         <ScrollView style={{marginBottom: -15}}>
           <View style={{flexWrap: 'wrap', flexDirection: 'row'}}>
-            {CategorieArr.map((person, index) => (
+            {CategorieArr.map((item, index) => (
               <CategoryItem
-                content={person}
+                content={item}
                 width={width}
-                // onPress={() => handlePressCategories(person)}
+                onPress={() => handlePressCategories(item)}
               />
             ))}
           </View>

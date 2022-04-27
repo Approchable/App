@@ -6,10 +6,11 @@ const Welcome = createNativeStackNavigator();
 
 export default function WelcomeStack() {
   return (
-    <Welcome.Navigator initialRouteName="Sucess">
+    <Welcome.Navigator initialRouteName="Explore">
       <Welcome.Screen
         name="Sucess"
-        component={Sucess}r
+        component={Sucess}
+        r
         options={{
           headerShown: false,
         }}

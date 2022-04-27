@@ -11,13 +11,14 @@ import {
 
 import {useCallback, useState, useContext, useEffect} from 'react';
 import {CategorieContext} from '../..//src/context/CategorieContext';
-function CategoryItem({content, position, onPress , width}) {
+function CategoryItem({content, position, onPress, width, moreStyles}) {
   const [categories, setCategories] = useContext(CategorieContext);
   const [enabled, setEnabled] = useState(false);
   const [size, onLayout] = useComponentSize();
 
   // hollow ? '#44BFBA' : 'white',
   const onPressHandler = () => {
+    onPress() 
     setEnabled(!enabled);
   };
 
@@ -32,7 +33,7 @@ function CategoryItem({content, position, onPress , width}) {
   };
 
   useEffect(() => {
-    handleCategories()
+    handleCategories();
   }, [enabled]);
   return (
     <TouchableOpacity
@@ -42,8 +43,18 @@ function CategoryItem({content, position, onPress , width}) {
       <View
         style={
           enabled
-            ? {...styles.selectedContainer , width:width, height:width}
-            : {...styles.unSelectedContainer ,  width:width, height:width}
+            ? {
+                ...styles.selectedContainer,
+                width: width,
+                height: width,
+                ...moreStyles,
+              }
+            : {
+                ...styles.unSelectedContainer,
+                width: width,
+                height: width,
+                ...moreStyles,
+              }
         }
         onLayout={onLayout}>
         <Text style={styles.unselectedText}> {content} </Text>
@@ -68,7 +79,6 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
     backgroundColor: 'rgba(68, 191, 186, 0.3)',
-
     justifyContent: 'center',
     margin: 8,
     borderRadius: 60,
