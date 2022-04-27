@@ -8,17 +8,12 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import Sucess from './src/screens/Onboarding/Sucess';
 import {CategoryProvider} from './src/context/CategorieContext';
-import AppLoading from 'expo-app-loading';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useState, useContext} from 'react';
 import {UserContext, UserProvider} from './src/context/UserContext';
 import {Provider, useSelector} from 'react-redux';
 import AppHeader from './src/components/Utility/AppHeader';
 import {store} from './src/store/index';
-import Waitlist from './src/screens/Waitlist/Waitlist';
-import CreatePost2 from './src/screens/Create/CreatePost2';
-import CreatePost3 from './src/screens/Create/CreatePost3';
-import {testStorage} from './FirebaseStorage';
+import Explore from './src/screens/Explore/Explore.js';
+
 
 
 export default function App() {
@@ -32,6 +27,7 @@ export default function App() {
             <SafeAreaView style={{...styles.container, height: 40}}>
               <View style={{...styles.container}}>
                 <RootNavigator />
+                {/* <Explore /> */}
               </View>
             </SafeAreaView>
           </SafeAreaProvider>

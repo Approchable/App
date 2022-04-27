@@ -21,6 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
+
 export default function CreatePost3({navigation}) {
   const [buttonActive, setButtonActive] = useState(false);
   const [image, setImage] = useState(null);
@@ -32,6 +33,7 @@ export default function CreatePost3({navigation}) {
     var user = await AsyncStorage.getItem('user');
     user = JSON.parse(user);
     const data = {
+      
       localImageUrl: image || '',
       user : user,
 

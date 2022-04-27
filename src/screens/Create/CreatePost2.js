@@ -26,36 +26,43 @@ export default function CreatePost2({navigation, route}) {
 
   const dispatch = useDispatch();
 
+  const currenTime = new Date();
+
   const [description, setDescription] = useState(null);
   const [buttonActive, setButtonActive] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
   const [startDateTime, setStartDateTime] = useState(null);
   const [endDateTime, setEndDateTime] = useState(null);
-  const [startTime, setStartTime] = useState('00:00');
-  const [endTime, setEndTime] = useState('00:00');
+  const [startTime, setStartTime] = useState("00:00");
+  const [endTime, setEndTime] = useState("00:00");
   const [location, setLocation] = useState(null);
   const [addressResult, setAddressResult] = useState(null);
-  const [screeningQuestion , setScreeningQuestion] = useState(null);
-
-  // const {headline} = route.params;
-  // console.log('headline', headline);
-  // const startTime = new Date();
+  const [screeningQuestion, setScreeningQuestion] = useState(null);
 
   const finishCreatePost2 = () => {
+    if (startTime == '00:00'){
+      Alert.alert('Please enter a start time');
+      return
+    }
+    if (addressResult == null || addressResult == undefined || addressResult == ''){
+      Alert.alert('Please enter a location');
+      return
+    }
+    
     const data = {
       description: description || '',
-      startDateTime: startDateTime || '',
-      endDateTime: endDateTime  || '',
-      startTime: startTime || '',
-      endTime: endTime || '', 
+      startDateTime: startDateTime || Date.now(),
+      endDateTime: endDateTime || '',
+      startTime: startTime ,
+      endTime: endTime || '',
       location: location || {},
       addressResult: addressResult || '',
       screeningQuestion: screeningQuestion || '',
     };
     dispatch(addToPostObject(data));
-    navigation.navigate('CreatePost3')
-  }
+    navigation.navigate('CreatePost3');
+  };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -97,26 +104,52 @@ export default function CreatePost2({navigation, route}) {
     if (date.getHours() < 10) {
       hoursAndMinutes = '0' + hoursAndMinutes;
     }
+    if (date.getMinutes() < 10) {
+      hoursAndMinutes = hoursAndMinutes + '0';
+    }
+
     console.log('Time with hours and minutes', hoursAndMinutes);
     return hoursAndMinutes;
   };
 
   useEffect(() => {
-    _checkDescription();
+    _isButtonActiveController();
     getLocationAndTurnToAdress();
+    
   }, [description]);
 
-  const _checkDescription = () => {
-    console.log('Checking description', description);
+  const isDescriptionComplete = () => {
     if (
+      description === '' ||
       description === null ||
-      description === undefined ||
-      description === ''
+      description === undefined
     ) {
-      setButtonActive(false);
-    } else {
-      setButtonActive(true);
+      return false;
     }
+    return true;
+  };
+
+  const isLocationComplete = () => {
+    if (addressResult === null || addressResult === undefined || addressResult === '') {
+      return false;
+    }
+    return true;
+  };
+
+  const isStartTimeComplete = () => {
+    if (startTime === null || startTime === undefined || startTime === '00:00') {
+      return false;
+    }
+    return true;
+  }
+  const _isButtonActiveController = () => {
+    if (isDescriptionComplete() && isLocationComplete()) {
+     
+      setButtonActive(true);
+    }else{
+      setButtonActive(false);
+    }
+   
   };
 
   const getLocationAndTurnToAdress = async () => {
@@ -139,28 +172,6 @@ export default function CreatePost2({navigation, route}) {
     setAddressResult(String(addressResult[0].name));
   };
 
-  const closeCreateTest = navigation => {
-    postHangout();
-    dispatch(NaviagteOutOfCreate());
-    navigation.navigate('Explore');
-  };
-  const postHangout = async () => {
-    var user = await AsyncStorage.getItem('user');
-    user = JSON.parse(user);
-    const postObject = {
-      headline: headline || null,
-      description: description || null,
-      time: new Date().toLocaleString() || null,
-      userId: user.id || null,
-      userName: user.name || null,
-      userImage: user.image || null,
-      userEmail: user.email || null,
-    };
-    dispatch(createPosts(postObject));
-    console.log('PostObject', postObject);
-    console.log('Posting hangout...');
-  };
-
   //NaviagteOutOfCreate
 
   return (
@@ -171,7 +182,7 @@ export default function CreatePost2({navigation, route}) {
             content="Your hangout details"
             moreStyles={{marginBottom: 10}}
           />
-          <RegularBoldText content="Describe your hangout" />
+          <RegularBoldText content="Describe your hangout*" />
           <NormalTextField
             placeholder="Required"
             moreStyles={{marginTop: -28}}
@@ -255,7 +266,7 @@ export default function CreatePost2({navigation, route}) {
               </Text>
             </TouchableOpacity>
           </View>
-          
+
           {isDatePickerVisible == true && (
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
@@ -293,9 +304,7 @@ export default function CreatePost2({navigation, route}) {
           }}>
           <NormalButton
             text="Next"
-            onPress={() =>
-              buttonActive ? finishCreatePost2() : null
-            }
+            onPress={() => (buttonActive ? finishCreatePost2() : null)}
             inActive={buttonActive}
             hollow
             moreStyles={{

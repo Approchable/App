@@ -7,6 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
   FlatList,
+  RefreshControl,
 } from 'react-native';
 import {RegularBoldText} from '../../components/Texts';
 import {NormalButton} from '../../components/Buttons';
@@ -25,6 +26,17 @@ function Explore() {
   var posts = useSelector(state => state.GetPostsReducer.posts);
   var loading = useSelector(state => state.GetPostsReducer.loading);
   var error = useSelector(state => state.GetPostsReducer.error);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    _getPosts();
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
   const dispatch = useDispatch();
 
   console.log('===========================');
@@ -38,6 +50,7 @@ function Explore() {
 
   useEffect(() => {
     _getPosts();
+    console.log(posts);
   }, []);
 
   const postCount = 0;
@@ -61,11 +74,24 @@ function Explore() {
           <FlatList
             data={posts}
             keyExtractor={item => item.id}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
             renderItem={({item}) => (
               <Post
-                userName={item.userName}
+                userName={item.user.name}
                 title={item.headline}
                 description={item.description}
+                imageUrl={item.imageUrl}
+                location={item.location}
+                screeningQuestion={item.screeningQuestion || ''}
+                startDateTime={item.startDateTime}
+                endDateTime={item.endDateTime}
+                addressResult={item.addressResult}
+                profileImage={item.user.photoUrl}
+                onPress={() => {
+                  console.log('Pressing a post');
+                }}
               />
             )}
           />
