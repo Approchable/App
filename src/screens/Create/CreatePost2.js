@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {NormalButton, TextButton} from '../../components/Buttons';
@@ -18,6 +19,7 @@ import AppHeader from '../../components/Utility/AppHeader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as Location from 'expo-location';
+import MyStatusBar from '../../components/MyStatusBar';
 
 export default function CreatePost2({navigation, route}) {
   const selectedStartTime = 'start';
@@ -149,145 +151,149 @@ export default function CreatePost2({navigation, route}) {
   //NaviagteOutOfCreate
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.container}>
-        <View style={{marginHorizontal: 16, flex: 0.5, marginTop: 40}}>
-          <HeaderText
-            content="Your hangout details"
-            moreStyles={{marginBottom: 10}}
-          />
-          <RegularBoldText content="Describe your hangout" />
-          <NormalTextField
-            placeholder="Required"
-            moreStyles={{marginTop: -28}}
-            onChangeText={text => setDescription(text)}
-          />
-          <RegularBoldText content="Location" />
-          {addressResult === null ? (
-            <ActivityIndicator size="large" color="#44BFBA" />
-          ) : (
+    <SafeAreaView style={styles.container}>
+      <MyStatusBar backgroundColor="white" />
+      <AppHeader moreStyles={{height: 50 }} />
+      <ScrollView style={styles.container}>
+        <View style={styles.container}>
+          <View style={{marginHorizontal: 16, flex: 0.5, marginTop: 40}}>
+            <HeaderText
+              content="Your hangout details"
+              moreStyles={{marginBottom: 10}}
+            />
+            <RegularBoldText content="Describe your hangout" />
             <NormalTextField
               placeholder="Required"
-              value={addressResult}
               moreStyles={{marginTop: -28}}
-              onChangeText={text => setAddressResult(text)}
+              onChangeText={text => setDescription(text)}
             />
-          )}
+            <RegularBoldText content="Location" />
+            {addressResult === null ? (
+              <ActivityIndicator size="large" color="#44BFBA" />
+            ) : (
+              <NormalTextField
+                placeholder="Required"
+                value={addressResult}
+                moreStyles={{marginTop: -28}}
+                onChangeText={text => setAddressResult(text)}
+              />
+            )}
 
-          <RegularBoldText
-            content="Time of hangout*"
-            moreStyles={{marginTop: 15, marginBottom: 10}}
-          />
-          <View
-            style={{
-              flexDirection: 'row',
-            }}>
-            <TouchableOpacity
-              onPress={() => showDatePicker()}
-              style={{
-                width: 66,
-                height: 44,
-                backgroundColor: 'white',
-                borderColor: '#ECEEF2',
-                borderWidth: 1,
-                borderRadius: 10,
-                justifyContent: 'center',
-              }}>
-              <Text
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  fontSize: 14,
-                  color: '#030E01',
-                  fontWeight: 'bold',
-                }}>
-                {startTime}
-              </Text>
-            </TouchableOpacity>
-
+            <RegularBoldText
+              content="Time of hangout*"
+              moreStyles={{marginTop: 15, marginBottom: 10}}
+            />
             <View
               style={{
-                marginHorizontal: 15,
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#696969',
+                flexDirection: 'row',
               }}>
-              <Text>-</Text>
+              <TouchableOpacity
+                onPress={() => showDatePicker()}
+                style={{
+                  width: 66,
+                  height: 44,
+                  backgroundColor: 'white',
+                  borderColor: '#ECEEF2',
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    fontSize: 14,
+                    color: '#030E01',
+                    fontWeight: 'bold',
+                  }}>
+                  {startTime}
+                </Text>
+              </TouchableOpacity>
+
+              <View
+                style={{
+                  marginHorizontal: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#696969',
+                }}>
+                <Text>-</Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => showEndTimePicker()}
+                style={{
+                  width: 66,
+                  height: 44,
+                  backgroundColor: 'white',
+                  borderColor: '#ECEEF2',
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    fontSize: 14,
+                    color: '#030E01',
+                    fontWeight: 'bold',
+                  }}>
+                  {endTime}
+                </Text>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              onPress={() => showEndTimePicker()}
-              style={{
-                width: 66,
-                height: 44,
-                backgroundColor: 'white',
-                borderColor: '#ECEEF2',
-                borderWidth: 1,
-                borderRadius: 10,
-                justifyContent: 'center',
-              }}>
-              <Text
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  fontSize: 14,
-                  color: '#030E01',
-                  fontWeight: 'bold',
-                }}>
-                {endTime}
-              </Text>
-            </TouchableOpacity>
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="time"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+            />
+
+            <DateTimePickerModal
+              isVisible={isEndTimePickerVisible}
+              mode="time"
+              onConfirm={handleEndConfirm}
+              onCancel={hideEndDatePicker}
+            />
+
+            <RegularBoldText content="Screening question (optional):" />
+            <RegularText
+              content="Ask anything that you want to require  potential connections to answer. "
+              moreStyles={{marginTop: -20}}
+            />
+            <NormalTextField
+              placeholder="Add a question"
+              moreStyles={{marginTop: -28}}
+              onChangeText={text => setDescription(text)}
+            />
           </View>
 
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="time"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-          />
-
-          <DateTimePickerModal
-            isVisible={isEndTimePickerVisible}
-            mode="time"
-            onConfirm={handleEndConfirm}
-            onCancel={hideEndDatePicker}
-          />
-
-          <RegularBoldText content="Screening question (optional):" />
-          <RegularText
-            content="Ask anything that you want to require  potential connections to answer. "
-            moreStyles={{marginTop: -20}}
-          />
-          <NormalTextField
-            placeholder="Add a question"
-            moreStyles={{marginTop: -28}}
-            onChangeText={text => setDescription(text)}
-          />
+          <View
+            style={{
+              flex: 1,
+              marginHorizontal: 16,
+              justifyContent: 'flex-end',
+              marginBottom: 20,
+            }}>
+            <NormalButton
+              text="Next"
+              onPress={() =>
+                buttonActive ? navigation.navigate('CreatePost3') : null
+              }
+              inActive={buttonActive}
+              hollow
+              moreStyles={{
+                marginTop: 20,
+              }}
+            />
+          </View>
         </View>
-
-        <View
-          style={{
-            flex: 1,
-            marginHorizontal: 16,
-            justifyContent: 'flex-end',
-            marginBottom: 20,
-          }}>
-          <NormalButton
-            text="Next"
-            onPress={() =>
-              buttonActive ? navigation.navigate('CreatePost3') : null
-            }
-            inActive={buttonActive}
-            hollow
-            moreStyles={{
-              marginTop: 20,
-            }}
-          />
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

@@ -8,6 +8,9 @@ import {Icons, Icon} from '../components/Utility/Icons';
 import React, {useEffect, useRef} from 'react';
 import * as Animatable from 'react-native-animatable';
 import CreateStack from './CreateNavigator';
+import ChatStack from './ChatStackNavigation/ChatStackNavigator'
+import Chat from '../screens/Chat/Chat';
+import Connections from '../screens/Chat/Connections';
 
 const TabArr = [
   {
@@ -25,6 +28,14 @@ const TabArr = [
     activeIcon: 'pluscircle',
     inActiveIcon: 'pluscircle',
     component: CreateStack,
+  },
+  {
+    route: 'Connections',
+    label: 'Connections',
+    type: Icons.FontAwesome, //TODO: we need to replace the icon with actual in figma
+    activeIcon: 'comments',
+    inActiveIcon: 'comments',
+    component: Connections,
   },
   {
     route: 'Profile',
@@ -59,7 +70,7 @@ export default function BottomTabNavigator() {
         headerShown: false,
       }}>
       
-      {TabArr.map((item, index) => {
+      {TabArr.map((item, index, route) => {
         return (
           <Tab.Screen
             key={index}

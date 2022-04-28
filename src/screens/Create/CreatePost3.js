@@ -16,6 +16,8 @@ import * as ImagePicker from 'expo-image-picker';
 import {NaviagteOutOfCreate, createPosts} from '../../store/actions';
 import {Camera} from 'expo-camera';
 import {useDispatch} from 'react-redux';
+import MyStatusBar from '../../components/MyStatusBar';
+import AppHeader from '../../components/Utility/AppHeader';
 
 
 
@@ -86,89 +88,93 @@ export default function CreatePost3({navigation}) {
     navigation.navigate('Explore');
   };
   return (
-    <ScrollView style={styles.container}>
-      <View style={{marginHorizontal: 16}}>
-        <HeaderText content="Add to your post" />
+    <SafeAreaView style={styles.container}>
+      <MyStatusBar backgroundColor="white" />
+      <AppHeader moreStyles={{height: 50 }} />
+      <ScrollView style={styles.container}>
+        <View style={{marginHorizontal: 16}}>
+          <HeaderText content="Add to your post" />
 
-        {image == null && (
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            style={{
-              backgroundColor: 'white',
-              justifyContent: 'center',
-              borderWidth: 1,
-              borderStyle: 'dashed',
-              borderColor: '#989898',
-              marginTop: 30,
-              height: 250,
-            }}>
-            <Text
+          {image == null && (
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
               style={{
-                textAlign: 'center',
-                alignItems: 'center',
+                backgroundColor: 'white',
                 justifyContent: 'center',
-
-                fontWeight: 'bold',
-                fontSize: 16,
-                color: '#44BFBA',
+                borderWidth: 1,
+                borderStyle: 'dashed',
+                borderColor: '#989898',
+                marginTop: 30,
+                height: 250,
               }}>
-              Add Photo
-            </Text>
-          </TouchableOpacity>
-        )}
+              <Text
+                style={{
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
 
-        {image && (
-          <Image
-            source={{uri: image}}
+                  fontWeight: 'bold',
+                  fontSize: 16,
+                  color: '#44BFBA',
+                }}>
+                Add Photo
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {image && (
+            <Image
+              source={{uri: image}}
+              style={{
+                flex: 1,
+                backgroundColor: 'white',
+                justifyContent: 'center',
+                borderRadius: 5,
+                marginTop: 30,
+                height: 250,
+                spectRatio: 1,
+              }}
+            />
+          )}
+
+          {image && (
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Text
+                style={{
+                  marginTop: 30,
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+
+                  fontWeight: 'bold',
+                  fontSize: 16,
+                  color: '#44BFBA',
+                }}>
+                Change Photo
+              </Text>
+            </TouchableOpacity>
+          )}
+          <ButtonModal visible={modalVisible} items={ButtonModalItems}  onCancel = {  () => setModalVisible(false)}/>
+          <View
             style={{
               flex: 1,
-              backgroundColor: 'white',
-              justifyContent: 'center',
-              borderRadius: 5,
-              marginTop: 30,
-              height: 250,
-              spectRatio: 1,
-            }}
-          />
-        )}
 
-        {image && (
-          <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Text
-              style={{
-                marginTop: 30,
-                textAlign: 'center',
-                alignItems: 'center',
-                justifyContent: 'center',
-
-                fontWeight: 'bold',
-                fontSize: 16,
-                color: '#44BFBA',
-              }}>
-              Change Photo
-            </Text>
-          </TouchableOpacity>
-        )}
-        <ButtonModal visible={modalVisible} items={ButtonModalItems}  onCancel = {  () => setModalVisible(false)}/>
-        <View
-          style={{
-            flex: 1,
-
-            justifyContent: 'flex-end',
-            marginBottom: 20,
-          }}>
-          <NormalButton
-            text="Post"
-            onPress={() => (image !== null ? post() : null)}
-            inActive={image !== null}
-            hollow
-            moreStyles={{
-              marginTop: 20,
-            }}
-          />
+              justifyContent: 'flex-end',
+              marginBottom: 20,
+            }}>
+            <NormalButton
+              text="Post"
+              onPress={() => (image !== null ? post() : null)}
+              inActive={image !== null}
+              hollow
+              moreStyles={{
+                marginTop: 20,
+              }}
+            />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

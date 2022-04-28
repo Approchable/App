@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import {NormalButton} from '../../components/Buttons';
 import Center from '../../components/Utility/Center';
@@ -23,6 +24,7 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import {useDispatch} from 'react-redux';
 import {login} from '../../store/actions';
+import MyStatusBar from '../../components/MyStatusBar';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -141,7 +143,9 @@ export default function Interests({navigation, route}) {
   }, [categories]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <MyStatusBar backgroundColor="white" />
+      <View style={styles.container}>
       <View
         style={{
           marginHorizontal: 16,
@@ -188,7 +192,9 @@ export default function Interests({navigation, route}) {
           moreStyles={{marginTop: 40}}
         />
       </View>
-    </View>
+      </View>
+    </SafeAreaView>
+   
   );
 }
 

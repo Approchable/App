@@ -19,6 +19,7 @@ import AppHeader from '../../components/Utility/AppHeader';
 import {useSelector} from 'react-redux';
 import {getPosts} from '../../store/actions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MyStatusBar from '../../components/MyStatusBar';
 //GetPostsReducer
 function Explore() {
   var posts = useSelector(state => state.GetPostsReducer.posts);
@@ -56,6 +57,9 @@ function Explore() {
   } else if (posts.length > 0 && loading == false) {
     return (
       <View style={styles.container}>
+        <MyStatusBar backgroundColor="white" />
+      <AppHeader moreStyles={{flex: 0.1 }} />
+        
         {/* <ScrollView>
        
         <Post
