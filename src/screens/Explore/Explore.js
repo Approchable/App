@@ -70,19 +70,17 @@ function Explore() {
   } else if (posts.length > 0 && loading == false) {
     return (
       <View style={styles.container}>
-        <MyStatusBar backgroundColor="white" />
-      <AppHeader moreStyles={{flex: 0.1 }} />
-        
-        {/* <ScrollView>
-       
-        <Post
-          userName={Postdata.userName}
-          title={Postdata.title}
-          description={Postdata.description}
-        />
-      </ScrollView> */}
-        <View style={{}}>
+        {/* <MyStatusBar backgroundColor="white" />
+        <AppHeader moreStyles={{flex: 0.1}} /> */}
+        <MyStatusBar backgroundColor="#F6F6F6" />
+        <AppHeader moreStyles={{flex: 0.1}} />
+        <View style={{flex : 1 , borderRadius: 16 ,}}>
           <FlatList
+          style = {{
+            marginTop: 0,
+            backgroundColor: "white",
+            borderRadius: 16,
+          }}
             data={posts}
             keyExtractor={item => item.id}
             refreshControl={
@@ -117,7 +115,7 @@ function Explore() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F6F6F6',
   },
 });
 export default Explore;
@@ -139,6 +137,7 @@ function NoPost() {
           marginTop: 90,
           marginHorizontal: 16,
           justifyContent: 'center',
+
 
           flex: 1,
           alignItems: 'center',

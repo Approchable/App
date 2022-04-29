@@ -28,6 +28,7 @@ export default function Post({
         profileImage={profileImage}
         moreStyles={{
           marginBottom: 8,
+          marginTop: 16,
         }}
       />
       {/* <PostUserName userName={userName} /> */}
@@ -315,9 +316,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   postProfileImage: {
-    height: 40,
-    width: 40,
-    borderRadius: 20,
+    height: 52,
+    width: 52,
+    borderRadius: 25.5,
     borderWidth: 0,
   },
   PostImageView: {},

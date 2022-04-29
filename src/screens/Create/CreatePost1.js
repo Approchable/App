@@ -77,7 +77,7 @@ export default function CreatePost1({navigation}) {
   const width = (Dimensions.get('window').width - 36) / 3.5;
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1 , backgroundColor: 'white'}}>
       <MyStatusBar backgroundColor="white" />
       <AppHeader moreStyles={{height: 50}} />
       <ScrollView>
@@ -89,6 +89,7 @@ export default function CreatePost1({navigation}) {
               placeholder="e.g. Visit the Satatue of Liberty (Required)"
               moreStyles={{marginTop: -28}}
               onChangeText={text => setHeadline(text)}
+              autoFocus = {false}
             />
 
             <RegularBoldText

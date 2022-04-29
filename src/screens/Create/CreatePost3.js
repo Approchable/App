@@ -8,6 +8,7 @@ import {
   Platform,
   Alert,
   Modal,
+  SafeAreaView
 } from 'react-native';
 import {HeaderText, RegularText, RegularBoldText} from '../../components/Texts';
 import React, {useState, useEffect} from 'react';
@@ -15,39 +16,37 @@ import {NormalButton} from '../../components/Buttons';
 import * as ImagePicker from 'expo-image-picker';
 import {NaviagteOutOfCreate, createPosts} from '../../store/actions';
 import {Camera} from 'expo-camera';
-import {useDispatch , useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {addToPostObject} from '..//../store//posts//posts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyStatusBar from '../../components/MyStatusBar';
 import AppHeader from '../../components/Utility/AppHeader';
-
-
 
 export default function CreatePost3({navigation}) {
   const [buttonActive, setButtonActive] = useState(false);
   const [image, setImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
-  var prevPostObject = useSelector(state => state.postsReducer)
+  var prevPostObject = useSelector(state => state.postsReducer);
 
   const finsihCreatePost3 = async () => {
     var user = await AsyncStorage.getItem('user');
     user = JSON.parse(user);
     const data = {
-      
       localImageUrl: image || '',
-      user : user,
-
+      user: user,
     };
     const newPostObject = {
       ...prevPostObject,
       ...data,
-    }
+    };
 
     // dispatch(addToPostObject(data));
     // console.log(postObject)
-    console.log("================================================================")
-    console.log ("newPostObject", newPostObject)
+    console.log(
+      '================================================================',
+    );
+    console.log('newPostObject', newPostObject);
     dispatch(createPosts(newPostObject));
     navigation.navigate('Explore');
   };
@@ -112,7 +111,7 @@ export default function CreatePost3({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
-      <AppHeader moreStyles={{height: 50 }} />
+      <AppHeader moreStyles={{height: 50}} />
       <ScrollView style={styles.container}>
         <View style={{marginHorizontal: 16}}>
           <HeaderText content="Add to your post" />
@@ -144,20 +143,19 @@ export default function CreatePost3({navigation}) {
             </TouchableOpacity>
           )}
 
-              {image && (
-          <Image
-            source={{uri: image}}
-            style={{
-              flex: 1,
-              backgroundColor: 'white',
-              justifyContent: 'center',
-              borderRadius: 5,
-              marginTop: 30,
-              height: 250,
-             
-            }}
-          />
-        )}
+          {image && (
+            <Image
+              source={{uri: image}}
+              style={{
+                flex: 1,
+                backgroundColor: 'white',
+                justifyContent: 'center',
+                borderRadius: 5,
+                marginTop: 30,
+                height: 250,
+              }}
+            />
+          )}
 
           {image && (
             <Image
@@ -191,7 +189,11 @@ export default function CreatePost3({navigation}) {
               </Text>
             </TouchableOpacity>
           )}
-          <ButtonModal visible={modalVisible} items={ButtonModalItems}  onCancel = {  () => setModalVisible(false)}/>
+          <ButtonModal
+            visible={modalVisible}
+            items={ButtonModalItems}
+            onCancel={() => setModalVisible(false)}
+          />
           <View
             style={{
               flex: 1,

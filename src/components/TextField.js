@@ -1,13 +1,13 @@
 import {View, TextInput, StyleSheet} from 'react-native';
 import {useRef} from 'react';
 
-export function NormalTextField({placeholder, onChangeText, onDelete, value , moreStyles}) {
+export function NormalTextField({placeholder, onChangeText, onDelete, value , moreStyles , autoFocus}) {
   var ref = useRef('null');
   return (
     <View style={{...styles.textInputView, ...moreStyles}}>
       <TextInput
         ref={ref}
-        autoFocus={true}
+        autoFocus={autoFocus || true} 
         value={value}
         style={styles.textInput}
         placeholder={placeholder}

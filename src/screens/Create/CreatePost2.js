@@ -211,6 +211,7 @@ export default function CreatePost2({navigation, route}) {
                 value={addressResult}
                 moreStyles={{marginTop: -28}}
                 onChangeText={text => setAddressResult(text)}
+                autoFocus = {false}
               />
             )}
 
