@@ -8,6 +8,7 @@ import {NormalTextField} from '../../components/TextField';
 import AppHeader from '../../components/Utility/AppHeader';
 import CategoryItem from '../../components/CategoryItem';
 import {addToPostObject} from '..//../store//posts//posts';
+import MyStatusBar from '../../components/MyStatusBar';
 
 export default function CreatePost1({navigation}) {
   const dispatch = useDispatch();
@@ -33,17 +34,15 @@ export default function CreatePost1({navigation}) {
   ];
 
   const finishCreatePost1 = () => {
-
     const data = {
       headline: headline || '',
       selectedInterest: selectedInterest || [],
-
-    }
+    };
     dispatch(addToPostObject(data));
 
     navigation.navigate('CreatePost2', {
       headline: headline,
-    })
+    });
   };
 
   const _checkHeadline = () => {
@@ -62,7 +61,6 @@ export default function CreatePost1({navigation}) {
   });
 
   const handleSelectingItems = item => {
-   
     if (selectedInterest.includes(item)) {
       //remove item from selectedInterestes
       const result = selectedInterest.filter(word => word !== item);
@@ -79,44 +77,48 @@ export default function CreatePost1({navigation}) {
   const width = (Dimensions.get('window').width - 36) / 3.5;
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={{...styles.container}}>
-        <View style={{marginHorizontal: 16, flex: 0.5, marginTop: 40}}>
-          <HeaderText content="What do you want to do right now?" />
-          <RegularBoldText content="Headline" />
-          <NormalTextField
-            placeholder="e.g. Visit the Satatue of Liberty (Required)"
-            moreStyles={{marginTop: -28}}
-            onChangeText={text => setHeadline(text)}
-          />
+    <View style={{flex: 1}}>
+      <MyStatusBar backgroundColor="white" />
+      <AppHeader moreStyles={{height: 50}} />
+      <ScrollView>
+        <View style={{...styles.container}}>
+          <View style={{marginHorizontal: 20, flex: 0.5}}>
+            <HeaderText content="What do you want to do right now?" />
+            <RegularBoldText content="Headline" />
+            <NormalTextField
+              placeholder="e.g. Visit the Satatue of Liberty (Required)"
+              moreStyles={{marginTop: -28}}
+              onChangeText={text => setHeadline(text)}
+            />
 
-          <RegularBoldText
-            content="Which categories does this fall into?"
-            moreStyles={{marginTop: 20}}
-          />
-          <RegularText
-            content="This helps us connect you with the right people."
-            moreStyles={{marginTop: -30, fontSize: 14}}
-          />
+            <RegularBoldText
+              content="Which categories does this fall into?"
+              moreStyles={{marginTop: 20}}
+            />
+            <RegularText
+              content="This helps us connect you with the right people."
+              moreStyles={{marginTop: -30, fontSize: 14}}
+            />
 
-          <View
-            style={{flexWrap: 'wrap', flexDirection: 'row', marginLeft: -5}}>
-            {interests.map((item, index) => (
-              <CategoryItem
-                content={item}
-                width={width}
-                onPress={() => handleSelectingItems(item)}
-                moreStyles={{
-                  borderRadius: 5,
-                  height: 50,
-                  margin: 5,
-                  width: null,
-                  paddingHorizontal: 10,
-                  borderWidth: 1,
-                  borderColor: '#E5E5E5',
-                }}
-              />
-            ))}
+            <View
+              style={{flexWrap: 'wrap', flexDirection: 'row', marginLeft: -5}}>
+              {interests.map((item, index) => (
+                <CategoryItem
+                  content={item}
+                  width={width}
+                  onPress={() => handleSelectingItems(item)}
+                  moreStyles={{
+                    borderRadius: 5,
+                    height: 50,
+                    margin: 5,
+                    width: null,
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderColor: '#E5E5E5',
+                  }}
+                />
+              ))}
+            </View>
           </View>
         </View>
 
@@ -135,8 +137,8 @@ export default function CreatePost1({navigation}) {
             hollow
           />
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 

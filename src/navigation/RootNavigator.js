@@ -21,6 +21,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { verifyToken } from '../store/WaitList/Waitlist';
+import ChatStack from './ChatStackNavigation/ChatStackNavigator';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // import { createAppContainer, createSwitchNavigator } from '@react-navigation';
 
 function OnboardingNavigator({userToken , isCorrectToken}) {
@@ -42,10 +44,31 @@ function OnboardingNavigator({userToken , isCorrectToken}) {
 
 function AppNavigator() {
   var create = useSelector(state => state.NavReducer.create);
+  const AppStack = createNativeStackNavigator();
 
   return (
     <NavigationContainer>
-      {create === true ? <CreateStack /> : <BottomTabNavigator />}
+      {create === true ? 
+        <CreateStack /> 
+      : 
+      // <BottomTabNavigator />
+        <AppStack.Navigator initialRouteName='Main' >
+          <AppStack.Screen
+            name='Main'
+            component={BottomTabNavigator}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <AppStack.Screen
+            name='ChatRoom'
+            component={ChatStack}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </AppStack.Navigator>
+      }
     </NavigationContainer>
   );
 }

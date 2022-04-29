@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
-import {View, Text, StyleSheet, Alert, Platform} from 'react-native';
+import {View, Text, StyleSheet, Alert, Platform, SafeAreaView} from 'react-native';
 import {HeaderText, RegularText, SmallerText} from '../../components/Texts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SucessLogo from '../../assets/images/assets/SucessLogo.svg';
@@ -8,6 +8,7 @@ import {UserContext} from '../..//context/UserContext';
 import {deleteUserData} from '../../../firebase';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import MyStatusBar from '../../components/MyStatusBar';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -63,78 +64,84 @@ export default function Sucess({navigation}) {
 
   if (user !== undefined && user !== null) {
     return (
-      <View style={styles.container}>
-        <View style={{marginHorizontal: 18, marginTop: 20, flex: 1}}>
-          {/* <HeaderText content={user.givenName + " is now Approached!"} /> */}
-          <View style={{flex: 1}}>
-            <HeaderText content="Approached!" />
-            <SmallerText
-              content={
-                'Planet Approachable is excited to have you onboard, ' +
-                user?.givenName +
-                '. We will let you know once your pod is ready. Stay tuned by enabling notifications.'
-              }
-            />
-            <View style={{marginTop: -20}}>
-              <SmallerText content="Already done? Sit tight and we will approach you! " />
+      <SafeAreaView style={styles.container}>
+        <MyStatusBar backgroundColor="white" />
+        <View style={styles.container}>
+          <View style={{marginHorizontal: 18, marginTop: 20, flex: 1}}>
+            {/* <HeaderText content={user.givenName + " is now Approached!"} /> */}
+            <View style={{flex: 1}}>
+              <HeaderText content="Approached!" />
+              <SmallerText
+                content={
+                  'Planet Approachable is excited to have you onboard, ' +
+                  user?.givenName +
+                  '. We will let you know once your pod is ready. Stay tuned by enabling notifications.'
+                }
+              />
+              <View style={{marginTop: -20}}>
+                <SmallerText content="Already done? Sit tight and we will approach you! " />
+              </View>
+            </View>
+            <View
+              style={{
+                //height: 300,
+                flex: 1.5,
+                alignItems: 'center',
+              }}>
+              <SucessLogo witdth="100%" />
+            </View>
+
+            <View style={{flex: 0.3, marginBottom: 40}}>
+              {/* <NormalButton
+                text="Delete yourself!"
+                onPress={() => (buttonActive ? removeItemValue('user') : null)} //clode app
+                inActive={true}
+                hollow
+              /> */}
+              <NormalButton
+                text="Go to Explore"
+                onPress={() =>
+                  buttonActive ? navigation.navigate('Explore') : null
+                } //clode app
+                inActive={true}
+                hollow
+              />
             </View>
           </View>
-          <View
-            style={{
-              //height: 300,
-              flex: 1.5,
-              alignItems: 'center',
-            }}>
-            <SucessLogo witdth="100%" />
-          </View>
-
-          <View style={{flex: 0.3, marginBottom: 40}}>
-            {/* <NormalButton
-              text="Delete yourself!"
-              onPress={() => (buttonActive ? removeItemValue('user') : null)} //clode app
-              inActive={true}
-              hollow
-            /> */}
-            <NormalButton
-              text="Go to Explore"
-              onPress={() =>
-                buttonActive ? navigation.navigate('Explore') : null
-              } //clode app
-              inActive={true}
-              hollow
-            />
-          </View>
         </View>
-      </View>
+      </SafeAreaView>
     );
   } else {
     return (
-      <View style={styles.container}>
-        <View style={{marginHorizontal: 18, marginTop: 20, flex: 1}}>
-          {/* <HeaderText content={user.givenName + " is now Approached!"} /> */}
-          <View style={{flex: 1}}>
-            <HeaderText content="Signed Out!" />
-            <SmallerText content={'Restart the app to sign in again. '} />
+      <SafeAreaView style={styles.container}>
+        <MyStatusBar backgroundColor="white" />
+        <View style={styles.container}>
+          <View style={{marginHorizontal: 18, marginTop: 20, flex: 1}}>
+            {/* <HeaderText content={user.givenName + " is now Approached!"} /> */}
+            <View style={{flex: 1}}>
+              <HeaderText content="Signed Out!" />
+              <SmallerText content={'Restart the app to sign in again. '} />
+            </View>
+            {/* <View
+              style={{
+                //height: 300,
+                flex: 1.5,
+                alignItems: 'center',
+              }}>
+              <SucessLogo witdth="100%" />
+            </View> */}
+            {/* 
+            <View style={{flex: 0.3, marginBottom: 20}}>
+              <NormalButton
+                text="Clear info"
+                onPress={() => (buttonActive ? removeItemValue('user') : null)} //clode app
+                inActive={true}
+                hollow
+              />
+            </View> */}
           </View>
-          {/* <View
-            style={{
-              //height: 300,
-              flex: 1.5,
-              alignItems: 'center',
-            }}>
-            <SucessLogo witdth="100%" />
-          </View> */}
-          {/* 
-          <View style={{flex: 0.3, marginBottom: 20}}>
-            <NormalButton
-              text="Clear info"
-              onPress={() => (buttonActive ? removeItemValue('user') : null)} //clode app
-              inActive={true}
-              hollow
-            />
-          </View> */}
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 }

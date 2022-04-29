@@ -2,7 +2,7 @@ import {View, Text, StyleSheet, StatusBar, SafeAreaView} from 'react-native';
 import React from 'react';
 import NavigationLogo from '../../assets/images/assets/NavigationLogo.svg';
 
-export default function AppHeader({moreStyles}) {
+export default function   AppHeader({moreStyles}) {
   return (
     <View style={{...styles.container ,...moreStyles, }}>
       <View
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   container: {
     // backgroundColor: '#F6F6F6',
     backgroundColor: 'white',
-    flex:1,
+    // flex:1,
   
     
   },
