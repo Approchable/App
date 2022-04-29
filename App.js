@@ -22,11 +22,9 @@ export default function App() {
     <Provider store={store}>
       <UserProvider>
         <CategoryProvider>
-          {/* <MyStatusBar backgroundColor="white" /> */}
           <SafeAreaProvider>
             <View style={{...styles.container}}>
               <RootNavigator />
-              {/* <Explore /> */}
             </View>
           </SafeAreaProvider>
         </CategoryProvider>

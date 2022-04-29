@@ -135,7 +135,6 @@ export default function CreatePost3({navigation}) {
                   alignItems: 'center',
                   justifyContent: 'center',
 
-    
                   fontWeight: 'bold',
                   fontSize: 16,
                   color: '#44BFBA',

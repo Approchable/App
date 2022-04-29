@@ -71,8 +71,8 @@ function Explore() {
     return (
       <View style={styles.container}>
         <MyStatusBar backgroundColor="white" />
-        <AppHeader moreStyles={{flex: 0.1}} />
-
+      <AppHeader moreStyles={{flex: 0.1 }} />
+        
         {/* <ScrollView>
        
         <Post

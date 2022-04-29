@@ -188,7 +188,7 @@ export default function CreatePost2({navigation, route}) {
   return (
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
-      <AppHeader moreStyles={{height: 50}} />
+      <AppHeader moreStyles={{height: 50 }} />
       <ScrollView style={styles.container}>
         <View style={styles.container}>
           <View style={{marginHorizontal: 16, flex: 0.5, marginTop: 40}}>
@@ -197,7 +197,6 @@ export default function CreatePost2({navigation, route}) {
               moreStyles={{marginBottom: 10}}
             />
             <RegularBoldText content="Describe your hangout" />
-
             <NormalTextField
               placeholder="Required"
               moreStyles={{marginTop: -28}}
