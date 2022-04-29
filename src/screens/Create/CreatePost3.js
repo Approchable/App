@@ -202,7 +202,7 @@ export default function CreatePost3({navigation}) {
             }}>
             <NormalButton
               text="Post"
-              onPress={() => (image !== null ? post() : null)}
+              onPress={() => (image !== null ? finsihCreatePost3() : null)}
               inActive={image !== null}
               hollow
               moreStyles={{
