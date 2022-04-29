@@ -111,7 +111,7 @@ export default function CreatePost3({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
-      <AppHeader moreStyles={{height: 50}} />
+      {/* <AppHeader moreStyles={{height: 50}} /> */}
       <ScrollView style={styles.container}>
         <View style={{marginHorizontal: 16}}>
           <HeaderText content="Add to your post" />

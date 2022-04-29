@@ -79,7 +79,7 @@ export default function CreatePost1({navigation}) {
   return (
     <View style={{flex: 1 , backgroundColor: 'white'}}>
       <MyStatusBar backgroundColor="white" />
-      <AppHeader moreStyles={{height: 50}} />
+      {/* <AppHeader moreStyles={{height: 50}} /> */}
       <ScrollView>
         <View style={{...styles.container}}>
           <View style={{marginHorizontal: 20, flex: 0.5}}>
