@@ -10,6 +10,11 @@ import {
   CREATE_POST,
   CREATE_POST_LOADING,
   CREATE_POST_ERROR,
+  CONNECTIONS_LOADING,
+  GET_CONNECTIONS_BY_ID,
+  GET_CONNECTIONS_BY_ID_ERROR,
+  CONNECTIONS_USER_DETAILS,
+  CONNECTIONS_USER_ERROR,
 } from './actionTypes';
 
 const authInitialState = {
@@ -57,6 +62,7 @@ const getPostInitialState = {
   posts: [],
   loading: false,
 };
+
 export function GetPostsReducer(state = getPostInitialState, action) {
   switch (action.type) {
     case GET_POSTS:
@@ -111,3 +117,56 @@ export function CreatePostsReducer(state = createPostInitialState, action) {
       return state;
   }
 }
+
+const getConnectionsInitialState = {
+  connections: null,
+  loading: false,
+};
+
+export function GetConnectionsReducer(state = getConnectionsInitialState, action) {
+  switch (action.type) {
+    case GET_CONNECTIONS_BY_ID:
+      return {
+        ...state,
+        connections: action.payload.connections,
+        loading: action.payload.loading,
+      };
+    case CONNECTIONS_LOADING:
+      return {
+        ...state,
+        loading: action.payload.loading,
+      };
+    case GET_CONNECTIONS_BY_ID_ERROR:
+      return {
+        ...state,
+        error: action.payload.error,
+        loading: action.payload.loading,
+      };
+    default:
+      return state;
+  }
+}
+
+const connectedUserState = {
+  connectedUser: undefined,
+  error: ''
+};
+export function getConnectionUserReducer(state = connectedUserState, action) {
+  switch (action.type) {
+
+    case CONNECTIONS_USER_DETAILS:
+      return {
+        ...state,
+        connectedUser: action.payload.userData,
+      };
+    case CONNECTIONS_USER_ERROR:
+      return {
+        ...state,
+        error: action.payload.err,
+      };
+
+    default:
+      return state;
+  }
+}
+

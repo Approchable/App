@@ -9,17 +9,24 @@ import {
   CREATE_POST,
   CREATE_POST_LOADING,
   CREATE_POST_ERROR,
+  GET_CONNECTIONS_BY_ID,
+  CONNECTIONS_LOADING,
+  GET_CONNECTIONS_BY_ID_ERROR,
+  CONNECTIONS_USER_DETAILS,
+  CONNECTIONS_USER_ERROR,
 } from './actionTypes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   deleteUserData,
+  getConnectedUserDetails,
+  getConnectionsByIdFromFireStore,
   getPostsFromFireStore,
- 
+
   writeUserData,
 
 } from '../../firebase';
 
-import {  sendPostToFireStore } from '../../FirebaseFireStore';
+import { sendPostToFireStore } from '../../FirebaseFireStore';
 
 export const Init = () => {
   //console.log('Initing user....');
@@ -27,7 +34,7 @@ export const Init = () => {
     try {
       var data = await AsyncStorage.getItem('user');
       data = JSON.parse(data);
-     // console.log('user found', data);
+      // console.log('user found', data);
       if (data === null || data === undefined) {
         dispatch({
           type: LOGIN,
@@ -53,9 +60,9 @@ export const Init = () => {
 export const login = data => {
   return async dispatch => {
     try {
-      console.log('in login action with user data: ' , data);
+      console.log('in login action with user data: ', data);
       await AsyncStorage.setItem('user', JSON.stringify(data));
-      
+
       dispatch({
         type: LOGIN,
         payload: {
@@ -72,7 +79,7 @@ export const logout = () => {
   return async dispatch => {
     try {
       var user = await AsyncStorage.getItem('user');
-      
+
       user = JSON.parse(user);
       await AsyncStorage.removeItem('user');
       await AsyncStorage.removeItem('WaitlistToken');
@@ -90,7 +97,7 @@ export const logout = () => {
 };
 
 export const NavigateToCreate = () => {
-  
+
   return dispatch => {
     dispatch({
       type: OPEN_CREATE_POST_NAV,
@@ -102,7 +109,7 @@ export const NavigateToCreate = () => {
 };
 
 export const NaviagteOutOfCreate = () => {
-  
+
   return dispatch => {
     dispatch({
       type: CLOSE_CREATE_POST_NAV,
@@ -172,6 +179,66 @@ export const createPosts = postObject => {
         payload: {
           error: err,
           loading: false,
+        },
+      });
+    }
+  };
+};
+
+// actions list of Connections
+
+export const getConnections = connectionId => {
+  return async dispatch => {
+    dispatch({
+      type: CONNECTIONS_LOADING,
+      payload: {
+        loading: true,
+      },
+    });
+    try {
+      const connections = await getConnectionsByIdFromFireStore(connectionId);
+      if (connections) {
+        dispatch({
+          type: GET_CONNECTIONS_BY_ID,
+          payload: {
+            connections: connections,
+            loading: false,
+          },
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      dispatch({
+        type: GET_CONNECTIONS_BY_ID_ERROR,
+        payload: {
+          error: err,
+          loading: false,
+        },
+      });
+    }
+  };
+};
+
+
+export const getConnectionUser = userId => {
+  return async dispatch => {
+    try {
+      const data = await getConnectedUserDetails(userId);
+      console.log('getConnectionUser userData ====:::: ', data);
+      if (data) {
+        dispatch({
+          type: CONNECTIONS_USER_DETAILS,
+          payload: {
+            userData: data,
+          },
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      dispatch({
+        type: CONNECTIONS_USER_ERROR,
+        payload: {
+          error: err,
         },
       });
     }

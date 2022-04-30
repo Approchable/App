@@ -26,4 +26,45 @@ export async function sendPostToFireStore(postObject) {
       return null;
     }
   }
+  // creating connection object which is actually chats main object
+  export async function createConnectionOnFireStore(connectionObject) {
+   
+    console.log("connectionObject -> ", connectionObject)
+    const collectionRef = collection(fireStore, 'connections');
+    try {
+      const docRef = await addDoc(collectionRef, connectionObject);
+      return docRef;
+
+    } catch (error) {
+      console.log('Error creating connection object to firebase ', error);
+      return null;
+    }
+  }
+
+  // get connections list which is actually chats main object
+  // export async function getConnectionsFromFireStore() {
+   
+  //   try {
+  //     const querySnapshot = await getDocs(collectionRef);
+  //     const data = querySnapshot.docs.map(doc => doc.data());
+  //     return data;
+  //   } catch (error) {
+  //     console.log('Error getting connections from firebase ', error);
+  //     return null;
+  //   }
+  // }
+
+  
+  // export async function sendChatMessageToFireStore(messageObject) {
+   
+  //   console.log("messageObject -> ", messageObject)
+  //   const collectionConnectionsRef = collection(fireStore, 'connections');
+  //   try {
+  //     const docRef = await getDocs(collectionConnectionsRef)
+  //     return docRef;
+  //   } catch (error) {
+  //     console.log('Error sending message to firebase ', error);
+  //     return null;
+  //   }
+  // }
   

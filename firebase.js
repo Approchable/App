@@ -1,15 +1,17 @@
 // Import the functions you need from the SDKs you need
 // import * as firebase from "firebase"
-import {initializeApp} from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import {
   getFirestore,
   collection,
   getDocs,
   addDoc,
   doc,
+  where,
+  query
 } from 'firebase/firestore';
-import {getDatabase, ref, set} from 'firebase/database';
-import {getStorage} from 'firebase/storage';
+import { getDatabase, onValue, ref, set } from 'firebase/database';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDdTfUFd_lcoQOKjwLV4mCSczLypegMPAs',
@@ -112,6 +114,65 @@ export async function readingtestToFireStore() {
   }
 }
 
+// get connections list which is actually chats main object
+export async function getConnectionsFromFireStore() {
+  const collectionRef = collection(fireStore, 'connections');
+  try {
+    const querySnapshot = await getDocs(collectionRef);
+    const data = querySnapshot.docs.map(doc => doc.data());
+    return data;
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error);
+    return null;
+  }
+}
+
+// get connection by id
+export async function getConnectionsByIdFromFireStore(connectionId) {
+  const collectionRef = collection(fireStore, 'connections');
+  try {
+
+    const q = query(collectionRef, where("id", "==", connectionId));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.map(doc => doc.data());
+    return data;
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error);
+    return null;
+  }
+}
+
+export async function getChatFromFireStoreById(connectedUserId) {
+
+  const collectionRef = collection(fireStore, 'messages');
+  try {
+
+    const q = query(collectionRef, where("id", "==", connectedUserId));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.map(doc => doc.data());
+    console.log('data chating ==== : ', data);
+    return data;
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error);
+    return null;
+  }
+}
+
+// get connected user by id
+
+export async function getConnectedUserDetails(userId) {
+  var data;
+  const db = getDatabase();
+  const userRef = ref(db, 'users/' + userId);
+  onValue(userRef, (snapshot) => {
+    const userData = snapshot.val();
+    console.log('getConnectedUserDetails userData ========>>>> ', userData);
+    data = userData
+  });
+  console.log('getConnectedUserDetails user data check ======= ::: ', data);
+  return data;
+}
 
 
-export {storage , db , fireStore  };
+
+export { storage, db, fireStore };

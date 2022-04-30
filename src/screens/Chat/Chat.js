@@ -11,15 +11,15 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {NormalButton} from '../../components/Buttons';
-import React, {useState, useEffect} from 'react';
-import {HeaderText, RegularBoldText} from '../../components/Texts';
+import { NormalButton } from '../../components/Buttons';
+import React, { useState, useEffect } from 'react';
+import { HeaderText, RegularBoldText } from '../../components/Texts';
 import CategoryItem from '../../components/CategoryItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useDispatch} from 'react-redux';
-import {ActivityIndicator} from 'react-native';
-import {logout} from '../../store/actions';
-import {NormalTextField} from '../../components/TextField';
+import { useDispatch, useSelector } from 'react-redux';
+import { ActivityIndicator } from 'react-native';
+import { logout } from '../../store/actions';
+import { NormalTextField } from '../../components/TextField';
 import {
   ColorSet,
   ImageSet,
@@ -27,10 +27,15 @@ import {
   screenWidth,
 } from '../../components/config/Constant';
 import MyStatusBar from '../../components/MyStatusBar';
-// import { SafeAreaView } from 'react-native-safe-area-context';
+import { getChatFromFireStoreById, getConnectedUserDetails } from '../../../firebase';
 
 const width = (Dimensions.get('window').width - 36) / 3.5;
-export default function Chat({navigation}) {
+export default function Chat({ navigation }) {
+  const connectedUser = useSelector(state => state.getConnectionUserReducer.connectedUser);
+  const connections = useSelector(state => state.GetConnectionsReducer.connections);
+
+  const [user, setUser] = useState('');
+  const [conId, setConId] = useState('101432345899135768743');
   const [message, setMessage] = useState('');
   const [messageArray, setMessageArray] = useState([
     {
@@ -59,13 +64,28 @@ export default function Chat({navigation}) {
   const [inputHeight, setInputHeight] = useState(0);
   const dispatch = useDispatch();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      getUserData()
+      getChat()
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const getUserData = async () => {
+    const userData = await getConnectedUserDetails(conId)
+    setUser(userData)
+  }
+  const getChat = async () => {
+    const chat = await getChatFromFireStoreById(conId)
+    console.log('chat ============== : ', chat);
+  }
 
   const onClickSend = () => {
     let currentTime = getCurrentTime();
     if (message != '') {
       var newMessage = {
-        isSender: true,
+        isSender: false,
         message: message,
         time: currentTime,
         unRead: false,
@@ -76,6 +96,8 @@ export default function Chat({navigation}) {
     setMessage('');
   };
 
+
+
   const getCurrentTime = () => {
     let today = new Date();
     let hours = (today.getHours() < 10 ? '0' : '') + today.getHours();
@@ -85,133 +107,134 @@ export default function Chat({navigation}) {
   };
 
   const onBackButton = async () => {
-    console.log('LOG =====>>>> onClickChatButton handler is working properly');
     navigation.goBack();
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}>
-      <MyStatusBar backgroundColor="white" />
-
-      <View style={{flex: 1}}>
-        <View style={[styles.topBar]}>
-          <View style={[styles.center]}>
-            <TouchableOpacity onPress={onBackButton}>
-              <Image style={[styles.backButton]} source={ImageSet.back} />
-            </TouchableOpacity>
-            <Text style={[styles.regularText]}>Leslie</Text>
-          </View>
-
-          <View style={[styles.leftIcons]}>
-            <TouchableOpacity //onPress={onBackButton}
-            >
-              <Image style={[styles.icon]} source={ImageSet.phone} />
-            </TouchableOpacity>
-            <TouchableOpacity //onPress={onBackButton}
-            >
-              <Image style={[styles.icon]} source={ImageSet.camera} />
-            </TouchableOpacity>
-            <TouchableOpacity //onPress={onBackButton}
-            >
-              <Image style={[styles.icon]} source={ImageSet.warning} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={[styles.chatSection]}>
-          <ScrollView
-            contentContainerStyle={{
-              flex: 1,
-              justifyContent: 'flex-end',
-              paddingBottom: 10,
-            }}>
-            {messageArray.map((item, index) => {
-              return (
-                <View key={index}>
-                  {item.today == true && (
-                    <View style={[styles.centerJustify, {marginVertical: 5}]}>
-                      <Text style={styles.dateLabelText}>Today</Text>
-                    </View>
-                  )}
-                  {item.unRead == true && (
-                    <View style={styles.unReadMessagesIndication}>
-                      <View style={styles.border} />
-                      <Text style={styles.dateLabelText}>Unread messages</Text>
-                      <View style={styles.border} />
-                    </View>
-                  )}
-                  {(item.isSender == true && (
-                    <View style={styles.rightMessageView}>
-                      <View style={styles.rightMessageText}>
-                        <Text style={[styles.dateLabelText, {marginRight: 10}]}>
-                          {item.time}
-                        </Text>
-                        <Text style={styles.messagesText}>{item.message}</Text>
-                      </View>
-                    </View>
-                  )) || (
-                    <View style={styles.leftMessageView}>
-                      <View style={styles.leftMessageText}>
-                        <Text style={styles.messagesText}>{item.message}</Text>
-                        <Text style={[styles.dateLabelText, {marginLeft: 10}]}>
-                          {item.time}
-                        </Text>
-                      </View>
-                    </View>
-                  )}
-                </View>
-              );
-            })}
-          </ScrollView>
-        </View>
-
-        <View style={styles.bottomBar}>
-          <View style={styles.inputView}>
-            <TouchableOpacity style={styles.flexEnd}>
-              <Image style={[styles.icon]} source={ImageSet.plus} />
-            </TouchableOpacity>
-            <TextInput
-              value={message}
-              multiline={true}
-              onChangeText={text => setMessage(text)}
-              // =====>>>>> when user type a message more then 1 line the height will increase as the user type more line
-              onContentSizeChange={event => {
-                setInputHeight(event.nativeEvent.contentSize.height);
-              }}
-              placeholder={'Start typing'}
-              placeholderTextColor={ColorSet.gray}
-              style={[
-                styles.textInput,
-                {
-                  height: Math.max(25, inputHeight),
-                  width:
-                    (message == '' && screenWidth.width60) ||
-                    screenWidth.width70,
-                },
-              ]}
-            />
-            {(message == '' && (
-              <View style={styles.sendIconView}>
-                <TouchableOpacity style={styles.flexEnd}>
-                  <Image style={[styles.icon]} source={ImageSet.mic} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.flexEnd}>
-                  <Image style={[styles.icon]} source={ImageSet.send} />
-                </TouchableOpacity>
-              </View>
-            )) || (
-              <TouchableOpacity
-                onPress={() => onClickSend()}
-                style={styles.flexEnd}>
-                <Image style={[styles.icon]} source={ImageSet.send} />
+    <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}>
+        <MyStatusBar backgroundColor="white" />
+        <View style={{ flex: 1 }}>
+          <View style={[styles.topBar]}>
+            <View style={[styles.center]}>
+              <TouchableOpacity onPress={onBackButton}>
+                <Image style={[styles.backButton]} source={ImageSet.back} />
               </TouchableOpacity>
-            )}
+              <Text style={[styles.regularText]}>
+                {user && user.givenName}
+              </Text>
+            </View>
+            <View style={[styles.leftIcons]}>
+              <TouchableOpacity //onPress={onBackButton}
+              >
+                <Image style={[styles.icon]} source={ImageSet.phone} />
+              </TouchableOpacity>
+              <TouchableOpacity //onPress={onBackButton}
+              >
+                <Image style={[styles.icon]} source={ImageSet.camera} />
+              </TouchableOpacity>
+              <TouchableOpacity //onPress={onBackButton}
+              >
+                <Image style={[styles.icon]} source={ImageSet.warning} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={[styles.chatSection]}>
+            <ScrollView
+              contentContainerStyle={{
+                flex: 1,
+                justifyContent: 'flex-end',
+                paddingBottom: 10,
+              }}>
+              {messageArray.map((item, index) => {
+                return (
+                  <View key={index}>
+                    {item.today == true && (
+                      <View style={[styles.centerJustify, { marginVertical: 5 }]}>
+                        <Text style={styles.dateLabelText}>Today</Text>
+                      </View>
+                    )}
+                    {item.unRead == true && (
+                      <View style={styles.unReadMessagesIndication}>
+                        <View style={styles.border} />
+                        <Text style={styles.dateLabelText}>Unread messages</Text>
+                        <View style={styles.border} />
+                      </View>
+                    )}
+                    {(item.isSender == true && (
+                      <View style={styles.rightMessageView}>
+                        <View style={styles.rightMessageText}>
+                          <Text style={[styles.dateLabelText, { marginRight: 10 }]}>
+                            {item.time}
+                          </Text>
+                          <Text style={styles.messagesText}>{item.message}</Text>
+                        </View>
+                      </View>
+                    )) || (
+                        <View style={styles.leftMessageView}>
+                          <View style={styles.leftMessageText}>
+                            <Text style={styles.messagesText}>{item.message}</Text>
+                            <Text style={[styles.dateLabelText, { marginLeft: 10 }]}>
+                              {item.time}
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </View>
+
+          <View style={styles.bottomBar}>
+            <View style={styles.inputView}>
+              <TouchableOpacity style={styles.flexEnd}>
+                <Image style={[styles.icon]} source={ImageSet.plus} />
+              </TouchableOpacity>
+              <TextInput
+                value={message}
+                multiline={true}
+                onChangeText={text => setMessage(text)}
+                // =====>>>>> when user type a message more then 1 line the height will increase as the user type more line
+                onContentSizeChange={event => {
+                  setInputHeight(event.nativeEvent.contentSize.height);
+                }}
+                placeholder={'Start typing'}
+                placeholderTextColor={ColorSet.gray}
+                style={[
+                  styles.textInput,
+                  {
+                    height: Math.max(25, inputHeight),
+                    width:
+                      (message == '' && screenWidth.width60) ||
+                      screenWidth.width70,
+                  },
+                ]}
+              />
+              {(message == '' && (
+                <View style={styles.sendIconView}>
+                  <TouchableOpacity style={styles.flexEnd}>
+                    <Image style={[styles.icon]} source={ImageSet.mic} />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.flexEnd}>
+                    <Image style={[styles.icon]} source={ImageSet.send} />
+                  </TouchableOpacity>
+                </View>
+              )) || (
+                  <TouchableOpacity
+                    onPress={() => onClickSend()}
+                    style={styles.flexEnd}>
+                    <Image style={[styles.icon]} source={ImageSet.send} />
+                  </TouchableOpacity>
+                )}
+            </View>
           </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -290,7 +313,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontFamily: 'Poppins_400Regular',
     fontStyle: 'normal',
-    minWidth: screenWidth.width30,
+    minWidth: screenWidth.width5,
     maxWidth: screenWidth.width75,
   },
   rightMessageView: {
@@ -307,7 +330,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderBottomRightRadius: 0,
-    minWidth: screenWidth.width30,
+    minWidth: screenWidth.width10,
     maxWidth: screenWidth.width90,
   },
   leftMessageView: {
@@ -323,7 +346,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderBottomLeftRadius: 0,
-    minWidth: screenWidth.width30,
+    minWidth: screenWidth.width5,
     maxWidth: screenWidth.width90,
   },
   border: {
