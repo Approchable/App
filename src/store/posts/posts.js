@@ -17,13 +17,12 @@ export const GET_POSTS_ERROR = 'GET_POSTS_ERROR';
 export const CREATE_POST = 'CREATE_POST';
 export const CREATE_POST_LOADING = 'CREATE_POST_LOADING';
 export const CREATE_POST_ERROR = 'CREATE_POST_ERROR';
+export const UPDATE_POST_OBJECT = 'UPDATE_POST_OBJECT';
 
 const initialPostObject = {};
 
 //actions
 export const addToPostObject = data => {
- 
-
   return {
     type: ADD_TO_POST_OBJECT,
     payload: {
@@ -39,6 +38,13 @@ export const removeFromPostObject = key => {
       key: key,
     },
   };
+};
+
+export const updatePostObject = someObject => {
+  // rereive objects from firebase
+  // update state of redux
+  // have another variable for loading
+  //call the varible fetchLoading
 };
 
 // // adding old actions not connected yet to the// please connect these actions in the future and also remove them from actions.js
@@ -127,6 +133,10 @@ export const postsReducer = (state = initialPostObject, action) => {
       };
     case CLEAR_POST_OBJECT:
       return {};
+    case UPDATE_POST_OBJECT:
+      return {
+        ...state,
+      };
     default:
       return state;
   }

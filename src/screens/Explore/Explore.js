@@ -26,6 +26,7 @@ function Explore() {
   var posts = useSelector(state => state.GetPostsReducer.posts);
   var loading = useSelector(state => state.GetPostsReducer.loading);
   var error = useSelector(state => state.GetPostsReducer.error);
+  
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -45,10 +46,13 @@ function Explore() {
   const [user, setUser] = useState(null);
 
   const _getPosts = async () => {
+    // dispatch fetch new post to properly update old posts
+    
     dispatch(getPosts());
   };
 
   useEffect(() => {
+    console.log('useEffect');
     _getPosts();
     console.log(posts);
   }, []);
@@ -74,13 +78,13 @@ function Explore() {
         <AppHeader moreStyles={{flex: 0.1}} /> */}
         <MyStatusBar backgroundColor="#F6F6F6" />
         <AppHeader moreStyles={{flex: 0.1}} />
-        <View style={{flex : 1 , borderRadius: 16 ,}}>
+        <View style={{flex: 1, borderRadius: 16}}>
           <FlatList
-          style = {{
-            marginTop: 0,
-            backgroundColor: "white",
-            borderRadius: 16,
-          }}
+            style={{
+              marginTop: 0,
+              backgroundColor: 'white',
+              borderRadius: 16,
+            }}
             data={posts}
             keyExtractor={item => item.id}
             refreshControl={
@@ -137,7 +141,6 @@ function NoPost() {
           marginTop: 90,
           marginHorizontal: 16,
           justifyContent: 'center',
-
 
           flex: 1,
           alignItems: 'center',

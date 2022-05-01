@@ -55,7 +55,7 @@ export default function CreatePost2({navigation, route}) {
       Alert.alert('Please enter a location');
       return;
     }
-
+    console.log("date times :" + startDateTime + " " + endDateTime);
     const data = {
       description: description || '',
       startDateTime: startDateTime || Date.now(),
@@ -87,6 +87,7 @@ export default function CreatePost2({navigation, route}) {
   };
 
   const handleConfirm = date => {
+    console.log(new Date(date))
     const hoursAndMinutes = getHoursandMinutes(date);
     setStartDateTime(date);
     setStartTime(hoursAndMinutes);
@@ -318,7 +319,7 @@ export default function CreatePost2({navigation, route}) {
             <NormalButton
               text="Next"
               onPress={() =>
-                buttonActive ? navigation.navigate('CreatePost3') : null
+                buttonActive ? finishCreatePost2() : null
               }
               inActive={buttonActive}
               hollow

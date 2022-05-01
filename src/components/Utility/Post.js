@@ -72,6 +72,10 @@ function PostLocation({location, addressResult}) {
   }, []);
 
   const getLocationAndTurnToAdress = async () => {
+    if (location === null || location === '' || location === undefined) {
+      setAddress('No Location!');
+      return;
+    }
     let {status} = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       setErrorMsg('Permission to access location was denied');
@@ -86,7 +90,7 @@ function PostLocation({location, addressResult}) {
   return (
     <View style={styles.PostLocationView}>
       <SmallerText
-        content={addressResult}
+        content={address}
         moreStyles={{marginBottom: -3, marginTop: -3}}
       />
     </View>
@@ -203,6 +207,9 @@ function PostTime({startDateTime, endDateTime}) {
     return true;
   };
   useEffect(() => {
+    // console.log(startDateTime , endDateTime , "end date time in posts");
+    // startDateTime = new Date(startDateTime)
+    // endDateTime = new Date(endDateTime)
     getStartTime();
     setStartTimeGreaterThanEndTime(isStartTimegreaterThanCurrentTime());
     formatAllTimes();

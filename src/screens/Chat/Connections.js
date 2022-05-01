@@ -19,6 +19,7 @@ export default function Connections({ navigation }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    
   }, []);
 
   const onClickChatButton = async () => {

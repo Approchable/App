@@ -143,19 +143,7 @@ export default function CreatePost3({navigation}) {
             </TouchableOpacity>
           )}
 
-          {image && (
-            <Image
-              source={{uri: image}}
-              style={{
-                flex: 1,
-                backgroundColor: 'white',
-                justifyContent: 'center',
-                borderRadius: 5,
-                marginTop: 30,
-                height: 250,
-              }}
-            />
-          )}
+  
 
           {image && (
             <Image
