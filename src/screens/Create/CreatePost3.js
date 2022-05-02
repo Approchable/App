@@ -8,7 +8,7 @@ import {
   Platform,
   Alert,
   Modal,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
 import {HeaderText, RegularText, RegularBoldText} from '../../components/Texts';
 import React, {useState, useEffect} from 'react';
@@ -21,6 +21,8 @@ import {addToPostObject} from '..//../store//posts//posts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyStatusBar from '../../components/MyStatusBar';
 import AppHeader from '../../components/Utility/AppHeader';
+import {StackActions} from '@react-navigation/native';
+import {CommonActions} from '@react-navigation/native';
 
 export default function CreatePost3({navigation}) {
   const [buttonActive, setButtonActive] = useState(false);
@@ -41,14 +43,24 @@ export default function CreatePost3({navigation}) {
       ...data,
     };
 
-    // dispatch(addToPostObject(data));
-    // console.log(postObject)
     console.log(
-      '================================================================',
+      '===========================Create post in firebase from post screen 3=====================================',
     );
-    console.log('newPostObject', newPostObject);
+    
     dispatch(createPosts(newPostObject));
-    navigation.navigate('Explore');
+    
+  
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 1,
+        routes: [
+          {name: 'Explore'},
+          {
+            name: 'Explore',
+          },
+        ],
+      }),
+    );
   };
 
   const pickImage = async () => {
@@ -143,8 +155,6 @@ export default function CreatePost3({navigation}) {
             </TouchableOpacity>
           )}
 
-  
-
           {image && (
             <Image
               source={{uri: image}}
@@ -155,7 +165,6 @@ export default function CreatePost3({navigation}) {
                 borderRadius: 5,
                 marginTop: 30,
                 height: 250,
-                spectRatio: 1,
               }}
             />
           )}

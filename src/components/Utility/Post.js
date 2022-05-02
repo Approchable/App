@@ -165,7 +165,14 @@ function LoadingScreen({visible}) {
 }
 
 function PostTime({startDateTime, endDateTime}) {
-  console.log(startDateTime, endDateTime);
+  if (startDateTime !== null || startDateTime !== '' || startDateTime !== undefined) {
+    startDateTime = dayjs(startDateTime.toDate());
+  }
+  if (endDateTime !== null || endDateTime !== '' || endDateTime !== undefined) {
+    endDateTime = dayjs(endDateTime.toDate());
+  }
+
+  
   var relativeTime = require('dayjs/plugin/relativeTime');
   dayjs.extend(relativeTime);
   const formatDateToDayJs = dayjs(startDateTime);
@@ -183,6 +190,10 @@ function PostTime({startDateTime, endDateTime}) {
   const [startTimeGreaterThanEndTime, setStartTimeGreaterThanEndTime] =
     useState(true);
   const getStartTime = () => {
+    if (startDateTime === null || startDateTime === '' || startDateTime === undefined) {
+      setStartRelativeTime(dayjs().to(Date.now()));
+      return
+    }
     const startTime = dayjs(startDateTime);
     setStartRelativeTime(dayjs().to(startTime));
   };
