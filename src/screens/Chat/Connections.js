@@ -12,8 +12,10 @@ import { Routes } from '../../components/config/Constant';
 import AppHeader from '../../components/Utility/AppHeader';
 import MyStatusBar from '../../components/MyStatusBar';
 import Loader from '../../components/Loader';
+import { getConnectionsById } from '../../../firebase';
 
 const width = (Dimensions.get('window').width - 36) / 3.5;
+
 
 
 
@@ -26,17 +28,28 @@ export default function Connections({ navigation }) {
 
   const dispatch = useDispatch();
 
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      dispatch(getConnections(conId));
+      //_getConnections()    
     });
     return unsubscribe;
   }, []);
 
+  const _getConnections = async () => {
+    dispatch(getConnections(conId));
+  }
 
   const onClickChatButton = async () => {
-    dispatch(getConnectionUser(conId2));
-    navigation.navigate(Routes.ChatRoom)
+    _getConnections()
+    console.log('conId ===>>>  ', conId);
+    const connections = await getConnectionsById(conId);
+    if (connections) {
+      console.log('connections new 1 ====>> ', connections);
+      navigation.navigate(Routes.Chat, { data: connections })
+    } else {
+      console.log('connections new 2 ====>> ', connections);
+    }
   };
 
 
@@ -54,6 +67,9 @@ export default function Connections({ navigation }) {
           moreStyles={{ marginTop: -18 }}
           onChangeText={text => setConId(text)}
         />
+      </View>
+      <View>
+
       </View>
       <View
         style={{

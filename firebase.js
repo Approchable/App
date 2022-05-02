@@ -13,6 +13,7 @@ import {
 import { getDatabase, onValue, ref, set } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
 
+
 const firebaseConfig = {
   apiKey: 'AIzaSyDdTfUFd_lcoQOKjwLV4mCSczLypegMPAs',
   authDomain: 'approachablebackend.firebaseapp.com',
@@ -31,6 +32,9 @@ const fireStore = getFirestore(app);
 const storage = getStorage(app);
 
 // console.log("test")
+createStorageUrlfromImage(
+  'file:///Users/ebukaegbunam/Library/Developer/CoreSimulator/Devices/71080F92-B428-460B-8F59-ABCE4268910B/data/Containers/Data/Application/A0E0666A-CBFB-41DD-8C25-54B5F263AFA9/Library/Caches/ExponentExperienceData/%2540ebukaegb%252FApproachableNative/ImagePicker/01D82213-8999-4C29-BFA4-69338B4734D1.jpg',
+);
 
 async function createStorageUrlfromImage(localUri) {
   console.log('creating storage url...');
@@ -47,9 +51,7 @@ async function createStorageUrlfromImage(localUri) {
   }
 }
 
-createStorageUrlfromImage(
-  'file:///Users/ebukaegbunam/Library/Developer/CoreSimulator/Devices/71080F92-B428-460B-8F59-ABCE4268910B/data/Containers/Data/Application/A0E0666A-CBFB-41DD-8C25-54B5F263AFA9/Library/Caches/ExponentExperienceData/%2540ebukaegb%252FApproachableNative/ImagePicker/01D82213-8999-4C29-BFA4-69338B4734D1.jpg',
-);
+
 
 function writeDatatoRdb(path, data) {
   const db = getDatabase();
@@ -126,32 +128,34 @@ export async function getConnectionsFromFireStore() {
     return null;
   }
 }
-
+// 
 // get connection by id
-export async function getConnectionsByIdFromFireStore(connectionId) {
+export async function getConnectionsById(connectionId) {
   const collectionRef = collection(fireStore, 'connections');
   try {
-
     const q = query(collectionRef, where("id", "==", connectionId));
     const querySnapshot = await getDocs(q);
     const data = querySnapshot.docs.map(doc => doc.data());
-    return data;
+    if (data.length > 0) {
+      return data[0]
+    } else {
+      return null
+    }
   } catch (error) {
     console.log('Error getting connections from firebase ', error);
     return null;
   }
 }
 
-export async function getChatFromFireStoreById(connectedUserId) {
+export async function getChatFromFireStoreById(conId, connectedUserId) {
 
-  const collectionRef = collection(fireStore, 'messages');
+  const collectionRef = collection(fireStore, 'connections/' + conId + '/' + 'messages');
   try {
-
-    const q = query(collectionRef, where("id", "==", connectedUserId));
+    const q = query(collectionRef, where("connection_id", "==", conId));
     const querySnapshot = await getDocs(q);
     const data = querySnapshot.docs.map(doc => doc.data());
     console.log('data chating ==== : ', data);
-    return data;
+    return data
   } catch (error) {
     console.log('Error getting connections from firebase ', error);
     return null;
@@ -162,15 +166,13 @@ export async function getChatFromFireStoreById(connectedUserId) {
 
 export async function getConnectedUserDetails(userId) {
   var data;
-  const db = getDatabase();
-  const userRef = ref(db, 'users/' + userId);
+  const database = getDatabase();
+  const userRef = ref(database, 'users/' + userId);
   onValue(userRef, (snapshot) => {
     const userData = snapshot.val();
-    console.log('getConnectedUserDetails userData ========>>>> ', userData);
     data = userData
-  });
-  console.log('getConnectedUserDetails user data check ======= ::: ', data);
-  return data;
+  })
+  return data
 }
 
 
