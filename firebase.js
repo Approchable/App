@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { getDatabase, onValue, ref, set } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
+import { setDataByDate } from './src/components/Utility/Helper';
 
 
 const firebaseConfig = {
@@ -154,8 +155,9 @@ export async function getChatFromFireStoreById(conId, connectedUserId) {
     const q = query(collectionRef, where("connection_id", "==", conId));
     const querySnapshot = await getDocs(q);
     const data = querySnapshot.docs.map(doc => doc.data());
-    console.log('data chating ==== : ', data);
-    return data
+    // console.log('data chating ==== : ', data);
+    const groupedData = setDataByDate(data)
+    return groupedData
   } catch (error) {
     console.log('Error getting connections from firebase ', error);
     return null;

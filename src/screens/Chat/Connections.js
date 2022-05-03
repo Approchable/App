@@ -29,12 +29,12 @@ export default function Connections({ navigation }) {
   const dispatch = useDispatch();
 
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      //_getConnections()    
-    });
-    return unsubscribe;
-  }, []);
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', () => {
+  //     //_getConnections()    
+  //   });
+  //   return unsubscribe;
+  // }, []);
 
   const _getConnections = async () => {
     dispatch(getConnections(conId));

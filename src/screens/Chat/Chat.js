@@ -29,7 +29,8 @@ import {
 import MyStatusBar from '../../components/MyStatusBar';
 import { getChatFromFireStoreById, getConnectedUserDetails } from '../../../firebase';
 import Loader from '../../components/Loader';
-import { getTimeFromDate } from '../../components/Utility/Helper';
+import { getCurrentDate, getDate, getTimeFromDate } from '../../components/Utility/Helper';
+import moment from 'moment';
 
 const width = (Dimensions.get('window').width - 36) / 3.5;
 
@@ -78,23 +79,26 @@ const Chat = ({ route, navigation }) => {
   const getChat = async () => {
     const chat = await getChatFromFireStoreById(conId)
     if (chat) {
-      console.log('chat ============== : ', chat);
+      // console.log('chat ============== : ', chat);
       setMessageArray(chat)
     }
   }
 
   const onClickSend = () => {
-    let currentTime = getCurrentTime();
+    // let currentTime = getCurrentTime();
     if (message != '') {
       var newMessage = {
-        isSender: false,
-        message: message,
-        time: currentTime,
+        connection_id: false,
+        id: message,
+        is_deleted: false,
         unRead: false,
         today: false,
       };
+
+
     }
-    setMessageArray([...messageArray, newMessage]);
+
+    // setMessageArray([...messageArray, newMessage]);
     setMessage('');
   };
 
@@ -154,39 +158,49 @@ const Chat = ({ route, navigation }) => {
                 paddingBottom: 10,
               }}>
               {messageArray.map((item, index) => {
-                const time = getTimeFromDate(item.sent_at.seconds)
+                let today = moment().format('YYYY-MM-DD');
+                let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD');
+                const time = moment(item.date).format('ddd, MMMM DD')
                 return (
                   <View key={index}>
-                    {item.today == true && (
-                      <View style={[styles.centerJustify, { marginVertical: 5 }]}>
-                        <Text style={styles.dateLabelText}>Today</Text>
-                      </View>
-                    )}
-                    {item.unRead == true && (
+                    <View style={[styles.centerJustify, { marginVertical: 5 }]}>
+                      <Text style={styles.dateLabelText}>
+                        {item.date == today ? 'Today' : item.date == yesterday ? 'Yesterday' : time}
+                      </Text>
+                    </View>
+                    {/* {item.unRead == true && (
                       <View style={styles.unReadMessagesIndication}>
                         <View style={styles.border} />
                         <Text style={styles.dateLabelText}>Unread messages</Text>
                         <View style={styles.border} />
                       </View>
-                    )}
-                    {item.sender.id === user.userId ?
-                      <View style={styles.rightMessageView}>
-                        <View style={styles.rightMessageText}>
-                          <Text style={[styles.dateLabelText, { marginRight: 10 }]}>
-                            {time}
-                          </Text>
-                          <Text style={styles.messagesText}>{item.message}</Text>
+                    )} */}
+                    {item.messages.map((subItem, index) => {
+                      const msgTime = getTimeFromDate(subItem.sent_at.seconds)
+                      return (
+                        <View key={index}>
+                          {subItem.sender.id === user.userId ?
+                            <View style={styles.rightMessageView}>
+                              <View style={styles.rightMessageText}>
+                                <Text style={[styles.dateLabelText, { marginRight: 10 }]}>
+                                  {msgTime}
+                                </Text>
+                                <Text style={styles.messagesText}>{subItem.message}</Text>
+                              </View>
+                            </View>
+                            :
+                            <View style={styles.leftMessageView}>
+                              <View style={styles.leftMessageText}>
+                                <Text style={styles.messagesText}>{subItem.message}</Text>
+                                <Text style={[styles.dateLabelText, { marginLeft: 10 }]}>
+                                  {msgTime}
+                                </Text>
+                              </View>
+                            </View>
+                          }
                         </View>
-                      </View>
-                      :
-                      <View style={styles.leftMessageView}>
-                        <View style={styles.leftMessageText}>
-                          <Text style={styles.messagesText}>{item.message}</Text>
-                          <Text style={[styles.dateLabelText, { marginLeft: 10 }]}>
-                            {time}
-                          </Text>
-                        </View>
-                      </View>
+                      )
+                    })
                     }
                   </View>
                 );
@@ -204,7 +218,6 @@ const Chat = ({ route, navigation }) => {
                 value={message}
                 multiline={true}
                 onChangeText={text => setMessage(text)}
-                // =====>>>>> when user type a message more then 1 line the height will increase as the user type more line
                 onContentSizeChange={event => {
                   setInputHeight(event.nativeEvent.contentSize.height);
                 }}
