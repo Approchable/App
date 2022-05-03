@@ -27,7 +27,7 @@ import {
   screenWidth,
 } from '../../components/config/Constant';
 import MyStatusBar from '../../components/MyStatusBar';
-import { getChatFromFireStoreById, getConnectedUserDetails } from '../../../firebase';
+import { getChatFromFireStoreById, getUserDataById } from '../../../firebase';
 import Loader from '../../components/Loader';
 import { getCurrentDate, getDate, getTimeFromDate } from '../../components/Utility/Helper';
 import moment from 'moment';
@@ -64,11 +64,11 @@ const Chat = ({ route, navigation }) => {
 
   const getUserData = async () => {
     setLoading(true)
-    // console.log('connection chat screen 1234 ===>>> ', connection);
+    console.log('connection chat screen 1234 ===>>> ', connection);
     const participentId = connection.participants_id.find((i) => i != user.userId)
-    // console.log('participentId ===>>> ', participentId);
-    const userData = await getConnectedUserDetails(participentId)
-    // console.log('userData ===>>> ', userData);
+    console.log('get other user Id ===>>> ', participentId);
+    const userData = await getUserDataById(participentId)
+    console.log('userData ===>>> ', userData);
     if (userData) {
       setConnectedUser(userData)
       setLoading(false)

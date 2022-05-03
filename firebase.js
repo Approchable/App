@@ -10,7 +10,7 @@ import {
   where,
   query
 } from 'firebase/firestore';
-import { getDatabase, onValue, ref, set } from 'firebase/database';
+import { getDatabase, onValue, ref, set, get, child } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
 import { setDataByDate } from './src/components/Utility/Helper';
 
@@ -83,6 +83,28 @@ export function deleteUserData(id) {
     });
 }
 
+// get user by id from firebase realtime database
+
+export async function getUserDataById(userId) {
+
+  const dbRef = ref(getDatabase());
+  const user = get(child(dbRef, `users/${userId}`)).then((snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      console.log('getUserDataById user ==> ', data)
+      return data
+    } else {
+      console.log("getUserDataById ==> No data available");
+      return null
+    }
+  }).catch((error) => {
+    console.error("getUserDataById Error ==>", error);
+    return null
+  });
+
+  return user;
+
+}
 
 
 export async function getPostsFromFireStore() {
@@ -163,20 +185,5 @@ export async function getChatFromFireStoreById(conId, connectedUserId) {
     return null;
   }
 }
-
-// get connected user by id
-
-export async function getConnectedUserDetails(userId) {
-  var data;
-  const database = getDatabase();
-  const userRef = ref(database, 'users/' + userId);
-  onValue(userRef, (snapshot) => {
-    const userData = snapshot.val();
-    data = userData
-  })
-  return data
-}
-
-
 
 export { storage, db, fireStore };
