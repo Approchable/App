@@ -1,19 +1,15 @@
 import moment from 'moment';
 
-export function getTimeFromDate(timestamp) {
-    // console.log('timestamp ====>>>>> ', timestamp);
+export function getTimeFromMilliseconds(timestamp) {
     const date = new Date(timestamp * 1000);
-    const hoursAndMinutes = date.getHours() + ':' + date.getMinutes();
-    // console.log('hoursAndMinutes ====>>>>> ', hoursAndMinutes);
-    return hoursAndMinutes
+    const dateTime2 = moment(date).format('h:mm a');
+    return dateTime2
+
 }
 
-
-export function getDateFromTimestamp(timestamp) {
-    const time = timestamp.toDate()
-    // console.log('time ============>>>> ', time);
+export function getDateFromDateTime(timestamp) {
+    const time = timestamp
     const dateTime2 = moment(time).format('YYYY-MM-DD');
-    // console.log('dateTime2 ============>>>> ', dateTime2);
     return dateTime2
 }
 
@@ -21,13 +17,12 @@ export function getDateFromTimestamp(timestamp) {
 export function getCurrentDate() {
     const currentDate = new Date();
     console.log('currentDate ===>>> ', currentDate);
-    // const date = moment(time).format('YYYY-MM-DD');
-    // return timestamp
+    return currentDate
 }
 
 export function setDataByDate(array) {
     const groups = array.reduce((groups, message) => {
-        const date = getDateFromTimestamp(message.sent_at)
+        const date = getDateFromDateTime(message.sent_at.toDate())
         if (!groups[date]) {
             groups[date] = [];
         }

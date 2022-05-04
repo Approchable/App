@@ -27,9 +27,9 @@ import {
   screenWidth,
 } from '../../components/config/Constant';
 import MyStatusBar from '../../components/MyStatusBar';
-import { getChatFromFireStoreById, getUserDataById } from '../../../firebase';
+import { getAllMessagesForConnectionId, getUserDataById, sendChatMessage } from '../../../firebase';
 import Loader from '../../components/Loader';
-import { getCurrentDate, getDate, getTimeFromDate } from '../../components/Utility/Helper';
+import { getCurrentDate, getTimeFromMilliseconds } from '../../components/Utility/Helper';
 import moment from 'moment';
 
 const width = (Dimensions.get('window').width - 36) / 3.5;
@@ -39,8 +39,8 @@ const Chat = ({ route, navigation }) => {
   const connection = route.params.data
   // const connectedUser = useSelector(state => state.getConnectionUserReducer.connectedUser);
   // const connections = useSelector(state => state.GetConnectionsReducer.connections);
-  const [conId, setConId] = useState('conid_12345680');
-  const [user, setUser] = useState({ userId: 'userid_123456' });
+  //TODO: Need to fetch the current user from secure items or aysnc storage
+  const [user, setUser] = useState({ userId: 'userid_123456', userName: 'Charles' });
   const [connectedUser, setConnectedUser] = useState();
   const [messageArray, setMessageArray] = useState([]);
   // const [participentId, setParticipentId] = useState(connections.participent_id[0]);
@@ -77,7 +77,8 @@ const Chat = ({ route, navigation }) => {
     }
   }
   const getChat = async () => {
-    const chat = await getChatFromFireStoreById(conId)
+    const connectionId = connection.id
+    const chat = await getAllMessagesForConnectionId(connectionId)
     if (chat) {
       // console.log('chat ============== : ', chat);
       setMessageArray(chat)
@@ -86,20 +87,41 @@ const Chat = ({ route, navigation }) => {
 
   const onClickSend = () => {
     // let currentTime = getCurrentTime();
-    if (message != '') {
-      var newMessage = {
-        connection_id: false,
-        id: message,
-        is_deleted: false,
-        unRead: false,
-        today: false,
+
+    const today = getCurrentDate()
+    const connectionId = connection.id
+    const msgId = `msgid_${today.getMilliseconds()}`
+    const isRead = false
+    const isDeleted = false
+    const mediaFiles = []
+    const sentAt = today
+    const msgText = message
+    const senderId = user.userId
+    const senderName = user.userName
+
+    //checking if message text is not empty
+    if (msgText != '') {
+      // sending message to database
+      const newMessage = {
+        connection_id: connectionId,
+        id: msgId,
+        is_deleted: isDeleted,
+        is_read: isRead,
+        sent_at: sentAt,
+        message: msgText,
+        media_files: mediaFiles,
+        sender: {
+          id: senderId,
+          name: senderName
+        }
       };
 
+      sendChatMessage(newMessage)
+
+      getChat() // TODO: Might need to get updated messages from firestorer
+      setMessage('');
 
     }
-
-    // setMessageArray([...messageArray, newMessage]);
-    setMessage('');
   };
 
 
@@ -176,7 +198,7 @@ const Chat = ({ route, navigation }) => {
                       </View>
                     )} */}
                     {item.messages.map((subItem, index) => {
-                      const msgTime = getTimeFromDate(subItem.sent_at.seconds)
+                      const msgTime = getTimeFromMilliseconds(subItem.sent_at.seconds)
                       return (
                         <View key={index}>
                           {subItem.sender.id === user.userId ?

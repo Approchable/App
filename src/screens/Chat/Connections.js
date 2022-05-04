@@ -12,7 +12,7 @@ import { Routes } from '../../components/config/Constant';
 import AppHeader from '../../components/Utility/AppHeader';
 import MyStatusBar from '../../components/MyStatusBar';
 import Loader from '../../components/Loader';
-import { getConnectionsById } from '../../../firebase';
+import { getConnectionById } from '../../../firebase';
 
 const width = (Dimensions.get('window').width - 36) / 3.5;
 
@@ -43,7 +43,7 @@ export default function Connections({ navigation }) {
   const onClickChatButton = async () => {
     _getConnections()
     console.log('conId ===>>>  ', conId);
-    const connections = await getConnectionsById(conId);
+    const connections = await getConnectionById(conId);
     if (connections) {
       console.log('connections new 1 ====>> ', connections);
       navigation.navigate(Routes.Chat, { data: connections })

@@ -6,11 +6,12 @@ import {
   collection,
   getDocs,
   addDoc,
-  doc,
+  orderBy,
   where,
-  query
+  query,
+  Timestamp
 } from 'firebase/firestore';
-import { getDatabase, onValue, ref, set, get, child } from 'firebase/database';
+import { getDatabase, ref, set, get, child } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
 import { setDataByDate } from './src/components/Utility/Helper';
 
@@ -28,14 +29,20 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+// Initialize Firestore Database
 const fireStore = getFirestore(app);
+
+// Initialize Realtime Database
+const realTimeDB = getDatabase(app);
+
+// Initialize Firebase Storage
 const storage = getStorage(app);
 
-// console.log("test")
 createStorageUrlfromImage(
   'file:///Users/ebukaegbunam/Library/Developer/CoreSimulator/Devices/71080F92-B428-460B-8F59-ABCE4268910B/data/Containers/Data/Application/A0E0666A-CBFB-41DD-8C25-54B5F263AFA9/Library/Caches/ExponentExperienceData/%2540ebukaegb%252FApproachableNative/ImagePicker/01D82213-8999-4C29-BFA4-69338B4734D1.jpg',
 );
+
+// Firebase Storage Methods
 
 async function createStorageUrlfromImage(localUri) {
   console.log('creating storage url...');
@@ -52,17 +59,15 @@ async function createStorageUrlfromImage(localUri) {
   }
 }
 
+// Realtime Database Methods
 
-
-function writeDatatoRdb(path, data) {
-  const db = getDatabase();
-  const ref = db.ref('users/' + id);
+function _writeDatatoRdb(path, data) {
+  const ref = realTimeDB.ref('users/' + id);
   ref.set(data);
 }
 
 export function writeUserData(userId, data) {
-  const db = getDatabase();
-  set(ref(db, 'users/' + userId), data)
+  set(ref(realTimeDB, 'users/' + userId), data)
     .then(() => {
       console.log('success with firebase writing user data');
     })
@@ -73,8 +78,7 @@ export function writeUserData(userId, data) {
 
 export function deleteUserData(id) {
   console.log(' deleting...');
-  const db = getDatabase();
-  set(ref(db, 'users/' + id), null)
+  set(ref(realTimeDB, 'users/' + id), null)
     .then(() => {
       console.log('deleted user');
     })
@@ -87,7 +91,7 @@ export function deleteUserData(id) {
 
 export async function getUserDataById(userId) {
 
-  const dbRef = ref(getDatabase());
+  const dbRef = ref(realTimeDB);
   const user = get(child(dbRef, `users/${userId}`)).then((snapshot) => {
     if (snapshot.exists()) {
       const data = snapshot.val();
@@ -106,6 +110,7 @@ export async function getUserDataById(userId) {
 
 }
 
+// Firestore Database Methods
 
 export async function getPostsFromFireStore() {
   const collectionRef = collection(fireStore, 'posts');
@@ -124,8 +129,6 @@ export async function verifyCredentialsFromFireStore(postId) {
   return true;
 }
 
-
-
 export async function readingtestToFireStore() {
   const collectionRef = collection(fireStore, 'posts');
   try {
@@ -140,10 +143,10 @@ export async function readingtestToFireStore() {
 }
 
 // get connections list which is actually chats main object
-export async function getConnectionsFromFireStore() {
-  const collectionRef = collection(fireStore, 'connections');
+export async function getAllConnections() {
+  const connectionsRef = collection(fireStore, 'connections');
   try {
-    const querySnapshot = await getDocs(collectionRef);
+    const querySnapshot = await getDocs(connectionsRef);
     const data = querySnapshot.docs.map(doc => doc.data());
     return data;
   } catch (error) {
@@ -153,10 +156,10 @@ export async function getConnectionsFromFireStore() {
 }
 // 
 // get connection by id
-export async function getConnectionsById(connectionId) {
-  const collectionRef = collection(fireStore, 'connections');
+export async function getConnectionById(connectionId) {
+  const connectionsRef = collection(fireStore, 'connections');
   try {
-    const q = query(collectionRef, where("id", "==", connectionId));
+    const q = query(connectionsRef, where("id", "==", connectionId));
     const querySnapshot = await getDocs(q);
     const data = querySnapshot.docs.map(doc => doc.data());
     if (data.length > 0) {
@@ -170,20 +173,52 @@ export async function getConnectionsById(connectionId) {
   }
 }
 
-export async function getChatFromFireStoreById(conId, connectedUserId) {
+export async function getAllMessagesForConnectionId(conId) {
 
-  const collectionRef = collection(fireStore, 'connections/' + conId + '/' + 'messages');
+  const messagesRef = collection(fireStore, 'connections/' + conId + '/' + 'messages');
   try {
-    const q = query(collectionRef, where("connection_id", "==", conId));
+    const q = query(messagesRef, where("connection_id", "==", conId), orderBy("sent_at"))
     const querySnapshot = await getDocs(q);
     const data = querySnapshot.docs.map(doc => doc.data());
     // console.log('data chating ==== : ', data);
     const groupedData = setDataByDate(data)
     return groupedData
   } catch (error) {
-    console.log('Error getting connections from firebase ', error);
+    console.log('Error getting chat from firebase ', error);
     return null;
   }
 }
 
-export { storage, db, fireStore };
+export async function sendChatMessage(messageObject) {
+
+  const msg = messageObject
+  const conId = msg.connection_id
+  console.log("sendChatMessage message ==> ", msg)
+  const sentAtTimeStamp = Timestamp.fromDate(msg.sent_at)
+  const messagesRef = collection(fireStore, 'connections/' + conId + '/' + 'messages');
+
+  const newMessage = {
+    connection_id: conId,
+    id: msg.id,
+    is_deleted: msg.is_deleted,
+    is_read: msg.is_read,
+    sent_at: sentAtTimeStamp,
+    message: msg.message,
+    media_files: msg.media_files,
+    sender: msg.sender
+  }
+
+  console.log("sendChatMessage message updated ==> ", newMessage)
+
+  try {
+    const docRef = await addDoc(messagesRef, newMessage);
+    console.log('sendChatMessage message sent successfully ==> ', docRef);
+    return docRef;
+  } catch (error) {
+    console.log('sendChatMessage message ==> ', error);
+    return null;
+  }
+
+}
+
+export { storage, fireStore };

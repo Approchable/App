@@ -19,7 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   deleteUserData,
   getUserDataById,
-  getConnectionsById,
+  getConnectionById,
   getPostsFromFireStore,
 
   writeUserData,
@@ -196,7 +196,7 @@ export const getConnections = connectionId => {
       },
     });
     try {
-      const connections = await getConnectionsById(connectionId);
+      const connections = await getConnectionById(connectionId);
       if (connections) {
         dispatch({
           type: GET_CONNECTIONS_BY_ID,
