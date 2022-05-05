@@ -21,6 +21,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {addToPostObject} from '..//../store//posts//posts';
 import * as Location from 'expo-location';
 import MyStatusBar from '../../components/MyStatusBar';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 export default function CreatePost2({navigation, route}) {
   const selectedStartTime = 'start';
@@ -41,6 +42,7 @@ export default function CreatePost2({navigation, route}) {
   const [location, setLocation] = useState(null);
   const [addressResult, setAddressResult] = useState(null);
   const [screeningQuestion, setScreeningQuestion] = useState(null);
+  
 
   const finishCreatePost2 = () => {
     if (startTime == '00:00') {
@@ -190,7 +192,7 @@ export default function CreatePost2({navigation, route}) {
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
       {/* <AppHeader moreStyles={{height: 50 }} /> */}
-      <ScrollView style={styles.container}>
+      <KeyboardAwareScrollView style={styles.container}>
         <View style={styles.container}>
           <View style={{marginHorizontal: 16, flex: 0.5, marginTop: 40}}>
             <HeaderText
@@ -329,7 +331,7 @@ export default function CreatePost2({navigation, route}) {
             />
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

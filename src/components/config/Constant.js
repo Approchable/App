@@ -1,4 +1,5 @@
-import { Dimensions } from 'react-native'
+import { Dimensions  } from 'react-native'
+
 
 export const screenHeight = {
     height5: Math.round((5 / 100) * Dimensions.get('window').height),
@@ -76,3 +77,4 @@ export const ImageSet = {
     send: require('../../assets/images/icons/send_icon.png'),
 }
 
+export const ASYNC_USER_STRING = 'user'

@@ -9,6 +9,7 @@ import {
   Alert,
   Modal,
   SafeAreaView,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {HeaderText, RegularText, RegularBoldText} from '../../components/Texts';
 import React, {useState, useEffect} from 'react';
@@ -23,6 +24,7 @@ import MyStatusBar from '../../components/MyStatusBar';
 import AppHeader from '../../components/Utility/AppHeader';
 import {StackActions} from '@react-navigation/native';
 import {CommonActions} from '@react-navigation/native';
+import uuid from 'react-native-uuid';
 
 export default function CreatePost3({navigation}) {
   const [buttonActive, setButtonActive] = useState(false);
@@ -35,8 +37,10 @@ export default function CreatePost3({navigation}) {
     var user = await AsyncStorage.getItem('user');
     user = JSON.parse(user);
     const data = {
+      postId: uuid.v4().toString(),
       localImageUrl: image || '',
       user: user,
+      usersWhoRequested:[user.id],
     };
     const newPostObject = {
       ...prevPostObject,
@@ -46,10 +50,9 @@ export default function CreatePost3({navigation}) {
     console.log(
       '===========================Create post in firebase from post screen 3=====================================',
     );
-    
+
     dispatch(createPosts(newPostObject));
-    
-  
+
     navigation.dispatch(
       CommonActions.reset({
         index: 1,
@@ -217,7 +220,6 @@ export default function CreatePost3({navigation}) {
 const ButtonModal = ({visible, items, onCancel}) => {
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <ModalBarTop />
       <View
         style={{
           ...styles.modal,
@@ -268,6 +270,9 @@ const ButtonModal = ({visible, items, onCancel}) => {
           />
         </View>
       </View>
+      <TouchableWithoutFeedback onPress={onCancel}>
+        <View style={styles.modalBG} />
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
@@ -297,5 +302,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'white',
+    zIndex: 1000,
+  },
+  modalBG: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    height: 900, // change this to height of screen later
   },
 });

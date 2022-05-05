@@ -9,6 +9,7 @@ import AppHeader from '../../components/Utility/AppHeader';
 import CategoryItem from '../../components/CategoryItem';
 import {addToPostObject} from '..//../store//posts//posts';
 import MyStatusBar from '../../components/MyStatusBar';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 export default function CreatePost1({navigation}) {
   const dispatch = useDispatch();
@@ -80,7 +81,7 @@ export default function CreatePost1({navigation}) {
     <View style={{flex: 1 , backgroundColor: 'white'}}>
       <MyStatusBar backgroundColor="white" />
       {/* <AppHeader moreStyles={{height: 50}} /> */}
-      <ScrollView>
+      <KeyboardAwareScrollView>
         <View style={{...styles.container}}>
           <View style={{marginHorizontal: 20, flex: 0.5}}>
             <HeaderText content="What do you want to do right now?" />
@@ -138,7 +139,7 @@ export default function CreatePost1({navigation}) {
             hollow
           />
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 }

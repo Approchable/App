@@ -7,9 +7,10 @@ export function NormalTextField({placeholder, onChangeText, onDelete, value , mo
     <View style={{...styles.textInputView, ...moreStyles}}>
       <TextInput
         ref={ref}
-        autoFocus={autoFocus || true} 
+        autoFocus={autoFocus} 
         value={value}
-        style={styles.textInput}
+        placeholderStyle = {{color:"green"}}
+        style={{...styles.textInput ,}}
         placeholder={placeholder}
         onChangeText={onChangeText}
         paddingStyle={styles.paddingStyle}
