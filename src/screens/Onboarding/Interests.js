@@ -13,7 +13,7 @@ import Center from '../../components/Utility/Center';
 import {HeaderText, RegularText, SmallerText} from '../../components/Texts';
 import LandingPage from '../Onboarding/LandingPage';
 import HowItWorks from './HowItWorks';
-import Animated, {set} from 'react-native-reanimated';
+import Animated, {exp, set} from 'react-native-reanimated';
 import {useState, useEffect, useContext, useRef} from 'react';
 import {writeUserData} from '../../../firebase';
 import CategoryItem from '../../components/CategoryItem';
@@ -86,7 +86,13 @@ export default function Interests({navigation, route}) {
     console.log("categoriessssss" , categories)
     // save user interest and expo token to firebase as well
     registerForPushNotificationsAsync().then(token => {
-      setExpoPushToken(token);
+      let expoToken = ''
+      if (token != undefined && token != null && token != '') {
+        expoToken = token
+      } else {
+        expoToken = 'simualator_token'
+      }
+      setExpoPushToken(expoToken);
       var finalId = '';
       var name = '';
       var finalResult = {};
@@ -99,14 +105,14 @@ export default function Interests({navigation, route}) {
         finalResult['id'] = finalId;
         finalResult['familyName'] = lastName;
         finalResult['givenName'] = firstname;
-        finalResult['expoPushToken'] = token;
+        finalResult['expoPushToken'] = expoToken;
         finalResult['name'] = firstname + ' ' + lastName;
         finalResult['appleId'] = id;
         finalResult['signUpType'] = 'apple';
         console.log(finalResult, 'apple');
       } else {
         finalResult = result.user;
-        finalResult['expoPushToken'] = token;
+        finalResult['expoPushToken'] = expoToken;
         finalResult['signUpType'] = 'google';
         console.log(finalResult, 'google');
         finalId = finalResult.id;
