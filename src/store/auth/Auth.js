@@ -40,9 +40,12 @@ export const Init = () => {
 };
 
 export const login = data => {
+  console.log('Logging in user....');
   return async dispatch => {
     try {
+      console.log('Storing user information in async storage...');
       await AsyncStorage.setItem('user', JSON.stringify(data));
+      console.log('adding user information in realtime database...');
       await writeUserData(data.id, data);
       dispatch({
         type: LOGIN,
