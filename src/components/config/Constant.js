@@ -1,5 +1,4 @@
-import { Dimensions  } from 'react-native'
-
+import { Dimensions } from 'react-native'
 
 export const screenHeight = {
     height5: Math.round((5 / 100) * Dimensions.get('window').height),
@@ -56,13 +55,14 @@ export const Routes = {
 }
 
 export const ColorSet = {
+    defaultTheme: '#44BFBA',
     lightGray: '#F6F6F6',
-    chatRightPopupGray:'#ECEEF2',
-    chatLeftPopupGray:'#F6F6F6',
-    chatPopupGray:'#ECEEF2',
+    chatRightPopupGray: '#ECEEF2',
+    chatLeftPopupGray: '#F6F6F6',
+    chatPopupGray: '#ECEEF2',
     gray: '#989898',
     textBlack: '#030E01',
-    white:'#fff',
+    white: '#fff',
 }
 
 export const ImageSet = {
@@ -75,6 +75,14 @@ export const ImageSet = {
     plus: require('../../assets/images/icons/plus_icon.png'),
     mic: require('../../assets/images/icons/mic_icon.png'),
     send: require('../../assets/images/icons/send_icon.png'),
+    search: require('../../assets/images/icons/search.png'),
+    dot: require('../../assets/images/icons/dot.png'),
+    profile: require('../../assets/images/icons/profile.jpg'),
+    noMessage: require('../../assets/images/icons/no-message.png'),
+    filter: require('../../assets/images/icons/filter-icon.png')
 }
 
-export const ASYNC_USER_STRING = 'user'
+export const TabType = {
+    connections: 'connections',
+    requests: 'requests'
+}
