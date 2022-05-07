@@ -1,21 +1,21 @@
-import {View, Text, StyleSheet, StatusBar, SafeAreaView} from 'react-native';
+import { View, Text, StyleSheet, StatusBar, SafeAreaView } from 'react-native';
 import React from 'react';
 import NavigationLogo from '../../assets/images/assets/NavigationLogo.svg';
 
-export default function AppHeader({moreStyles}) {
+export default function AppHeader({ moreStyles }) {
   return (
-    <View style={{...styles.container, ...moreStyles}}>
+    <View style={{ ...styles.container, ...moreStyles }}>
       <View
         style={{
           height: 60,
           flex: 1,
-          alignItems: 'left',
+          // alignItems: 'left',
           justifyContent: 'center',
 
-          
+
           backgroundColor: '#F6F6F6',
         }}>
-        <View style = {{ marginLeft: 16}}>
+        <View style={{ marginLeft: 16 }}>
           <NavigationLogo witdth="100%" />
         </View>
       </View>
@@ -23,8 +23,8 @@ export default function AppHeader({moreStyles}) {
   );
 }
 
-const MyStatusBar = ({backgroundColor, ...props}) => (
-  <View style={[styles.statusBar, {backgroundColor}]}>
+const MyStatusBar = ({ backgroundColor, ...props }) => (
+  <View style={[styles.statusBar, { backgroundColor }]}>
     <SafeAreaView>
       <StatusBar translucent backgroundColor={backgroundColor} {...props} />
     </SafeAreaView>
