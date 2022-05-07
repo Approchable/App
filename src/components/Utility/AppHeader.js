@@ -9,7 +9,7 @@ export default function AppHeader({ moreStyles }) {
         style={{
           height: 60,
           flex: 1,
-          // alignItems: 'left',
+          alignItems: 'flex-start',
           justifyContent: 'center',
 
 

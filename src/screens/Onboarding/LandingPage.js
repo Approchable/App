@@ -79,7 +79,7 @@ export default function LandingPage({ navigation }) {
     }
   };
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     setGoogleSubmitting(true);
     console.log('test sign in');
 
@@ -97,11 +97,10 @@ export default function LandingPage({ navigation }) {
     // console.log('config google  =====>>> ', config);
 
     Google.logInAsync(config)
-      .then(result => {
+      .then(async (result) => {
         const { type, user, accessToken } = result;
+        await Google.logOutAsync({ accessToken, ...config });
         if (type === 'success') {
-
-          Google.logOutAsync({ accessToken, ...config });
           console.log('result', result);
           const { familyName, givenName } = user;
 
@@ -111,7 +110,7 @@ export default function LandingPage({ navigation }) {
             navigation.navigate('Name', { result, familyName, givenName, type }),
           );
 
-          return accessToken;
+          return result.accessToken;
         } else {
           return { cancelled: true };
         }
