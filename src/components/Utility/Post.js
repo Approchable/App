@@ -17,7 +17,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import FastImage from 'react-native-fast-image';
 import {getusersWhoRequested} from '../..//store//Requests//Requests';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {ExploreReport} from '../Report';
 var dayjs = require('dayjs');
 
 export default function Post({
@@ -32,9 +32,8 @@ export default function Post({
   endDateTime,
   onPress,
   postId,
-  usersWhoRequested
+  usersWhoRequested,
 }) {
- 
   return (
     <View style={styles.PostView}>
       <PostHeader
@@ -72,7 +71,6 @@ export function PostModal({post, onPressSend}) {
   const [buttonActive, setButtonActive] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
 
- 
   const handleButtonActive = () => {
     if (description === null || description === '') {
       setButtonActive(false);
@@ -139,16 +137,26 @@ function PostHeader({
 }) {
   return (
     <View
-      style={{...styles.PostHeaderView, flexDirection: 'row', ...moreStyles}}>
-      <PostProfileImage imageUrl={profileImage} />
-      <View style={{marginLeft: 10}}>
-        <PostUserName userName={userName} />
-        <PostLocation
-          location={location}
-          addressResult={addressResult}
-          showJoinButton
-        />
+      style={{
+        ...styles.PostHeaderView,
+        flexDirection: 'row',
+        ...moreStyles,
+        
+        justifyContent: 'space-between',
+      }}>
+      <View style={{flexDirection: 'row'}}>
+        <PostProfileImage imageUrl={profileImage} />
+        <View style={{marginLeft: 10}}>
+          <PostUserName userName={userName} />
+          <PostLocation
+            location={location}
+            addressResult={addressResult}
+            showJoinButton
+          />
+        </View>
       </View>
+
+      <ExploreReport moreStyles={{ }} />
     </View>
   );
 }
@@ -230,23 +238,20 @@ function PostImage({imageUrl}) {
   // chnage image here to fast image from  https://github.com/DylanVann/react-native-fast-image for cahed and faster reloads
   const [loading, setLoading] = useState(true);
   if (imageUrl === null || imageUrl === '' || imageUrl === undefined) {
-    return <></>
-  }else{
-
-  
-
-  return (
-    <View style={styles.PostImageView}>
-      <LoadingScreen visible={loading} />
-      <Image
-        style={styles.PostImage}
-        source={{uri: imageUrl}}
-        fadeDuration={300}
-        onLoadStart={() => setLoading(true)}
-        onLoadEnd={() => setLoading(false)}
-      />
-    </View>
-  );
+    return <></>;
+  } else {
+    return (
+      <View style={styles.PostImageView}>
+        <LoadingScreen visible={loading} />
+        <Image
+          style={styles.PostImage}
+          source={{uri: imageUrl}}
+          fadeDuration={300}
+          onLoadStart={() => setLoading(true)}
+          onLoadEnd={() => setLoading(false)}
+        />
+      </View>
+    );
   }
 }
 
@@ -370,25 +375,20 @@ function PostTime({startDateTime, endDateTime}) {
   );
 }
 
-function PostJoinButton({onPress, postId , usersWhoRequested}) {
-  
- 
+function PostJoinButton({onPress, postId, usersWhoRequested}) {
   const [isLoading, setIsLoading] = useState(false);
   const [isUserRequested, setisUserRequested] = useState(false);
-  const [message , setMessage] = useState('');
+  const [message, setMessage] = useState('');
 
- 
   const checkIfUserRequested = async () => {
     const user = await AsyncStorage.getItem('user');
     const userId = JSON.parse(user).id;
     console.log('user id is', userId);
 
-   
     if (usersWhoRequested.includes(userId)) {
       setisUserRequested(true);
       setMessage('Request Sent');
-    }
-    else{
+    } else {
       setisUserRequested(false);
       setMessage('Join');
     }
@@ -396,7 +396,6 @@ function PostJoinButton({onPress, postId , usersWhoRequested}) {
 
   useEffect(() => {
     checkIfUserRequested();
-    
   }, []);
   if (isUserRequested == true) {
     return (
@@ -464,7 +463,13 @@ function PostFooter({
         startDateTime={startDateTime}
         endDateTime={endDateTime}
       />
-      {showJoinButton && <PostJoinButton onPress={onPress} postId={postId} usersWhoRequested={usersWhoRequested}/>}
+      {showJoinButton && (
+        <PostJoinButton
+          onPress={onPress}
+          postId={postId}
+          usersWhoRequested={usersWhoRequested}
+        />
+      )}
     </View>
   );
 }

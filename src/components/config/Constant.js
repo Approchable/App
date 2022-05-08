@@ -75,6 +75,7 @@ export const ImageSet = {
     plus: require('../../assets/images/icons/plus_icon.png'),
     mic: require('../../assets/images/icons/mic_icon.png'),
     send: require('../../assets/images/icons/send_icon.png'),
+    threeDots: require('../../assets/images/icons/three_dots_icon.png'),
 }
 
 export const ASYNC_USER_STRING = 'user'
