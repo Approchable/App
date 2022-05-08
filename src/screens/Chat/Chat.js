@@ -10,65 +10,73 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
-import { NormalButton } from '../../components/Buttons';
-import React, { useState, useEffect } from 'react';
-import { HeaderText, RegularBoldText } from '../../components/Texts';
-import CategoryItem from '../../components/CategoryItem';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch, useSelector } from 'react-redux';
-import { ActivityIndicator } from 'react-native';
-import { logout } from '../../store/actions';
-import { NormalTextField } from '../../components/TextField';
+} from 'react-native'
+import { NormalButton } from '../../components/Buttons'
+import React, { useState, useEffect } from 'react'
+import { HeaderText, RegularBoldText } from '../../components/Texts'
+import CategoryItem from '../../components/CategoryItem'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useDispatch, useSelector } from 'react-redux'
+import { ActivityIndicator } from 'react-native'
+import { logout } from '../../store/actions'
+import { NormalTextField } from '../../components/TextField'
 import {
   ColorSet,
   ImageSet,
   Routes,
   screenWidth,
-} from '../../components/config/Constant';
-import MyStatusBar from '../../components/MyStatusBar';
-import { getAllMessagesForConnectionId, getUserDataById, sendChatMessage } from '../../../firebase';
-import Loader from '../../components/Loader';
-import { getCurrentDate, getTimeFromMilliseconds } from '../../components/Utility/Helper';
-import moment from 'moment';
+} from '../../components/config/Constant'
+import MyStatusBar from '../../components/MyStatusBar'
+import {
+  getAllMessagesForConnectionId,
+  getUserDataById,
+  sendChatMessage,
+} from '../../../firebase'
+import Loader from '../../components/Loader'
+import {
+  getCurrentDate,
+  getTimeFromMilliseconds,
+} from '../../components/Utility/Helper'
+import moment from 'moment'
 
-const width = (Dimensions.get('window').width - 36) / 3.5;
-
+const width = (Dimensions.get('window').width - 36) / 3.5
 
 const Chat = ({ route, navigation }) => {
   const connection = route.params.data
   // const connectedUser = useSelector(state => state.getConnectionUserReducer.connectedUser);
   // const connections = useSelector(state => state.GetConnectionsReducer.connections);
   //TODO: Need to fetch the current user from secure items or aysnc storage
-  const [user, setUser] = useState({ userId: 'userid_123456', userName: 'Charles' });
-  const [connectedUser, setConnectedUser] = useState();
-  const [messageArray, setMessageArray] = useState([]);
+  const [user, setUser] = useState({
+    userId: 'userid_123456',
+    userName: 'Charles',
+  })
+  const [connectedUser, setConnectedUser] = useState()
+  const [messageArray, setMessageArray] = useState([])
   // const [participentId, setParticipentId] = useState(connections.participent_id[0]);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
 
   // console.log('connectionData chat screen ===>>> ', connections);
 
   // console.log('connectionData chat screen participentId ===>>> ', participentId);
 
-  const [inputHeight, setInputHeight] = useState(0);
-  const dispatch = useDispatch();
-
+  const [inputHeight, setInputHeight] = useState(0)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     getUserData()
     getChat()
-  }, []);
-
-
+  }, [])
 
   const getUserData = async () => {
     setLoading(true)
-    console.log('connection chat screen 1234 ===>>> ', connection);
-    const participentId = connection.participants_id.find((i) => i != user.userId)
-    console.log('get other user Id ===>>> ', participentId);
+    console.log('connection chat screen 1234 ===>>> ', connection)
+    const participentId = connection.participants_id.find(
+      (i) => i != user.userId
+    )
+    console.log('get other user Id ===>>> ', participentId)
     const userData = await getUserDataById(participentId)
-    console.log('userData ===>>> ', userData);
+    console.log('userData ===>>> ', userData)
     if (userData) {
       setConnectedUser(userData)
       setLoading(false)
@@ -112,33 +120,28 @@ const Chat = ({ route, navigation }) => {
         media_files: mediaFiles,
         sender: {
           id: senderId,
-          name: senderName
-        }
-      };
+          name: senderName,
+        },
+      }
 
       sendChatMessage(newMessage)
 
       getChat() // TODO: Might need to get updated messages from firestorer
-      setMessage('');
-
+      setMessage('')
     }
-  };
-
-
+  }
 
   const getCurrentTime = () => {
-    let today = new Date();
-    let hours = (today.getHours() < 10 ? '0' : '') + today.getHours();
-    let minutes = (today.getMinutes() < 10 ? '0' : '') + today.getMinutes();
-    let seconds = (today.getSeconds() < 10 ? '0' : '') + today.getSeconds();
-    return hours + ':' + minutes;
-  };
+    let today = new Date()
+    let hours = (today.getHours() < 10 ? '0' : '') + today.getHours()
+    let minutes = (today.getMinutes() < 10 ? '0' : '') + today.getMinutes()
+    let seconds = (today.getSeconds() < 10 ? '0' : '') + today.getSeconds()
+    return hours + ':' + minutes
+  }
 
   const onBackButton = async () => {
-    navigation.goBack();
-  };
-
-
+    navigation.goBack()
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -180,14 +183,18 @@ const Chat = ({ route, navigation }) => {
                 paddingBottom: 10,
               }}>
               {messageArray.map((item, index) => {
-                let today = moment().format('YYYY-MM-DD');
-                let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD');
+                let today = moment().format('YYYY-MM-DD')
+                let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD')
                 const time = moment(item.date).format('ddd, MMMM DD')
                 return (
                   <View key={index}>
                     <View style={[styles.centerJustify, { marginVertical: 5 }]}>
                       <Text style={styles.dateLabelText}>
-                        {item.date == today ? 'Today' : item.date == yesterday ? 'Yesterday' : time}
+                        {item.date == today
+                          ? 'Today'
+                          : item.date == yesterday
+                          ? 'Yesterday'
+                          : time}
                       </Text>
                     </View>
                     {/* {item.unRead == true && (
@@ -198,36 +205,48 @@ const Chat = ({ route, navigation }) => {
                       </View>
                     )} */}
                     {item.messages.map((subItem, index) => {
-                      const msgTime = getTimeFromMilliseconds(subItem.sent_at.seconds)
+                      const msgTime = getTimeFromMilliseconds(
+                        subItem.sent_at.seconds
+                      )
                       return (
                         <View key={index}>
-                          {subItem.sender.id === user.userId ?
+                          {subItem.sender.id === user.userId ? (
                             <View style={styles.rightMessageView}>
                               <View style={styles.rightMessageText}>
-                                <Text style={[styles.dateLabelText, { marginRight: 10 }]}>
+                                <Text
+                                  style={[
+                                    styles.dateLabelText,
+                                    { marginRight: 10 },
+                                  ]}>
                                   {msgTime}
                                 </Text>
-                                <Text style={styles.messagesText}>{subItem.message}</Text>
+                                <Text style={styles.messagesText}>
+                                  {subItem.message}
+                                </Text>
                               </View>
                             </View>
-                            :
+                          ) : (
                             <View style={styles.leftMessageView}>
                               <View style={styles.leftMessageText}>
-                                <Text style={styles.messagesText}>{subItem.message}</Text>
-                                <Text style={[styles.dateLabelText, { marginLeft: 10 }]}>
+                                <Text style={styles.messagesText}>
+                                  {subItem.message}
+                                </Text>
+                                <Text
+                                  style={[
+                                    styles.dateLabelText,
+                                    { marginLeft: 10 },
+                                  ]}>
                                   {msgTime}
                                 </Text>
                               </View>
                             </View>
-                          }
+                          )}
                         </View>
                       )
-                    })
-                    }
+                    })}
                   </View>
-                );
-              })
-              }
+                )
+              })}
             </ScrollView>
           </View>
 
@@ -239,9 +258,9 @@ const Chat = ({ route, navigation }) => {
               <TextInput
                 value={message}
                 multiline={true}
-                onChangeText={text => setMessage(text)}
-                onContentSizeChange={event => {
-                  setInputHeight(event.nativeEvent.contentSize.height);
+                onChangeText={(text) => setMessage(text)}
+                onContentSizeChange={(event) => {
+                  setInputHeight(event.nativeEvent.contentSize.height)
                 }}
                 placeholder={'Start typing'}
                 placeholderTextColor={ColorSet.gray}
@@ -265,19 +284,19 @@ const Chat = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </View>
               )) || (
-                  <TouchableOpacity
-                    onPress={() => onClickSend()}
-                    style={styles.flexEnd}>
-                    <Image style={[styles.icon]} source={ImageSet.send} />
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity
+                  onPress={() => onClickSend()}
+                  style={styles.flexEnd}>
+                  <Image style={[styles.icon]} source={ImageSet.send} />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
       </KeyboardAvoidingView>
       <Loader isVisible={loading} />
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -425,6 +444,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     alignSelf: 'flex-end',
   },
-});
+})
 
 export default Chat
