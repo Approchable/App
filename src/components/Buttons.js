@@ -1,4 +1,4 @@
-import {TouchableOpacity, View, Text, StyleSheet} from 'react-native';
+import {TouchableOpacity, View, Text, StyleSheet , ActivityIndicator} from 'react-native';
 import {
   useFonts,
   Poppins_400Regular,
@@ -11,6 +11,15 @@ import {GoogleIcon, AppleIcon} from './Utility/Icons';
 import {RegularText, SmallerText} from './Texts';
 
 export function TextButton({text, onPress}) {
+  let [fontsLoaded] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Regular,
+    Poppins_700Normal,
+    Poppins_700Bold,
+  });
+  if (fontsLoaded) {
+    return <></>;
+  }
   return (
     <TouchableOpacity style={{padding: 0}} onPress={onPress}>
       <Text
@@ -32,12 +41,22 @@ export function NormalButton({
   onPress,
   inActive,
   textStyles,
+  loading
 }) {
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
+    Poppins_700Bold,
   });
+  if (fontsLoaded) {
+    return <></>;
+  }
+  if (loading){
+    return <>
+      <ActivityIndicator size="small" color="#44BFBA" />
+    </>
+  }
 
   if (inActive == false) {
     return (
@@ -86,7 +105,11 @@ export function GoogleButtonWithIcon({onPress, position}) {
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
+    Poppins_700Bold,
   });
+  if (fontsLoaded) {
+    return <></>;
+  }
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.GoogleButton}>
@@ -113,7 +136,11 @@ export function AppleButtonWithIcon({onPress}) {
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
+    Poppins_700Bold,
   });
+  if (fontsLoaded) {
+    return <></>;
+  }
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={{...styles.GoogleButton, backgroundColor: 'black'}}>

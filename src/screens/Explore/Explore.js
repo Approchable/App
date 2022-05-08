@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {RegularBoldText} from '../../components/Texts';
 import {NormalButton} from '../../components/Buttons';
@@ -15,19 +17,24 @@ import EmptyCreatePost from '../../assets/images/assets/EmptyCreatePost.svg';
 import {useDispatch} from 'react-redux';
 import SucessLogo from '../../assets/images/assets/SucessLogo.svg';
 import {NavigateToCreate} from '../../store/actions';
-import Post from '../../components/Utility/Post';
+import Post, {PostModal} from '../../components/Utility/Post';
 import AppHeader from '../../components/Utility/AppHeader';
 import {useSelector} from 'react-redux';
 import {getPosts} from '../../store/actions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import MyStatusBar from '../../components/MyStatusBar';
+import {sendJoinRequest} from '../../store/Requests/Requests';
+import * as Random from 'expo-random';
+import uuid from 'react-native-uuid';
 //GetPostsReducer
-function Explore() {
+function Explore({navigation}) {
   var posts = useSelector(state => state.GetPostsReducer.posts);
   var loading = useSelector(state => state.GetPostsReducer.loading);
   var error = useSelector(state => state.GetPostsReducer.error);
 
   const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalPost, setModalPost] = useState(null);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -39,18 +46,26 @@ function Explore() {
   };
   const dispatch = useDispatch();
 
-  console.log('===========================');
-  console.log('loading', loading, 'error', error);
-
   const [user, setUser] = useState(null);
 
   const _getPosts = async () => {
+    // dispatch fetch new post to properly update old posts
     dispatch(getPosts());
   };
 
+  const handleJoin = postObject => {
+    setModalVisible(true);
+    setModalPost(postObject);
+  };
+
+  const handleCancel = () => {
+    _getPosts();
+    setModalVisible(false);
+
+  }
+
   useEffect(() => {
     _getPosts();
-    console.log(posts);
   }, []);
 
   const postCount = 0;
@@ -70,8 +85,17 @@ function Explore() {
   } else if (posts.length > 0 && loading == false) {
     return (
       <View style={styles.container}>
-        <View style={{}}>
+        {/* <MyStatusBar backgroundColor="white" />
+        <AppHeader moreStyles={{flex: 0.1}} /> */}
+        <MyStatusBar backgroundColor="#F6F6F6" />
+        <AppHeader moreStyles={{flex: 0.1}} />
+        <View style={{flex: 1, borderRadius: 16}}>
           <FlatList
+            style={{
+              marginTop: 0,
+              backgroundColor: 'white',
+              borderRadius: 16,
+            }}
             data={posts}
             keyExtractor={item => item.id}
             refreshControl={
@@ -89,35 +113,35 @@ function Explore() {
                 endDateTime={item.endDateTime}
                 addressResult={item.addressResult}
                 profileImage={item.user.photoUrl}
+                postId={item.postId}
                 onPress={() => {
-                  console.log('Pressing a post');
+                  handleJoin(item);
                 }}
+                usersWhoRequested={item.usersWhoRequested}
               />
             )}
+          />
+
+          <JoinModal
+            visible={modalVisible}
+            onCancel={() => handleCancel()}
+            postObject={modalPost}
           />
         </View>
       </View>
     );
   } else {
-    return <NoPost />;
+    return <NoPost navigation={navigation} />;
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-});
-export default Explore;
-
-function NoPost() {
+function NoPost({navigation}) {
   const dispatch = useDispatch();
 
   const postCount = 0;
 
   const NavigateToCreateInExplore = () => {
-    dispatch(NavigateToCreate());
+    navigation.navigate('Create');
   };
 
   return (
@@ -152,3 +176,73 @@ function NoPost() {
     </View>
   );
 }
+
+const JoinModal = ({visible, postObject, onCancel}) => {
+  const dispatch = useDispatch();
+  const handleSendRequest = post => {
+    console.log('add join dispacth function here');
+    dispatch(sendJoinRequest(post));
+    onCancel();
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="slide">
+      <View
+        style={{
+          ...styles.modal,
+        }}>
+        <ModalBarTop post={postObject} />
+
+        <PostModal
+          post={postObject}
+          onPressSend={() => {
+            handleSendRequest(postObject);
+          }}
+        />
+      </View>
+      <TouchableWithoutFeedback onPress={onCancel}>
+        <View style={styles.modalBG} />
+      </TouchableWithoutFeedback>
+    </Modal>
+  );
+};
+
+const ModalBarTop = () => {
+  return (
+    <View
+      style={{
+        backgroundColor: '#ECEEF2',
+        height: 4,
+        width: 70,
+        borderRadius: 13,
+        alignSelf: 'center',
+        marginTop: 10,
+      }}></View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  modal: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    zIndex: 1000,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  modalBG: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    height: 900, // change this to height of screen later
+  },
+});
+export default Explore;

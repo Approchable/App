@@ -1,10 +1,23 @@
-import {View, Text, StyleSheet, Image, ActivityIndicator} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import * as Location from 'expo-location';
 import {SmallerText} from '../Texts';
 import {Icon, Icons} from './Icons';
 import {NormalButton} from '../Buttons';
-
+import {NormalTextField} from '..//TextField.js';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import FastImage from 'react-native-fast-image';
+import {getusersWhoRequested} from '../..//store//Requests//Requests';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ExploreReport} from '../Report';
 var dayjs = require('dayjs');
 
 export default function Post({
@@ -18,6 +31,8 @@ export default function Post({
   startDateTime,
   endDateTime,
   onPress,
+  postId,
+  usersWhoRequested,
 }) {
   return (
     <View style={styles.PostView}>
@@ -28,6 +43,7 @@ export default function Post({
         profileImage={profileImage}
         moreStyles={{
           marginBottom: 8,
+          marginTop: 16,
         }}
       />
       {/* <PostUserName userName={userName} /> */}
@@ -38,8 +54,77 @@ export default function Post({
         startDateTime={startDateTime}
         endDateTime={endDateTime}
         onPress={onPress}
+        showJoinButton={true}
+        postId={postId}
+        usersWhoRequested={usersWhoRequested}
       />
     </View>
+  );
+}
+
+export function PostModal({post, onPressSend}) {
+  const dispatch = useDispatch();
+  if (post === null || post === undefined) {
+    return null;
+  }
+  const [description, setDescription] = useState(null);
+  const [buttonActive, setButtonActive] = useState(false);
+  const [hasJoined, setHasJoined] = useState(false);
+
+  const handleButtonActive = () => {
+    if (description === null || description === '') {
+      setButtonActive(false);
+    } else {
+      setButtonActive(true);
+    }
+  };
+  useEffect(() => {
+    handleButtonActive();
+  }, [description]);
+  return (
+    <KeyboardAwareScrollView extraHeight={60}>
+      <View style={styles.PostView}>
+        <PostHeader
+          userName={post.user.name}
+          location={post.location}
+          addressResult={post.addressResult}
+          profileImage={post.user.photoUrl}
+          moreStyles={{
+            marginBottom: 8,
+            marginTop: 16,
+          }}
+        />
+        <PostTitle title={post.headline} />
+        <PostDescription description={post.description} />
+        <PostImage imageUrl={post.imageUrl} />
+        <PostFooter
+          startDateTime={post.startDateTime}
+          endDateTime={post.endDateTime}
+          showJoinButton={false}
+        />
+        <View
+          style={{
+            marginTop: 20,
+            marginBottom: 10,
+          }}>
+          <NormalTextField
+            placeholder="Break the ice with a comment"
+            moreStyles={{marginBottom: 60}}
+            onChangeText={text => setDescription(text)}
+            autoFocus={false}
+          />
+          <NormalButton
+            text={'Send Request'}
+            onPress={onPressSend}
+            inActive={buttonActive}
+            hollow={true}
+            moreStyles={{
+              marginBottom: 60,
+            }}
+          />
+        </View>
+      </View>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -52,12 +137,26 @@ function PostHeader({
 }) {
   return (
     <View
-      style={{...styles.PostHeaderView, flexDirection: 'row', ...moreStyles}}>
-      <PostProfileImage imageUrl={profileImage} />
-      <View style={{marginLeft: 10}}>
-        <PostUserName userName={userName} />
-        <PostLocation location={location} addressResult={addressResult} />
+      style={{
+        ...styles.PostHeaderView,
+        flexDirection: 'row',
+        ...moreStyles,
+        
+        justifyContent: 'space-between',
+      }}>
+      <View style={{flexDirection: 'row'}}>
+        <PostProfileImage imageUrl={profileImage} />
+        <View style={{marginLeft: 10}}>
+          <PostUserName userName={userName} />
+          <PostLocation
+            location={location}
+            addressResult={addressResult}
+            showJoinButton
+          />
+        </View>
       </View>
+
+      <ExploreReport moreStyles={{ }} />
     </View>
   );
 }
@@ -71,6 +170,10 @@ function PostLocation({location, addressResult}) {
   }, []);
 
   const getLocationAndTurnToAdress = async () => {
+    if (location === null || location === '' || location === undefined) {
+      setAddress('No Location!');
+      return;
+    }
     let {status} = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       setErrorMsg('Permission to access location was denied');
@@ -85,7 +188,7 @@ function PostLocation({location, addressResult}) {
   return (
     <View style={styles.PostLocationView}>
       <SmallerText
-        content={addressResult}
+        content={address}
         moreStyles={{marginBottom: -3, marginTop: -3}}
       />
     </View>
@@ -95,7 +198,7 @@ function PostDescription({description}) {
   return (
     <View style={styles.PostDescriptionView}>
       <SmallerText
-        style={styles.PostDescriptionText}
+        moreStyles={{marginBottom: 8, marginTop: 4}}
         content={description}></SmallerText>
     </View>
   );
@@ -132,20 +235,24 @@ function PostProfileImage({imageUrl}) {
 }
 
 function PostImage({imageUrl}) {
+  // chnage image here to fast image from  https://github.com/DylanVann/react-native-fast-image for cahed and faster reloads
   const [loading, setLoading] = useState(true);
-
-  return (
-    <View style={styles.PostImageView}>
-      <LoadingScreen visible={loading} />
-      <Image
-        style={styles.PostImage}
-        source={{uri: imageUrl}}
-        fadeDuration={300}
-        onLoadStart={() => setLoading(true)}
-        onLoadEnd={() => setLoading(false)}
-      />
-    </View>
-  );
+  if (imageUrl === null || imageUrl === '' || imageUrl === undefined) {
+    return <></>;
+  } else {
+    return (
+      <View style={styles.PostImageView}>
+        <LoadingScreen visible={loading} />
+        <Image
+          style={styles.PostImage}
+          source={{uri: imageUrl}}
+          fadeDuration={300}
+          onLoadStart={() => setLoading(true)}
+          onLoadEnd={() => setLoading(false)}
+        />
+      </View>
+    );
+  }
 }
 
 function LoadingScreen({visible}) {
@@ -160,7 +267,20 @@ function LoadingScreen({visible}) {
 }
 
 function PostTime({startDateTime, endDateTime}) {
-  console.log(startDateTime, endDateTime);
+  if (
+    startDateTime !== null ||
+    startDateTime !== '' ||
+    startDateTime !== undefined
+  ) {
+    startDateTime = dayjs(startDateTime.toDate());
+  }
+
+  if (endDateTime === null || endDateTime === '' || endDateTime === undefined) {
+    endDateTime = dayjs(new Date());
+  } else {
+    endDateTime = dayjs(endDateTime.toDate());
+  }
+
   var relativeTime = require('dayjs/plugin/relativeTime');
   dayjs.extend(relativeTime);
   const formatDateToDayJs = dayjs(startDateTime);
@@ -178,6 +298,14 @@ function PostTime({startDateTime, endDateTime}) {
   const [startTimeGreaterThanEndTime, setStartTimeGreaterThanEndTime] =
     useState(true);
   const getStartTime = () => {
+    if (
+      startDateTime === null ||
+      startDateTime === '' ||
+      startDateTime === undefined
+    ) {
+      setStartRelativeTime(dayjs().to(Date.now()));
+      return;
+    }
     const startTime = dayjs(startDateTime);
     setStartRelativeTime(dayjs().to(startTime));
   };
@@ -202,6 +330,9 @@ function PostTime({startDateTime, endDateTime}) {
     return true;
   };
   useEffect(() => {
+    // console.log(startDateTime , endDateTime , "end date time in posts");
+    // startDateTime = new Date(startDateTime)
+    // endDateTime = new Date(endDateTime)
     getStartTime();
     setStartTimeGreaterThanEndTime(isStartTimegreaterThanCurrentTime());
     formatAllTimes();
@@ -244,30 +375,87 @@ function PostTime({startDateTime, endDateTime}) {
   );
 }
 
-function PostJoinButton({onPress}) {
-  return (
-    <View style={styles.PostJoinButtonView}>
-      <NormalButton
-        text={'join'}
-        onPress={onPress}
-        moreStyles={{
-          height: 36,
-          paddingLeft: 25,
-          paddingRight: 25,
-          width: 96,
-        }}
-        textStyles={{
-          fontSize: 14,
-          lineHeight: 24,
-        }}
-        buttonActive={true}
-        hollow
-      />
-    </View>
-  );
+function PostJoinButton({onPress, postId, usersWhoRequested}) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUserRequested, setisUserRequested] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const checkIfUserRequested = async () => {
+    const user = await AsyncStorage.getItem('user');
+    const userId = JSON.parse(user).id;
+    console.log('user id is', userId);
+
+    if (usersWhoRequested.includes(userId)) {
+      setisUserRequested(true);
+      setMessage('Request Sent');
+    } else {
+      setisUserRequested(false);
+      setMessage('Join');
+    }
+  };
+
+  useEffect(() => {
+    checkIfUserRequested();
+  }, []);
+  if (isUserRequested == true) {
+    return (
+      <View style={styles.PostJoinButtonView}>
+        <NormalButton
+          text={message}
+          onPress={onPress}
+          moreStyles={{
+            height: 36,
+            paddingLeft: 25,
+            paddingRight: 25,
+            width: null,
+          }}
+          textStyles={{
+            fontSize: 14,
+            lineHeight: 24,
+          }}
+          buttonActive={false}
+          hollow
+          loading={isLoading}
+          inActive={false}
+        />
+      </View>
+    );
+    // ngoId : 113992437978529065350
+    // ebuka egbunam : 101432345899135768743
+    //ebuka egb:107841417840884772453
+  } else {
+    return (
+      <View style={styles.PostJoinButtonView}>
+        <NormalButton
+          text={message}
+          onPress={onPress}
+          moreStyles={{
+            height: 36,
+            paddingLeft: 25,
+            paddingRight: 25,
+            width: 96,
+          }}
+          textStyles={{
+            fontSize: 14,
+            lineHeight: 24,
+          }}
+          buttonActive={true}
+          hollow
+          loading={isLoading}
+        />
+      </View>
+    );
+  }
 }
 
-function PostFooter({startDateTime, endDateTime, onPress}) {
+function PostFooter({
+  startDateTime,
+  endDateTime,
+  onPress,
+  showJoinButton,
+  postId,
+  usersWhoRequested,
+}) {
   return (
     <View style={{...styles.PostFooterView, flexDirection: 'row'}}>
       <PostTime
@@ -275,7 +463,13 @@ function PostFooter({startDateTime, endDateTime, onPress}) {
         startDateTime={startDateTime}
         endDateTime={endDateTime}
       />
-      <PostJoinButton onPress={onPress} />
+      {showJoinButton && (
+        <PostJoinButton
+          onPress={onPress}
+          postId={postId}
+          usersWhoRequested={usersWhoRequested}
+        />
+      )}
     </View>
   );
 }
@@ -290,7 +484,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 24,
     color: '#030E01',
-    fontFamily: 'Poppins',
   },
   PostUserNameView: {},
   PostTitleView: {},
@@ -299,14 +492,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#030E01',
-    fontFamily: 'Poppins',
   },
   PostDescriptionView: {},
   PostDescriptionText: {
     fontSize: 14,
     lineHeight: 24,
     color: '#030E01',
-    fontFamily: 'Poppins',
   },
   PostProfileImageView: {},
   PostImage: {
@@ -315,9 +506,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   postProfileImage: {
-    height: 40,
-    width: 40,
-    borderRadius: 20,
+    height: 52,
+    width: 52,
+    borderRadius: 25.5,
     borderWidth: 0,
   },
   PostImageView: {},

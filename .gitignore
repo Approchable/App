@@ -32,6 +32,7 @@ local.properties
 
 # node.js
 #
+.expo/*
 **/node_modules
 node_modules/
 npm-debug.log

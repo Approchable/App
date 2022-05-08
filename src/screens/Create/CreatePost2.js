@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {NormalButton, TextButton} from '../../components/Buttons';
@@ -19,6 +20,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {addToPostObject} from '..//../store//posts//posts';
 import * as Location from 'expo-location';
+import MyStatusBar from '../../components/MyStatusBar';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 export default function CreatePost2({navigation, route}) {
   const selectedStartTime = 'start';
@@ -34,27 +37,32 @@ export default function CreatePost2({navigation, route}) {
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
   const [startDateTime, setStartDateTime] = useState(null);
   const [endDateTime, setEndDateTime] = useState(null);
-  const [startTime, setStartTime] = useState("00:00");
-  const [endTime, setEndTime] = useState("00:00");
+  const [startTime, setStartTime] = useState('00:00');
+  const [endTime, setEndTime] = useState('00:00');
   const [location, setLocation] = useState(null);
   const [addressResult, setAddressResult] = useState(null);
   const [screeningQuestion, setScreeningQuestion] = useState(null);
+  
 
   const finishCreatePost2 = () => {
-    if (startTime == '00:00'){
+    if (startTime == '00:00') {
       Alert.alert('Please enter a start time');
-      return
+      return;
     }
-    if (addressResult == null || addressResult == undefined || addressResult == ''){
+    if (
+      addressResult == null ||
+      addressResult == undefined ||
+      addressResult == ''
+    ) {
       Alert.alert('Please enter a location');
-      return
+      return;
     }
-    
+    console.log("date times :" + startDateTime + " " + endDateTime);
     const data = {
       description: description || '',
       startDateTime: startDateTime || Date.now(),
       endDateTime: endDateTime || '',
-      startTime: startTime ,
+      startTime: startTime,
       endTime: endTime || '',
       location: location || {},
       addressResult: addressResult || '',
@@ -81,6 +89,7 @@ export default function CreatePost2({navigation, route}) {
   };
 
   const handleConfirm = date => {
+    console.log(new Date(date))
     const hoursAndMinutes = getHoursandMinutes(date);
     setStartDateTime(date);
     setStartTime(hoursAndMinutes);
@@ -115,7 +124,6 @@ export default function CreatePost2({navigation, route}) {
   useEffect(() => {
     _isButtonActiveController();
     getLocationAndTurnToAdress();
-    
   }, [description]);
 
   const isDescriptionComplete = () => {
@@ -130,26 +138,32 @@ export default function CreatePost2({navigation, route}) {
   };
 
   const isLocationComplete = () => {
-    if (addressResult === null || addressResult === undefined || addressResult === '') {
+    if (
+      addressResult === null ||
+      addressResult === undefined ||
+      addressResult === ''
+    ) {
       return false;
     }
     return true;
   };
 
   const isStartTimeComplete = () => {
-    if (startTime === null || startTime === undefined || startTime === '00:00') {
+    if (
+      startTime === null ||
+      startTime === undefined ||
+      startTime === '00:00'
+    ) {
       return false;
     }
     return true;
-  }
+  };
   const _isButtonActiveController = () => {
     if (isDescriptionComplete() && isLocationComplete()) {
-     
       setButtonActive(true);
-    }else{
+    } else {
       setButtonActive(false);
     }
-   
   };
 
   const getLocationAndTurnToAdress = async () => {
@@ -175,145 +189,150 @@ export default function CreatePost2({navigation, route}) {
   //NaviagteOutOfCreate
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.container}>
-        <View style={{marginHorizontal: 16, flex: 0.5, marginTop: 40}}>
-          <HeaderText
-            content="Your hangout details"
-            moreStyles={{marginBottom: 10}}
-          />
-          <RegularBoldText content="Describe your hangout*" />
-          <NormalTextField
-            placeholder="Required"
-            moreStyles={{marginTop: -28}}
-            onChangeText={text => setDescription(text)}
-          />
-          <RegularBoldText content="Location" />
-          {addressResult === null ? (
-            <ActivityIndicator size="large" color="#44BFBA" />
-          ) : (
+    <SafeAreaView style={styles.container}>
+      <MyStatusBar backgroundColor="white" />
+      {/* <AppHeader moreStyles={{height: 50 }} /> */}
+      <KeyboardAwareScrollView style={styles.container}>
+        <View style={styles.container}>
+          <View style={{marginHorizontal: 16, flex: 0.5, marginTop: 40}}>
+            <HeaderText
+              content="Your hangout details"
+              moreStyles={{marginBottom: 10}}
+            />
+            <RegularBoldText content="Describe your hangout" />
             <NormalTextField
               placeholder="Required"
-              value={addressResult}
               moreStyles={{marginTop: -28}}
-              onChangeText={text => setAddressResult(text)}
+              onChangeText={text => setDescription(text)}
             />
-          )}
+            <RegularBoldText content="Location" />
+            {addressResult === null ? (
+              <ActivityIndicator size="large" color="#44BFBA" />
+            ) : (
+              <NormalTextField
+                placeholder="Required"
+                value={addressResult}
+                moreStyles={{marginTop: -28}}
+                onChangeText={text => setAddressResult(text)}
+                autoFocus = {false}
+              />
+            )}
 
-          <RegularBoldText
-            content="Time of hangout*"
-            moreStyles={{marginTop: 15, marginBottom: 10}}
-          />
-          <View
-            style={{
-              flexDirection: 'row',
-            }}>
-            <TouchableOpacity
-              onPress={() => showDatePicker()}
-              style={{
-                width: 66,
-                height: 44,
-                backgroundColor: 'white',
-                borderColor: '#ECEEF2',
-                borderWidth: 1,
-                borderRadius: 10,
-                justifyContent: 'center',
-              }}>
-              <Text
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  fontSize: 14,
-                  color: '#030E01',
-                  fontWeight: 'bold',
-                }}>
-                {startTime}
-              </Text>
-            </TouchableOpacity>
-
+            <RegularBoldText
+              content="Time of hangout*"
+              moreStyles={{marginTop: 15, marginBottom: 10}}
+            />
             <View
               style={{
-                marginHorizontal: 15,
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#696969',
+                flexDirection: 'row',
               }}>
-              <Text>-</Text>
+              <TouchableOpacity
+                onPress={() => showDatePicker()}
+                style={{
+                  width: 66,
+                  height: 44,
+                  backgroundColor: 'white',
+                  borderColor: '#ECEEF2',
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    fontSize: 14,
+                    color: '#030E01',
+                    fontWeight: 'bold',
+                  }}>
+                  {startTime}
+                </Text>
+              </TouchableOpacity>
+
+              <View
+                style={{
+                  marginHorizontal: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#696969',
+                }}>
+                <Text>-</Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => showEndTimePicker()}
+                style={{
+                  width: 66,
+                  height: 44,
+                  backgroundColor: 'white',
+                  borderColor: '#ECEEF2',
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    fontSize: 14,
+                    color: '#030E01',
+                    fontWeight: 'bold',
+                  }}>
+                  {endTime}
+                </Text>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              onPress={() => showEndTimePicker()}
-              style={{
-                width: 66,
-                height: 44,
-                backgroundColor: 'white',
-                borderColor: '#ECEEF2',
-                borderWidth: 1,
-                borderRadius: 10,
-                justifyContent: 'center',
-              }}>
-              <Text
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  fontSize: 14,
-                  color: '#030E01',
-                  fontWeight: 'bold',
-                }}>
-                {endTime}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {isDatePickerVisible == true && (
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
               mode="time"
               onConfirm={handleConfirm}
               onCancel={hideDatePicker}
             />
-          )}
 
-          <DateTimePickerModal
-            isVisible={isEndTimePickerVisible}
-            mode="time"
-            onConfirm={handleEndConfirm}
-            onCancel={hideEndDatePicker}
-          />
+            <DateTimePickerModal
+              isVisible={isEndTimePickerVisible}
+              mode="time"
+              onConfirm={handleEndConfirm}
+              onCancel={hideEndDatePicker}
+            />
 
-          <RegularBoldText content="Screening question (optional):" />
-          <RegularText
-            content="Ask anything that you want to require  potential connections to answer. "
-            moreStyles={{marginTop: -20}}
-          />
-          <NormalTextField
-            placeholder="Add a question"
-            moreStyles={{marginTop: -28}}
-            onChangeText={text => setScreeningQuestion(text)}
-          />
+            <RegularBoldText content="Screening question (optional):" />
+            <RegularText
+              content="Ask anything that you want to require  potential connections to answer. "
+              moreStyles={{marginTop: -20}}
+            />
+            <NormalTextField
+              placeholder="Add a question"
+              moreStyles={{marginTop: -28}}
+              onChangeText={text => setDescription(text)}
+            />
+          </View>
+
+          <View
+            style={{
+              flex: 1,
+              marginHorizontal: 16,
+              justifyContent: 'flex-end',
+              marginBottom: 20,
+            }}>
+            <NormalButton
+              text="Next"
+              onPress={() =>
+                buttonActive ? finishCreatePost2() : null
+              }
+              inActive={buttonActive}
+              hollow
+              moreStyles={{
+                marginTop: 20,
+              }}
+            />
+          </View>
         </View>
-
-        <View
-          style={{
-            flex: 1,
-            marginHorizontal: 16,
-            justifyContent: 'flex-end',
-            marginBottom: 20,
-          }}>
-          <NormalButton
-            text="Next"
-            onPress={() => (buttonActive ? finishCreatePost2() : null)}
-            inActive={buttonActive}
-            hollow
-            moreStyles={{
-              marginTop: 20,
-            }}
-          />
-        </View>
-      </View>
-    </ScrollView>
+      </KeyboardAwareScrollView>
+    </SafeAreaView>
   );
 }
 

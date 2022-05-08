@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Dimensions} from 'react-native';
+import {View, Text, StyleSheet, Dimensions, SafeAreaView} from 'react-native';
 import AppHeader from '../../components/Utility/AppHeader';
 import {NormalButton} from '../../components/Buttons';
 import React, {useState, useEffect} from 'react';
@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {ActivityIndicator} from 'react-native';
 import {logout} from '../../store/actions';
+import MyStatusBar from '../../components/MyStatusBar';
 const CategorieArr = [
   'Self development',
   'Creativity',
@@ -51,8 +52,10 @@ function NoUser() {
 
 function UserExists({user, deleteUser}) {
   return (
-    <View style={{...styles.container}}>
-      <View style={{flex: '1', marginHorizontal: 16, marginTop: 20}}>
+    <SafeAreaView style={styles.container}>
+    <MyStatusBar backgroundColor="white" />
+    <AppHeader moreStyles={{height: 50 }} />
+      <View style={{flex: '1', marginHorizontal: 16, marginTop: 10}}>
         <HeaderText content={user.name} moreStyles={{fontSize: 27}} />
         <HeaderText content="Interests" moreStyles={{fontSize: 18}} />
         <View style={{flexWrap: 'wrap', flexDirection: 'row', marginLeft: -5}}>
@@ -89,7 +92,7 @@ function UserExists({user, deleteUser}) {
           inActive={true}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

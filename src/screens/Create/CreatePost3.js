@@ -8,6 +8,8 @@ import {
   Platform,
   Alert,
   Modal,
+  SafeAreaView,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {HeaderText, RegularText, RegularBoldText} from '../../components/Texts';
 import React, {useState, useEffect} from 'react';
@@ -15,40 +17,53 @@ import {NormalButton} from '../../components/Buttons';
 import * as ImagePicker from 'expo-image-picker';
 import {NaviagteOutOfCreate, createPosts} from '../../store/actions';
 import {Camera} from 'expo-camera';
-import {useDispatch , useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {addToPostObject} from '..//../store//posts//posts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
-
+import MyStatusBar from '../../components/MyStatusBar';
+import AppHeader from '../../components/Utility/AppHeader';
+import {StackActions} from '@react-navigation/native';
+import {CommonActions} from '@react-navigation/native';
+import uuid from 'react-native-uuid';
 
 export default function CreatePost3({navigation}) {
   const [buttonActive, setButtonActive] = useState(false);
   const [image, setImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
-  var prevPostObject = useSelector(state => state.postsReducer)
+  var prevPostObject = useSelector(state => state.postsReducer);
 
   const finsihCreatePost3 = async () => {
     var user = await AsyncStorage.getItem('user');
     user = JSON.parse(user);
     const data = {
-      
+      postId: uuid.v4().toString(),
       localImageUrl: image || '',
-      user : user,
-
+      user: user,
+      usersWhoRequested:[user.id],
     };
     const newPostObject = {
       ...prevPostObject,
       ...data,
-    }
+    };
 
-    // dispatch(addToPostObject(data));
-    // console.log(postObject)
-    console.log("================================================================")
-    console.log ("newPostObject", newPostObject)
+    console.log(
+      '===========================Create post in firebase from post screen 3=====================================',
+    );
+
     dispatch(createPosts(newPostObject));
-    navigation.navigate('Explore');
+
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 1,
+        routes: [
+          {name: 'Explore'},
+          {
+            name: 'Explore',
+          },
+        ],
+      }),
+    );
   };
 
   const pickImage = async () => {
@@ -109,100 +124,102 @@ export default function CreatePost3({navigation}) {
     navigation.navigate('Explore');
   };
   return (
-    <ScrollView style={styles.container}>
-      <View style={{marginHorizontal: 16}}>
-        <HeaderText content="Add to your post" />
+    <SafeAreaView style={styles.container}>
+      <MyStatusBar backgroundColor="white" />
+      {/* <AppHeader moreStyles={{height: 50}} /> */}
+      <ScrollView style={styles.container}>
+        <View style={{marginHorizontal: 16}}>
+          <HeaderText content="Add to your post" />
 
-        {image == null && (
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            style={{
-              backgroundColor: 'white',
-              justifyContent: 'center',
-              borderWidth: 1,
-              borderStyle: 'dashed',
-              borderColor: '#989898',
-              marginTop: 30,
-              height: 250,
-            }}>
-            <Text
+          {image == null && (
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
               style={{
-                textAlign: 'center',
-                alignItems: 'center',
+                backgroundColor: 'white',
                 justifyContent: 'center',
-
-                fontWeight: 'bold',
-                fontSize: 16,
-                color: '#44BFBA',
+                borderWidth: 1,
+                borderStyle: 'dashed',
+                borderColor: '#989898',
+                marginTop: 30,
+                height: 250,
               }}>
-              Add Photo
-            </Text>
-          </TouchableOpacity>
-        )}
+              <Text
+                style={{
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
 
-        {image && (
-          <Image
-            source={{uri: image}}
+                  fontWeight: 'bold',
+                  fontSize: 16,
+                  color: '#44BFBA',
+                }}>
+                Add Photo
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {image && (
+            <Image
+              source={{uri: image}}
+              style={{
+                flex: 1,
+                backgroundColor: 'white',
+                justifyContent: 'center',
+                borderRadius: 5,
+                marginTop: 30,
+                height: 250,
+              }}
+            />
+          )}
+
+          {image && (
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Text
+                style={{
+                  marginTop: 30,
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+
+                  fontWeight: 'bold',
+                  fontSize: 16,
+                  color: '#44BFBA',
+                }}>
+                Change Photo
+              </Text>
+            </TouchableOpacity>
+          )}
+          <ButtonModal
+            visible={modalVisible}
+            items={ButtonModalItems}
+            onCancel={() => setModalVisible(false)}
+          />
+          <View
             style={{
               flex: 1,
-              backgroundColor: 'white',
-              justifyContent: 'center',
-              borderRadius: 5,
-              marginTop: 30,
-              height: 250,
-             
-            }}
-          />
-        )}
 
-        {image && (
-          <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Text
-              style={{
-                marginTop: 30,
-                textAlign: 'center',
-                alignItems: 'center',
-                justifyContent: 'center',
-
-                fontWeight: 'bold',
-                fontSize: 16,
-                color: '#44BFBA',
-              }}>
-              Change Photo
-            </Text>
-          </TouchableOpacity>
-        )}
-        <ButtonModal
-          visible={modalVisible}
-          items={ButtonModalItems}
-          onCancel={() => setModalVisible(false)}
-        />
-        <View
-          style={{
-            flex: 1,
-
-            justifyContent: 'flex-end',
-            marginBottom: 20,
-          }}>
-          <NormalButton
-            text="Post"
-            onPress={() => (image !== null ? finsihCreatePost3() : null)}
-            inActive={image !== null}
-            hollow
-            moreStyles={{
-              marginTop: 20,
-            }}
-          />
+              justifyContent: 'flex-end',
+              marginBottom: 20,
+            }}>
+            <NormalButton
+              text="Post"
+              onPress={() => (image !== null ? finsihCreatePost3() : null)}
+              inActive={image !== null}
+              hollow
+              moreStyles={{
+                marginTop: 20,
+              }}
+            />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const ButtonModal = ({visible, items, onCancel}) => {
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <ModalBarTop />
       <View
         style={{
           ...styles.modal,
@@ -253,6 +270,9 @@ const ButtonModal = ({visible, items, onCancel}) => {
           />
         </View>
       </View>
+      <TouchableWithoutFeedback onPress={onCancel}>
+        <View style={styles.modalBG} />
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
@@ -282,5 +302,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'white',
+    zIndex: 1000,
+  },
+  modalBG: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    height: 900, // change this to height of screen later
   },
 });

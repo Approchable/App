@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {View, Text, StyleSheet, TextInput} from 'react-native';
+import {View, Text, StyleSheet, TextInput, SafeAreaView} from 'react-native';
 import {NormalButton} from '../../components/Buttons';
 import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,6 +8,7 @@ import {
   Poppins_400Regular,
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
+import MyStatusBar from '../../components/MyStatusBar';
 
 export default function Name({route, navigation}) {
   let [fontsLoaded] = useFonts({
@@ -59,52 +60,55 @@ export default function Name({route, navigation}) {
     // checkTextInputs();
   }
   return (
-    <View style={styles.container}>
-      <View style={styles.mainView}>
-        <Text
-          style={{
-            ...HeadingStyle,
-            fontFamily: 'Poppins_700Bold',
-            fontWeight: '700',
-            textAlign: 'left',
-            marginVertical: 24,
-          }}>
-          What's your name?
-        </Text>
-        <NormalTextField
-          value={firstname}
-          placeholder="Add first Name(Required)"
-          onChangeText={text => updateFirstNameandCheckTextInputs(text)}
-          onDelete={() => console.log('deletikkkdfng')}
-        />
-        <NormalTextField
-          placeholder="Add last Name"
-          value={lastName}
-          onChangeText={text => updateLastNameandCheckTextInputs(text)}
-        />
-      </View>
+    <SafeAreaView style={styles.container}>
+      <MyStatusBar backgroundColor="white" />
+      <View style={styles.container}>
+        <View style={styles.mainView}>
+          <Text
+            style={{
+              ...HeadingStyle,
+              fontFamily: 'Poppins_700Bold',
+              fontWeight: '700',
+              textAlign: 'left',
+              marginVertical: 24,
+            }}>
+            What's your name?
+          </Text>
+          <NormalTextField
+            value={firstname}
+            placeholder="Add first Name(Required)"
+            onChangeText={text => updateFirstNameandCheckTextInputs(text)}
+            onDelete={() => console.log('deletikkkdfng')}
+          />
+          <NormalTextField
+            placeholder="Add last Name"
+            value={lastName}
+            onChangeText={text => updateLastNameandCheckTextInputs(text)}
+          />
+        </View>
 
-      <View
-        style={{
-          ...styles.mainView,
-          justifyContent: 'flex-end',
-          marginVertical: 20,
-        }}>
-        <NormalButton
-          text="Next"
-          onPress={() =>
-            buttonActive
-              ? navigation.navigate('Interests', {
-                  result,
-                  lastName,
-                  firstname,
-                })
-              : null
-          }
-          inActive={buttonActive}
-        />
+        <View
+          style={{
+            ...styles.mainView,
+            justifyContent: 'flex-end',
+            marginVertical: 20,
+          }}>
+          <NormalButton
+            text="Next"
+            onPress={() =>
+              buttonActive
+                ? navigation.navigate('Interests', {
+                    result,
+                    lastName,
+                    firstname,
+                  })
+                : null
+            }
+            inActive={buttonActive}
+          />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -4,18 +4,20 @@ import NavigationLogo from '../../assets/images/assets/NavigationLogo.svg';
 
 export default function AppHeader({moreStyles}) {
   return (
-    <View style={{...styles.container ,...moreStyles, }}>
+    <View style={{...styles.container, ...moreStyles}}>
       <View
         style={{
           height: 60,
           flex: 1,
           alignItems: 'left',
           justifyContent: 'center',
-          marginLeft: 16,
-          marginVertical: 4,
+
           
+          backgroundColor: '#F6F6F6',
         }}>
-        <NavigationLogo witdth="100%" />
+        <View style = {{ marginLeft: 16}}>
+          <NavigationLogo witdth="100%" />
+        </View>
       </View>
     </View>
   );
@@ -36,9 +38,7 @@ const styles = StyleSheet.create({
   container: {
     // backgroundColor: '#F6F6F6',
     backgroundColor: 'white',
-    flex:1,
-  
-    
+    // flex:1,
   },
   statusBar: {
     height: STATUSBAR_HEIGHT,

@@ -1,4 +1,4 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Sucess from '../screens/Onboarding/Sucess';
 import Explore from '../screens/Explore/Explore';
 
@@ -10,7 +10,6 @@ export default function WelcomeStack() {
       <Welcome.Screen
         name="Sucess"
         component={Sucess}
-        r
         options={{
           headerShown: false,
         }}

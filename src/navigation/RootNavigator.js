@@ -1,16 +1,16 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import OnboardingStack from './OnboardingNavigator';
-import {useState, useContext, useEffect} from 'react';
-import {UserContext, UserProvider} from '../context/UserContext';
+import { useState, useContext, useEffect } from 'react';
+import { UserContext, UserProvider } from '../context/UserContext';
 import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WelcomeStack from './WelcomeNavigator';
 import CreateNavigator from './CreateNavigator';
-import {Provider, useSelector} from 'react-redux';
-import {store} from '../store/index';
-import {useDispatch} from 'react-redux';
-import {Init, login} from '../store/actions';
+import { Provider, useSelector } from 'react-redux';
+import { store } from '../store/index';
+import { useDispatch } from 'react-redux';
+import { Init, login } from '../store/actions';
 import CreateStack from './CreateNavigator';
 import BottomTabNavigator from './BottomTabNavigator';
 import {
@@ -21,14 +21,17 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { verifyToken } from '../store/WaitList/Waitlist';
+import ChatStack from './ChatStackNavigation/ChatStackNavigator';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Chat from '../screens/Chat/Chat';
 // import { createAppContainer, createSwitchNavigator } from '@react-navigation';
 
-function OnboardingNavigator({userToken , isCorrectToken}) {
+function OnboardingNavigator({ userToken, isCorrectToken }) {
   console.log('userToken in onboarding', userToken);
 
   if (userToken === undefined) {
     return (
-      <View style={{flex: 1, justifyContent: 'center'}}>
+      <View style={{ flex: 1, justifyContent: 'center' }}>
         <ActivityIndicator size="large" color="#44BFBA" />
       </View>
     );
@@ -42,10 +45,31 @@ function OnboardingNavigator({userToken , isCorrectToken}) {
 
 function AppNavigator() {
   var create = useSelector(state => state.NavReducer.create);
+  const AppStack = createNativeStackNavigator();
 
   return (
     <NavigationContainer>
-      {create === true ? <CreateStack /> : <BottomTabNavigator />}
+      {create === true ?
+        <CreateStack />
+        :
+        // <BottomTabNavigator />
+        <AppStack.Navigator initialRouteName='Main' >
+          <AppStack.Screen
+            name='Main'
+            component={BottomTabNavigator}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <AppStack.Screen
+            name='Chat'
+            component={Chat}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </AppStack.Navigator>
+      }
     </NavigationContainer>
   );
 }
@@ -60,7 +84,7 @@ export default function RootNavigator() {
   var isCorrectWaitListCode = useSelector(state => state.WaitlistReducer.isCorrectToken);
   //console.log(isCorrectWaitListCode , "code waitlist reducer");
   // userToken = null
- // console.log('user', userToken);
+  // console.log('user', userToken);
 
   const dispatch = useDispatch();
 
@@ -71,7 +95,7 @@ export default function RootNavigator() {
   const verifyWaitListCode = async () => {
     try {
       var correctToken = await AsyncStorage.getItem('WaitlistToken');
-     
+
       //console.log('===================correctToken===============', correctToken);
       if (correctToken !== null) {
         dispatch(verifyToken(correctToken));
@@ -80,11 +104,11 @@ export default function RootNavigator() {
       console.error(err);
     }
   }
-   
+
 
   useEffect(() => {
     checkForUserThroughredux();
-     verifyWaitListCode();
+    verifyWaitListCode();
   });
 
   const checkUserCredentials = async () => {
@@ -105,6 +129,6 @@ export default function RootNavigator() {
     // if (isCorrectWaitListCode == true){
     return <AppNavigator />;
   } else {
-    return <OnboardingNavigator userToken={userToken}  />;
+    return <OnboardingNavigator userToken={userToken} />;
   }
 }

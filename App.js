@@ -12,24 +12,20 @@ import {UserContext, UserProvider} from './src/context/UserContext';
 import {Provider, useSelector} from 'react-redux';
 import AppHeader from './src/components/Utility/AppHeader';
 import {store} from './src/store/index';
-import Explore from './src/screens/Explore/Explore.js';
-
-
+import Waitlist from './src/screens/Waitlist/Waitlist';
+import CreatePost2 from './src/screens/Create/CreatePost2';
+import CreatePost3 from './src/screens/Create/CreatePost3';
+import MyStatusBar from './src/components/MyStatusBar';
 
 export default function App() {
   return (
     <Provider store={store}>
       <UserProvider>
         <CategoryProvider>
-          <MyStatusBar backgroundColor="white" />
-          <AppHeader moreStyles={{flex: 0.1}} />
           <SafeAreaProvider>
-            <SafeAreaView style={{...styles.container, height: 40}}>
-              <View style={{...styles.container}}>
-                <RootNavigator />
-                {/* <Explore /> */}
-              </View>
-            </SafeAreaView>
+            <View style={{...styles.container}}>
+              <RootNavigator />
+            </View>
           </SafeAreaProvider>
         </CategoryProvider>
       </UserProvider>
@@ -37,23 +33,7 @@ export default function App() {
   );
 }
 
-const MyStatusBar = ({backgroundColor, ...props}) => (
-  <View style={[styles.statusBar, {backgroundColor}]}>
-    <SafeAreaView>
-      <StatusBar translucent backgroundColor={backgroundColor} {...props} />
-    </SafeAreaView>
-  </View>
-);
-
-const STATUSBAR_HEIGHT = StatusBar.currentHeight;
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  statusBar: {
-    height: STATUSBAR_HEIGHT,
-  },
   container: {
     flex: 1,
   },
