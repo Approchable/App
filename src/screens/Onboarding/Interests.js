@@ -8,22 +8,22 @@ import {
   ScrollView,
   SafeAreaView,
 } from 'react-native';
-import {NormalButton} from '../../components/Buttons';
+import { NormalButton } from '../../components/Buttons';
 import Center from '../../components/Utility/Center';
-import {HeaderText, RegularText, SmallerText} from '../../components/Texts';
+import { HeaderText, RegularText, SmallerText } from '../../components/Texts';
 import LandingPage from '../Onboarding/LandingPage';
 import HowItWorks from './HowItWorks';
-import Animated, {set} from 'react-native-reanimated';
-import {useState, useEffect, useContext, useRef} from 'react';
-import {writeUserData} from '../../../firebase';
+import Animated, { exp, set } from 'react-native-reanimated';
+import { useState, useEffect, useContext, useRef } from 'react';
+import { writeUserData } from '../../../firebase';
 import CategoryItem from '../../components/CategoryItem';
-import {CategorieContext} from '../..//context/CategorieContext';
+import { CategorieContext } from '../..//context/CategorieContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {UserContext, UserProvider} from '../../context/UserContext';
+import { UserContext, UserProvider } from '../../context/UserContext';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
-import {useDispatch} from 'react-redux';
-import {login} from '../../store/actions';
+import { useDispatch } from 'react-redux';
+import { login } from '../../store/actions';
 import MyStatusBar from '../../components/MyStatusBar';
 
 Notifications.setNotificationHandler({
@@ -34,9 +34,9 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export default function Interests({navigation, route}) {
+export default function Interests({ navigation, route }) {
   var [user, setUser] = useContext(UserContext);
-  let {result, lastName, firstname} = route.params;
+  let { result, lastName, firstname } = route.params;
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
@@ -64,8 +64,8 @@ export default function Interests({navigation, route}) {
 
   const handlePressCategories = newVal => {
     console.log(newVal);
-    console.log("categories",categories);
-    
+    console.log("categories", categories);
+
 
     setCategories([...categories, newVal]);
   };
@@ -83,38 +83,44 @@ export default function Interests({navigation, route}) {
   };
 
   const handleSavingUser = async () => {
-    console.log("categoriessssss" , categories)
+    console.log("categoriessssss", categories)
     // save user interest and expo token to firebase as well
     registerForPushNotificationsAsync().then(token => {
-      setExpoPushToken(token);
+      let expoToken = ''
+      if (token != undefined && token != null && token != '') {
+        expoToken = token
+      } else {
+        expoToken = 'simualator_token'
+      }
+      setExpoPushToken(expoToken);
       var finalId = '';
       var name = '';
       var finalResult = {};
 
       if (result.type === 'apple') {
-        const {id} = result;
+        const { id } = result;
         finalId = id.replaceAll('.', '');
         console.log('finalId', finalId);
 
         finalResult['id'] = finalId;
         finalResult['familyName'] = lastName;
         finalResult['givenName'] = firstname;
-        finalResult['expoPushToken'] = token;
+        finalResult['expoPushToken'] = expoToken;
         finalResult['name'] = firstname + ' ' + lastName;
         finalResult['appleId'] = id;
         finalResult['signUpType'] = 'apple';
         console.log(finalResult, 'apple');
       } else {
         finalResult = result.user;
-        finalResult['expoPushToken'] = token;
+        finalResult['expoPushToken'] = expoToken;
         finalResult['signUpType'] = 'google';
         console.log(finalResult, 'google');
         finalId = finalResult.id;
       }
       finalResult['interests'] = categories;
 
-      navigation.navigate('Waitlist' , finalResult);
- 
+      navigation.navigate('Waitlist', finalResult);
+
     });
   };
   useEffect(() => {
@@ -146,55 +152,55 @@ export default function Interests({navigation, route}) {
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
       <View style={styles.container}>
-      <View
-        style={{
-          marginHorizontal: 16,
-          marginVertical: 10,
-          // flex: 1,
-          // backgroundColor: 'red',
-          flexWrap: 'wrap',
-        }}>
-        <HeaderText content="What do you like?" />
-        <SmallerText content="Select below to help us find the people and hangouts for you" />
-      </View>
+        <View
+          style={{
+            marginHorizontal: 16,
+            marginVertical: 10,
+            // flex: 1,
+            // backgroundColor: 'red',
+            flexWrap: 'wrap',
+          }}>
+          <HeaderText content="What do you like?" />
+          <SmallerText content="Select below to help us find the people and hangouts for you" />
+        </View>
 
-      <View
-        ref={ref}
-        style={{
-          flex: 1,
-          alignItems: 'left',
-          marginHorizontal: 16,
-          flexGrow: 1,
-          marginBottom: 50,
-          justifyContent: 'flex-end',
-          // backgroundColor: 'blue',
-        }}>
-        <ScrollView style={{marginBottom: -15}}>
-          <View style={{flexWrap: 'wrap', flexDirection: 'row'}}>
-            {CategorieArr.map((item, index) => (
-              <CategoryItem
-                content={item}
-                width={width}
-                onPress={() => handlePressCategories(item)}
-              />
-            ))}
-          </View>
-        </ScrollView>
-      </View>
+        <View
+          ref={ref}
+          style={{
+            flex: 1,
+            // alignItems: 'left',
+            marginHorizontal: 16,
+            flexGrow: 1,
+            marginBottom: 50,
+            justifyContent: 'flex-end',
+            // backgroundColor: 'blue',
+          }}>
+          <ScrollView style={{ marginBottom: -15 }}>
+            <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
+              {CategorieArr.map((item, index) => (
+                <CategoryItem
+                  content={item}
+                  width={width}
+                  onPress={() => handlePressCategories(item)}
+                />
+              ))}
+            </View>
+          </ScrollView>
+        </View>
 
-      <View style={{marginBottom: 20, flex: 0.3, marginHorizontal: 16}}>
-        <NormalButton
-          text="Next"
-          onPress={
-            () => (buttonActive ? handleSavingUser() : null) //navigation.navigate('Sucess')
-          }
-          inActive={buttonActive}
-          moreStyles={{marginTop: 40}}
-        />
-      </View>
+        <View style={{ marginBottom: 20, flex: 0.3, marginHorizontal: 16 }}>
+          <NormalButton
+            text="Next"
+            onPress={
+              () => (buttonActive ? handleSavingUser() : null) //navigation.navigate('Sucess')
+            }
+            inActive={buttonActive}
+            moreStyles={{ marginTop: 40 }}
+          />
+        </View>
       </View>
     </SafeAreaView>
-   
+
   );
 }
 
@@ -230,10 +236,10 @@ const styles = StyleSheet.create({
 async function registerForPushNotificationsAsync() {
   let token;
   if (Device.isDevice) {
-    const {status: existingStatus} = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
-      const {status} = await Notifications.requestPermissionsAsync();
+      const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {

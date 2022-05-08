@@ -77,7 +77,7 @@ export function writeUserData(userId, data) {
 }
 
 export function deleteUserData(id) {
-  console.log(' deleting...');
+  console.log(' deleting user -> ...', id);
   set(ref(realTimeDB, 'users/' + id), null)
     .then(() => {
       console.log('deleted user');

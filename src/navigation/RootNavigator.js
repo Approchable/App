@@ -129,6 +129,7 @@ export default function RootNavigator() {
     // if (isCorrectWaitListCode == true){
     return <AppNavigator />;
   } else {
+    // return <AppNavigator />;
     return <OnboardingNavigator userToken={userToken} />;
   }
 }
