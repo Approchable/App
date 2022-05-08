@@ -73,6 +73,7 @@ export const ImageSet = {
   plus: require('../../assets/images/icons/plus_icon.png'),
   mic: require('../../assets/images/icons/mic_icon.png'),
   send: require('../../assets/images/icons/send_icon.png'),
+  threeDots: require('../../assets/images/icons/three_dots_icon.png'),
   search: require('../../assets/images/icons/search.png'),
   dot: require('../../assets/images/icons/dot.png'),
   profile: require('../../assets/images/icons/profile.jpg'),
