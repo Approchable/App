@@ -172,7 +172,7 @@ export default function Connections({ navigation }) {
         </TouchableOpacity>
       </View>
       {connectionTab ? (
-        connectionsArray.length > 5 ? (
+        connectionsArray.length > 0 ? (
           <View
             style={{
               flex: 1,
