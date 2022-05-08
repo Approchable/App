@@ -1,22 +1,23 @@
-import {View, Pressable, Text, StyleSheet, SafeAreaView} from 'react-native';
+import { View, Pressable, Text, StyleSheet, SafeAreaView } from 'react-native';
 import {
   NormalButton,
   GoogleButtonWithIcon,
   AppleButtonWithIcon,
 } from '../../components/Buttons';
-import {Dimensions} from 'react-native';
-import {useState, useEffect} from 'react';
+import { Dimensions } from 'react-native';
+import { useState, useEffect } from 'react';
 import Center from '../../components/Utility/Center';
 import HeadingStyle from '../../components/Utility/Styles/TextStyles';
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import LandingPageImage from '../../assets/images/assets/LandingPageImage.svg';
 import * as Google from 'expo-google-app-auth';
 import * as GoogleSignIn from 'expo-google-sign-in';
-import {HeaderText} from '../../components/Texts';
+import { HeaderText } from '../../components/Texts';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import MyStatusBar from '../../components/MyStatusBar';
 import AppHeader from '../../components/Utility/AppHeader';
-export default function LandingPage({navigation}) {
+
+export default function LandingPage({ navigation }) {
   const windowWidth = Dimensions.get('window').width;
   const [googleSubmitting, setGoogleSubmitting] = useState(false); // use this for loading indicator
   const AndriodClientID =
@@ -28,7 +29,7 @@ export default function LandingPage({navigation}) {
       GoogleSignIn.initAsync({
         clientId: Platform.OS === 'ios' ? IOSClientID : AndriodClientID,
       });
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const handleAppleAuth = async () => {
@@ -39,15 +40,15 @@ export default function LandingPage({navigation}) {
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
       }).then(credential => {
-       
-        const {email, familyName, givenName} = credential;
-        const result = {email: email, id: credential.user};
+
+        const { email, familyName, givenName } = credential;
+        const result = { email: email, id: credential.user };
         const type = 'apple';
         result["type"] = type;
-       
+
 
         setTimeout(() =>
-          navigation.navigate('Name', {result, familyName, givenName, type}), 1000
+          navigation.navigate('Name', { result, familyName, givenName, type }), 1000
         );
       });
     } catch (e) {
@@ -65,7 +66,7 @@ export default function LandingPage({navigation}) {
     try {
       AppleAuthentication.refreshAsync({
         user: ebukaId,
-      }).then(credential => {});
+      }).then(credential => { });
 
       console.log(' referesh', credential);
     } catch (e) {
@@ -78,7 +79,7 @@ export default function LandingPage({navigation}) {
     }
   };
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     setGoogleSubmitting(true);
     console.log('test sign in');
 
@@ -90,25 +91,28 @@ export default function LandingPage({navigation}) {
       iosStandaloneAppClientId:
         '724006010963-er1i8nf3hsoeibm6vg8m01au6gqq8bhb.apps.googleusercontent.com',
 
-      scopes: ['profile', 'email'],
+      // scopes: ['profile', 'email'],
     };
 
+    // console.log('config google  =====>>> ', config);
+
     Google.logInAsync(config)
-      .then(result => {
-        const {type, user} = result;
+      .then(async (result) => {
+        const { type, user, accessToken } = result;
+        await Google.logOutAsync({ accessToken, ...config });
         if (type === 'success') {
           console.log('result', result);
-          const {familyName, givenName} = user;
-          
+          const { familyName, givenName } = user;
+
           const type = 'google';
           result["type"] = 'google';
           setTimeout(() =>
-            navigation.navigate('Name', {result, familyName, givenName, type}),
+            navigation.navigate('Name', { result, familyName, givenName, type }),
           );
 
           return result.accessToken;
         } else {
-          return {cancelled: true};
+          return { cancelled: true };
         }
       })
       .catch(error => {
@@ -121,7 +125,7 @@ export default function LandingPage({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
-      <AppHeader moreStyles={{height: 50 }} />
+      <AppHeader moreStyles={{ height: 50 }} />
       <View style={styles.container}>
         <View style={styles.container}>
           <Center />
@@ -148,12 +152,12 @@ export default function LandingPage({navigation}) {
             // marginLeft: 30,
             marginBottom: 20,
           }}>
-          <View style={{width: windowWidth * 0.9, marginVertical: 8}}>
+          <View style={{ width: windowWidth * 0.9, marginVertical: 8 }}>
             <GoogleButtonWithIcon
               onPress={() => handleGoogleSignIn(navigation)}
             />
           </View>
-          <View style={{width: windowWidth * 0.9, marginVertical: 8}}>
+          <View style={{ width: windowWidth * 0.9, marginVertical: 8 }}>
             <AppleButtonWithIcon onPress={() => handleAppleAuth()} />
           </View>
         </View>
