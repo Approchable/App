@@ -96,49 +96,49 @@ function Explore({ navigation }) {
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
             renderItem={({ item }) => (
-              <SkeletonContent
-                key={item.id}
-                containerStyle={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: 80,
-                  width: screenWidth.width85,
-                  margin: 10,
-                }}
-                layout={[
-                  // long line
-                  {
-                    width: 44,
-                    height: 44,
-                    resizeMode: 'contain',
-                    borderRadius: 22,
-                    alignItems: 'center',
-                    // marginBottom: 10,
-                  },
-                  {
-                    children: [
-                      {
-                        width: screenWidth.width65,
-                        height: 20,
-                        marginBottom: 6,
-                        marginLeft: 10,
-                        marginTop: 10,
-                      },
-                      {
-                        width: screenWidth.width65,
-                        height: 50,
-                        marginLeft: 10,
-                        marginTop: 10,
-                        marginBottom: 10,
-                      },
-                    ],
-                  },
-                ]}
-                isVisible={true}
-                isLoading={true}
-                animationType="pulse"
-                animationDirection="horizontalRight">
+              // <SkeletonContent
+              //   key={item.id}
+              //   containerStyle={{
+              //     flexDirection: 'row',
+              //     alignItems: 'center',
+              //     justifyContent: 'center',
+              //     height: 80,
+              //     width: screenWidth.width85,
+              //     margin: 10,
+              //   }}
+              //   layout={[
+              //     // long line
+              //     {
+              //       width: 44,
+              //       height: 44,
+              //       resizeMode: 'contain',
+              //       borderRadius: 22,
+              //       alignItems: 'center',
+              //       // marginBottom: 10,
+              //     },
+              //     {
+              //       children: [
+              //         {
+              //           width: screenWidth.width65,
+              //           height: 20,
+              //           marginBottom: 6,
+              //           marginLeft: 10,
+              //           marginTop: 10,
+              //         },
+              //         {
+              //           width: screenWidth.width65,
+              //           height: 50,
+              //           marginLeft: 10,
+              //           marginTop: 10,
+              //           marginBottom: 10,
+              //         },
+              //       ],
+              //     },
+              //   ]}
+              //   isVisible={false}
+              //   isLoading={false}
+              //   animationType="pulse"
+              //   animationDirection="horizontalRight">
                 <Post
                   userName={item.user.name}
                   title={item.headline}
@@ -156,7 +156,7 @@ function Explore({ navigation }) {
                   }}
                   usersWhoRequested={item.usersWhoRequested}
                 />
-              </SkeletonContent>
+             // </SkeletonContent>
             )}
           />
 
