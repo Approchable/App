@@ -79,6 +79,8 @@ export const ImageSet = {
   profile: require('../../assets/images/icons/profile.jpg'),
   noMessage: require('../../assets/images/icons/no-message.png'),
   filter: require('../../assets/images/icons/filter-icon.png'),
+  defaultProfileImage:
+    'https://firebasestorage.googleapis.com/v0/b/approachablebackend.appspot.com/o/images%2Fdefault_profile_image.png?alt=media&token=2e6a9e79-a6bf-4580-986b-dc8d30aab4df',
 }
 
 export const TabType = {
