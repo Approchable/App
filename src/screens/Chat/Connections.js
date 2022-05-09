@@ -31,7 +31,7 @@ import { SafeAreaView } from 'react-native'
 import { Image } from 'react-native'
 import SkeletonContent from 'react-native-skeleton-content'
 
-const dataArray = [
+const DataArray = [
   {
     name: 'Jane',
     lastMassage: 'Amet minim mollit non deser ull..',
@@ -57,6 +57,23 @@ const dataArray = [
     count: 0,
   },
 ]
+const RequestsDataArray = [
+  {
+    name: 'Kristin',
+    lastMassage: 'That sounds fun! I’d love to join That sounds fun! I’d love to join That sounds fun! I’d love to join ',
+    time: '14h',
+  },
+  {
+    name: 'Ralph',
+    lastMassage: null,
+    time: '14h',
+  },
+  {
+    name: 'Jane',
+    lastMassage: null,
+    time: '14h',
+  },
+]
 
 export default function Connections({ navigation }) {
   const connections = useSelector(
@@ -70,17 +87,18 @@ export default function Connections({ navigation }) {
   const [conId2, setConId2] = useState('101432345899135768743')
   const [connectionTab, setConnectionTab] = useState(true)
   const [requestTab, setRequestTab] = useState(false)
-  const [isFetched, setIsFetched] = useState(false)
-  const [connectionsArray, setConnectionsArray] = useState(dataArray)
+  const [isFetched, setIsFetched] = useState(true)
+  const [isFetchedRequest, setIsFetchedRequest] = useState(true)
+  const [connectionsArray, setConnectionsArray] = useState(DataArray)
+  const [requestArray, setRequestsArray] = useState(RequestsDataArray)
 
   const dispatch = useDispatch()
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setTimeout(() => {
-        setIsFetched(true)
-      }, 3000)
-      //_getConnections()
+        setIsFetched(false)
+      }, 2000)
     })
     return unsubscribe
   }, [])
@@ -91,24 +109,32 @@ export default function Connections({ navigation }) {
 
   const onClickChatButton = async () => {
     _getConnections()
-    console.log('conId ===>>>  ', conId)
+    // console.log('conId ===>>>  ', conId)
     const connections = await getConnectionById(conId)
     if (connections) {
-      console.log('connections new 1 ====>> ', connections)
+      // console.log('connections new 1 ====>> ', connections)
       navigation.navigate(Routes.Chat, { data: connections })
     } else {
-      console.log('connections new 2 ====>> ', connections)
+      // console.log('connections new 2 ====>> ', connections)
     }
   }
 
   const tabsChangingHandler = (tabType) => {
     if (tabType == TabType.connections) {
+      setIsFetched(true)
       setConnectionTab(true)
       setRequestTab(false)
+      setTimeout(() => {
+        setIsFetched(false)
+      }, 2000)
     }
     if (tabType == TabType.requests) {
+      setIsFetchedRequest(true)
       setRequestTab(true)
       setConnectionTab(false)
+      setTimeout(() => {
+        setIsFetchedRequest(false)
+      }, 2000)
     }
   }
 
@@ -121,113 +147,65 @@ export default function Connections({ navigation }) {
           // value={value}
           style={styles.textInput}
           placeholder={'Search'}
-          // onChangeText={onChangeText}
+        // onChangeText={onChangeText}
         />
         <Image style={styles.filterIcon} source={ImageSet.filter} />
       </View>
       <View style={styles.tabView}>
         <TouchableOpacity
+          activeOpacity={0.5}
           style={[
             styles.tabs,
             {
-              borderColor: connectionTab
-                ? ColorSet.defaultTheme
-                : ColorSet.textBlack,
+              borderColor: connectionTab ? ColorSet.defaultTheme : ColorSet.dimGray,
+              borderBottomWidth: connectionTab && 1.5
             },
           ]}
           onPress={() => tabsChangingHandler(TabType.connections)}>
           <Text
             style={[
               styles.tabsText,
-              {
-                color: connectionTab
-                  ? ColorSet.defaultTheme
-                  : ColorSet.textBlack,
-              },
+              { color: connectionTab ? ColorSet.defaultTheme : ColorSet.dimGray },
             ]}>
             Connections
           </Text>
           <Image style={styles.dotIcon} source={ImageSet.dot} />
         </TouchableOpacity>
         <TouchableOpacity
+          activeOpacity={0.5}
           style={[
             styles.tabs,
             {
-              borderColor: requestTab
-                ? ColorSet.defaultTheme
-                : ColorSet.textBlack,
+              borderColor: requestTab ? ColorSet.defaultTheme : ColorSet.dimGray,
+              borderBottomWidth: requestTab && 1.5
             },
           ]}
           onPress={() => tabsChangingHandler(TabType.requests)}>
           <Text
             style={[
               styles.tabsText,
-              {
-                color: requestTab ? ColorSet.defaultTheme : ColorSet.textBlack,
-              },
+              { color: requestTab ? ColorSet.defaultTheme : ColorSet.dimGray },
             ]}>
             Requests
           </Text>
           <Image style={styles.dotIcon} source={ImageSet.dot} />
         </TouchableOpacity>
       </View>
+
       {connectionTab ? (
         connectionsArray.length > 0 ? (
-          <View
-            style={{
-              flex: 1,
-              paddingVertical: 16,
-              paddingHorizontal: 16,
-            }}>
+          <View style={styles.mainView}>
             {connectionsArray.map((item, index) => {
               return (
                 <SkeletonContent
                   key={index}
-                  containerStyle={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: 65,
-                    width: screenWidth.width85,
-                    margin: 10,
-                  }}
-                  isLoading={!isFetched}
+                  containerStyle={styles.skeletonContentStyle}
+                  isLoading={isFetched}
                   isVisible={true}
                   animationType="pulse"
                   animationDirection="horizontalRight"
-                  layout={[
-                    // long line
-                    {
-                      width: 44,
-                      height: 44,
-                      resizeMode: 'contain',
-                      borderRadius: 22,
-                      alignItems: 'center',
-                      // marginBottom: 10,
-                    },
-                    {
-                      children: [
-                        {
-                          width: screenWidth.width65,
-                          height: 20,
-                          marginBottom: 6,
-                          marginLeft: 10,
-                        },
-                        {
-                          width: screenWidth.width65,
-                          height: 20,
-                          marginLeft: 10,
-                        },
-                      ],
-                    },
-                    {
-                      width: 25,
-                      height: 25,
-                      borderRadius: 10,
-                      marginLeft: 10,
-                    },
-                  ]}>
-                  <TouchableOpacity key={index} style={styles.connectionsView}>
+                  layout={[styles.userIconShimmer, { children: [styles.titleShimmer, styles.messageShimmer], }, styles.countShimmer]}>
+                  <TouchableOpacity activeOpacity={0.5} style={styles.connectionsView}>
                     <Image style={styles.userImage} source={ImageSet.profile} />
                     <View>
                       <Text style={styles.userName}>{item.name}</Text>
@@ -257,8 +235,50 @@ export default function Connections({ navigation }) {
           </View>
         )
       ) : null}
-      {requestTab ? <View></View> : null}
-      <View></View>
+
+      {requestTab ? (
+        requestArray.length > 0 ? (
+          <View style={styles.mainView}>
+            {requestArray.map((item, index) => {
+              return (
+                <SkeletonContent
+                  key={index}
+                  containerStyle={styles.skeletonContentStyle}
+                  isLoading={isFetchedRequest}
+                  isVisible={true}
+                  animationType="pulse"
+                  animationDirection="horizontalRight"
+                  layout={[styles.userIconShimmer, { children: [styles.titleShimmer, styles.messageShimmer], }, styles.countShimmer]}>
+                  <TouchableOpacity activeOpacity={0.5} style={styles.requestsView}>
+                    {item.lastMassage &&
+                      <Image style={styles.dotIconForNewRequests} source={ImageSet.dot} />
+                    }
+                    <Image style={styles.userImage} source={ImageSet.profile} />
+                    <View>
+                      <Text style={styles.userName}>{item.name}</Text>
+                      <View style={styles.lastMessageView}>
+                        <Text numberOfLines={1}
+                          style={[
+                            styles.lastMessageText,
+                            { width: item.lastMassage ? screenWidth.width60 : screenWidth.width65, }
+                          ]}>
+                          {item.lastMassage ? item.lastMassage : item.name + ' ' + "is Approachable! start the chat."}
+                        </Text>
+                        <Text style={styles.time}>{'  ' + item.time}</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                </SkeletonContent>
+              )
+            })}
+          </View>
+        ) : (
+          <View style={styles.noMessageView}>
+            <Image style={styles.noMessageIcon} source={ImageSet.noMessage} />
+            <Text style={styles.noMessageText}>No requests yet</Text>
+          </View>
+        )
+      ) : null}
       <Loader isVisible={loading} />
     </SafeAreaView>
   )
@@ -285,31 +305,27 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     resizeMode: 'contain',
-    // marginRight: 15,
-    // backgroundColor: ColorSet.chatRightPopupGray
   },
   textInput: {
     width: screenWidth.width65,
-    // backgroundColor: ColorSet.lightGray,
     height: 40,
   },
-
   filterIcon: {
     width: 25,
     height: 25,
     resizeMode: 'contain',
-    // backgroundColor: ColorSet.chatRightPopupGray
   },
   tabView: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
+    borderBottomColor: ColorSet.chatPopupGray,
+    borderBottomWidth: 1,
   },
   tabs: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomWidth: 2,
     width: screenWidth.width40,
     paddingVertical: 10,
   },
@@ -329,6 +345,7 @@ const styles = StyleSheet.create({
     height: 45,
     resizeMode: 'contain',
     borderRadius: 150,
+    marginRight: 10
   },
   userName: {
     fontSize: 14,
@@ -338,6 +355,7 @@ const styles = StyleSheet.create({
   lastMessageView: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: screenWidth.width65,
   },
   lastMessageText: {
     fontSize: 14,
@@ -355,8 +373,10 @@ const styles = StyleSheet.create({
   connectionsView: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     flex: 1,
+    borderBottomColor: ColorSet.chatPopupGray,
+    borderBottomWidth: 1,
+    paddingBottom: 10
   },
   messageCountView: {
     width: 20,
@@ -386,5 +406,60 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontWeight: '600',
     color: ColorSet.dimGray,
+  },
+  mainView: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  skeletonContentStyle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 65,
+    width: screenWidth.width85,
+    margin: 10,
+  },
+  userIconShimmer: {
+    width: 44,
+    height: 44,
+    resizeMode: 'contain',
+    borderRadius: 22,
+    alignItems: 'center',
+  },
+  titleShimmer: {
+    width: screenWidth.width65,
+    height: 15,
+    marginBottom: 6,
+    marginLeft: 10,
+  },
+  messageShimmer: {
+    width: screenWidth.width65,
+    height: 15,
+    marginLeft: 10,
+  },
+  countShimmer: {
+    width: 25,
+    height: 25,
+    borderRadius: 10,
+    marginLeft: 10,
+  },
+
+  //Request tab styling starts from here
+
+  requestsView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    borderBottomColor: ColorSet.chatPopupGray,
+    borderBottomWidth: 1,
+    paddingBottom: 10
+  },
+  dotIconForNewRequests: {
+    width: 8,
+    height: 8,
+    resizeMode: 'contain',
+    marginTop: 5,
+    marginRight: 10
   },
 })
