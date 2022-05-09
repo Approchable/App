@@ -120,39 +120,6 @@ export const NaviagteOutOfCreate = () => {
   };
 };
 
-export const getPosts = () => {
-  return async dispatch => {
-    dispatch({
-      type: GET_POSTS_LOADING,
-      payload: {
-        loading: true,
-      },
-    });
-    try {
-      const posts = await getPostsFromFireStore();
-      if (posts !== null) {
-        dispatch({
-          type: GET_POSTS,
-
-          payload: {
-            posts: posts,
-            loading: false,
-          },
-        });
-      }
-    } catch (err) {
-      console.log(err);
-      dispatch({
-        type: GET_POSTS_ERROR,
-        payload: {
-          error: err,
-          loading: false,
-        },
-      });
-    }
-  };
-};
-
 export const createPosts = postObject => {
   return async dispatch => {
     dispatch({

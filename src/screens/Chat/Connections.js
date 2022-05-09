@@ -8,10 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native'
-import { NormalButton } from '../../components/Buttons'
-import { HeaderText } from '../../components/Texts'
-import CategoryItem from '../../components/CategoryItem'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import { useDispatch, useSelector } from 'react-redux'
 import { ActivityIndicator } from 'react-native'
 import { getConnections, getConnectionUser, logout } from '../../store/actions'
