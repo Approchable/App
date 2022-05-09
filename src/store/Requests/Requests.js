@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ASYNC_USER_STRING} from '../../components/config/Constant';
+import {ASYNC_USER_STRING} from '..//..//components//config/Constant';
 import {
   joinPostRequest,
   sendRequestToFireStore,
@@ -43,7 +43,7 @@ requestObject =
 export const sendJoinRequest = post => {
   return async dispatch => {
     dispatch({type: SEND_REQUEST_LOADING});
-    const user = await AsyncStorage.getItem(ASYNC_USER_STRING);
+    const user = await AsyncStorage.getItem('user');
     if (!user) {
       dispatch({
         type: SEND_REQUEST_FAILURE,
