@@ -25,6 +25,7 @@ import * as Notifications from 'expo-notifications';
 import { useDispatch } from 'react-redux';
 import { login } from '../../store/actions';
 import MyStatusBar from '../../components/MyStatusBar';
+import { ImageSet } from '../../components/config/Constant';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -118,6 +119,13 @@ export default function Interests({ navigation, route }) {
         finalId = finalResult.id;
       }
       finalResult['interests'] = categories;
+      //add default profle picture
+      if (finalResult['photoUrl'] == undefined) {
+        finalResult['photoUrl'] = ImageSet.defaultProfileImage;
+      }
+      console.log('finalResult', finalResult);
+      
+
 
       navigation.navigate('Waitlist', finalResult);
 
