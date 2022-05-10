@@ -41,3 +41,13 @@ export function setDataByDate(array) {
     // console.log('groupArrays ===>>>> ', groupArrays);
     return groupArrays
 }
+
+
+export function dateDifference(date2) {
+    const currentDate = new Date();
+    const date1 = currentDate.getTime();
+
+    console.log('date 1 ==>> ', date1);
+    console.log('date 2 ==>> ', date2);
+    // return;
+}

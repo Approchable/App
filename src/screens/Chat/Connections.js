@@ -26,10 +26,13 @@ import {
 import AppHeader from '../../components/Utility/AppHeader'
 import MyStatusBar from '../../components/MyStatusBar'
 import Loader from '../../components/Loader'
-import { getConnectionById } from '../../../firebase'
+import { getConnectionById, getUserRequests } from '../../../firebase'
 import { SafeAreaView } from 'react-native'
 import { Image } from 'react-native'
 import SkeletonContent from 'react-native-skeleton-content'
+import { getRequests } from '../../store/Requests/Requests'
+import moment from 'moment'
+import { dateDifference } from '../../components/Utility/Helper'
 
 const DataArray = [
   {
@@ -76,13 +79,18 @@ const RequestsDataArray = [
 ]
 
 export default function Connections({ navigation }) {
+  const requests = useSelector(
+    (state) => state.getAllRequestsReducer.requests
+  )
   const connections = useSelector(
     (state) => state.GetConnectionsReducer.connections
   )
+
+
   const connectedUser = useSelector(
     (state) => state.getConnectionUserReducer.connectedUser
   )
-  const loading = useSelector((state) => state.GetConnectionsReducer.loading)
+  // const loading = useSelector((state) => state.GetConnectionsReducer.loading)
   const [conId, setConId] = useState('conid_12345680')
   const [conId2, setConId2] = useState('101432345899135768743')
   const [connectionTab, setConnectionTab] = useState(true)
@@ -90,12 +98,14 @@ export default function Connections({ navigation }) {
   const [isFetched, setIsFetched] = useState(true)
   const [isFetchedRequest, setIsFetchedRequest] = useState(true)
   const [connectionsArray, setConnectionsArray] = useState(DataArray)
-  const [requestArray, setRequestsArray] = useState(RequestsDataArray)
+  const [requestArray, setRequestsArray] = useState(requests)
 
   const dispatch = useDispatch()
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
+      _getRequests()
+      _getConnections()
       setTimeout(() => {
         setIsFetched(false)
       }, 2000)
@@ -106,6 +116,12 @@ export default function Connections({ navigation }) {
   const _getConnections = async () => {
     dispatch(getConnections(conId))
   }
+
+  const _getRequests = async () => {
+    dispatch(getRequests())
+  }
+
+
 
   const onClickChatButton = async () => {
     _getConnections()
@@ -129,14 +145,17 @@ export default function Connections({ navigation }) {
       }, 2000)
     }
     if (tabType == TabType.requests) {
+      _getRequests()
       setIsFetchedRequest(true)
       setRequestTab(true)
       setConnectionTab(false)
+      setRequestsArray(requests)
       setTimeout(() => {
         setIsFetchedRequest(false)
       }, 2000)
     }
   }
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -240,6 +259,10 @@ export default function Connections({ navigation }) {
         requestArray.length > 0 ? (
           <View style={styles.mainView}>
             {requestArray.map((item, index) => {
+              const data = item.userSendingRequest
+              const time = dateDifference(item.createdAt.seconds)
+              // console.log('time ====>>>> ', time);
+
               return (
                 <SkeletonContent
                   key={index}
@@ -250,21 +273,21 @@ export default function Connections({ navigation }) {
                   animationDirection="horizontalRight"
                   layout={[styles.userIconShimmer, { children: [styles.titleShimmer, styles.messageShimmer], }, styles.countShimmer]}>
                   <TouchableOpacity activeOpacity={0.5} style={styles.requestsView}>
-                    {item.lastMassage &&
+                    {/* {item.lastMassage &&
                       <Image style={styles.dotIconForNewRequests} source={ImageSet.dot} />
-                    }
-                    <Image style={styles.userImage} source={ImageSet.profile} />
+                    } */}
+                    <Image style={styles.userImage} source={{ uri: data.photoUrl }} />
                     <View>
-                      <Text style={styles.userName}>{item.name}</Text>
+                      <Text style={styles.userName}>{data.givenName}</Text>
                       <View style={styles.lastMessageView}>
                         <Text numberOfLines={1}
                           style={[
                             styles.lastMessageText,
                             { width: item.lastMassage ? screenWidth.width60 : screenWidth.width65, }
                           ]}>
-                          {item.lastMassage ? item.lastMassage : item.name + ' ' + "is Approachable! start the chat."}
+                          {item.comments ? item.comments : data.givenName + ' ' + "is Approachable! start the chat."}
                         </Text>
-                        <Text style={styles.time}>{'  ' + item.time}</Text>
+                        <Text style={styles.time}>{'12h'}</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -279,7 +302,7 @@ export default function Connections({ navigation }) {
           </View>
         )
       ) : null}
-      <Loader isVisible={loading} />
+      {/* <Loader isVisible={loading} /> */}
     </SafeAreaView>
   )
 }

@@ -1,12 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ASYNC_USER_STRING} from '..//..//components//config/Constant';
+import { ASYNC_USER_STRING } from '..//..//components//config/Constant';
 import {
   joinPostRequest,
   sendRequestToFireStore,
   getAllRequestIDs,
+  getAllRequest,
 } from '../../../FirebaseFireStore';
 
 import uuid from 'react-native-uuid';
+import { GET_ALL_REQUESTS, GET_ALL_REQUESTS_ERROR } from '../actionTypes';
+import { getUserRequests } from '../../../firebase';
 // action types
 
 const SEND_REQUEST_LOADING = 'SET_REQUEST_LOADING';
@@ -42,7 +45,7 @@ requestObject =
 
 export const sendJoinRequest = post => {
   return async dispatch => {
-    dispatch({type: SEND_REQUEST_LOADING});
+    dispatch({ type: SEND_REQUEST_LOADING });
     const user = await AsyncStorage.getItem('user');
     if (!user) {
       dispatch({
@@ -104,7 +107,7 @@ export const getusersWhoRequested = postId => {
     return;
   }
   return async dispatch => {
-    dispatch({type: GET_REQUESTS_LOADING});
+    dispatch({ type: GET_REQUESTS_LOADING });
     const requestIds = await getAllRequestIDs(postId);
     if (requestIds.length === 0) {
       dispatch({
@@ -125,6 +128,37 @@ export const getusersWhoRequested = postId => {
     });
   };
 };
+
+
+
+// get all requests actions are here
+
+export const getRequests = () => {
+  return async dispatch => {
+    try {
+      const requests = await getUserRequests();
+      // console.log('api response of requests ===>>> ', requests);
+      if (requests.length > 0) {
+        dispatch({
+          type: GET_ALL_REQUESTS,
+          payload: {
+            requests: requests
+          },
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      dispatch({
+        type: GET_ALL_REQUESTS_ERROR,
+        payload: {
+          error: err,
+        },
+      });
+    }
+  };
+};
+
+
 
 //reducers
 const requestInitialState = {
@@ -182,6 +216,30 @@ export function userRequestsReducer(state = userRequestIdsInitialState, action) 
       return {
         ...state,
         isLoading: false,
+        errorMessage: action.payload.errorMessage,
+      };
+    default:
+      return state;
+  }
+}
+
+
+
+const getAllRequestsInitialState = {
+  requests: [],
+  errorMessage: ''
+};
+
+export function getAllRequestsReducer(state = getAllRequestsInitialState, action) {
+  switch (action.type) {
+    case GET_ALL_REQUESTS:
+      return {
+        ...state,
+        requests: action.payload.requests,
+      };
+    case GET_ALL_REQUESTS_ERROR:
+      return {
+        ...state,
         errorMessage: action.payload.errorMessage,
       };
     default:

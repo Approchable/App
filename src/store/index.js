@@ -10,11 +10,10 @@ import {
 } from './reducers.js';
 import { postsReducer } from "./posts/posts.js";
 import WaitlistReducer from './WaitList/Waitlist.js';
-import {RequestReducer ,userRequestsReducer} from './Requests/Requests.js';
+import { RequestReducer, userRequestsReducer, getAllRequestsReducer } from './Requests/Requests.js';
 
 
 const RootReducer = combineReducers({
-  ///
   AuthReducer,
   NavReducer,
   CreatePostsReducer,
@@ -24,7 +23,8 @@ const RootReducer = combineReducers({
   RequestReducer,
   userRequestsReducer,
   GetConnectionsReducer,
-  getConnectionUserReducer
+  getConnectionUserReducer,
+  getAllRequestsReducer
 });
 
 export const store = createStore(RootReducer, applyMiddleware(thunk));
