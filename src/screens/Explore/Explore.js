@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import {
   View,
   StyleSheet,
-  ActivityIndicator,
   FlatList,
   RefreshControl,
   Modal,
@@ -13,13 +12,7 @@ import { RegularBoldText } from '../../components/Texts'
 import { NormalButton } from '../../components/Buttons'
 import EmptyCreatePost from '../../assets/images/assets/EmptyCreatePost.svg'
 import { useDispatch } from 'react-redux'
-import {
-  ImageSet,
-  Routes,
-  screenWidth,
-  ColorSet,
-  TabType,
-} from '../../components/config/Constant'
+import { screenWidth } from '../../components/config/Constant'
 
 import Post, { PostModal } from '../../components/Post'
 import AppHeader from '../../components/Utility/AppHeader'
@@ -28,7 +21,6 @@ import { getPosts } from '../../store/posts/posts'
 import SkeletonContent from 'react-native-skeleton-content'
 import MyStatusBar from '../../components/MyStatusBar'
 import { sendJoinRequest } from '../../store/Requests/Requests'
-import { useFocusEffect } from '@react-navigation/native'
 
 //GetPostsReducer
 function Explore({ navigation }) {
@@ -64,7 +56,7 @@ function Explore({ navigation }) {
       console.log('focsed on explore ')
       // _getPosts()
     })
-   _getPosts()
+    _getPosts()
   }, [navigation])
 
   return (
@@ -119,10 +111,6 @@ function Explore({ navigation }) {
 }
 
 function NoPost({ navigation }) {
-  const dispatch = useDispatch()
-
-  const postCount = 0
-
   const NavigateToCreateInExplore = () => {
     navigation.navigate('Create')
   }
@@ -162,9 +150,10 @@ function NoPost({ navigation }) {
 
 const JoinModal = ({ visible, postObject, onCancel }) => {
   const dispatch = useDispatch()
-  const handleSendRequest = (post) => {
+  const [comment, setComment] = useState('')
+  const handleSendRequest = (post , comment="") => {
     console.log('add join dispacth function here')
-    dispatch(sendJoinRequest(post))
+    dispatch(sendJoinRequest(post , comment))
     onCancel()
   }
 
@@ -177,9 +166,10 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
         <ModalBarTop post={postObject} />
 
         <PostModal
+          setComment={setComment}
           post={postObject}
           onPressSend={() => {
-            handleSendRequest(postObject)
+            handleSendRequest(postObject , comment)
           }}
         />
       </View>
