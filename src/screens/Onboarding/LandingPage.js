@@ -1,36 +1,36 @@
-import { View, Pressable, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Pressable, Text, StyleSheet, SafeAreaView } from 'react-native'
 import {
   NormalButton,
   GoogleButtonWithIcon,
   AppleButtonWithIcon,
-} from '../../components/Buttons';
-import { Dimensions } from 'react-native';
-import { useState, useEffect } from 'react';
-import Center from '../../components/Utility/Center';
-import HeadingStyle from '../../components/Utility/Styles/TextStyles';
-import { Platform } from 'react-native';
-import LandingPageImage from '../../assets/images/assets/LandingPageImage.svg';
-import * as Google from 'expo-google-app-auth';
-import * as GoogleSignIn from 'expo-google-sign-in';
-import { HeaderText } from '../../components/Texts';
-import * as AppleAuthentication from 'expo-apple-authentication';
-import MyStatusBar from '../../components/MyStatusBar';
-import AppHeader from '../../components/Utility/AppHeader';
+} from '../../components/Buttons'
+import { Dimensions } from 'react-native'
+import { useState, useEffect } from 'react'
+import Center from '../../components/Utility/Center'
+import HeadingStyle from '../../components/Utility/Styles/TextStyles'
+import { Platform } from 'react-native'
+import LandingPageImage from '../../assets/images/assets/LandingPageImage.svg'
+import * as Google from 'expo-google-app-auth'
+import * as GoogleSignIn from 'expo-google-sign-in'
+import { HeaderText } from '../../components/Texts'
+import * as AppleAuthentication from 'expo-apple-authentication'
+import MyStatusBar from '../../components/MyStatusBar'
+import AppHeader from '../../components/Utility/AppHeader'
 
 export default function LandingPage({ navigation }) {
-  const windowWidth = Dimensions.get('window').width;
-  const [googleSubmitting, setGoogleSubmitting] = useState(false); // use this for loading indicator
+  const windowWidth = Dimensions.get('window').width
+  const [googleSubmitting, setGoogleSubmitting] = useState(false) // use this for loading indicator
   const AndriodClientID =
-    '724006010963-9p0s32i5i7httcsnqfdls7ffnc6vkkvl.apps.googleusercontent.com';
+    '724006010963-9p0s32i5i7httcsnqfdls7ffnc6vkkvl.apps.googleusercontent.com'
   const IOSClientID =
-    '724006010963-pbh207t1saug4n1cuscoufiodd73pjf6.apps.googleusercontent.com';
+    '724006010963-pbh207t1saug4n1cuscoufiodd73pjf6.apps.googleusercontent.com'
   const initAsync = () => {
     try {
       GoogleSignIn.initAsync({
         clientId: Platform.OS === 'ios' ? IOSClientID : AndriodClientID,
-      });
-    } catch (e) { }
-  };
+      })
+    } catch (e) {}
+  }
 
   const handleAppleAuth = async () => {
     try {
@@ -39,49 +39,54 @@ export default function LandingPage({ navigation }) {
           AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
-      }).then(credential => {
+      }).then((credential) => {
+        const { email, familyName, givenName } = credential
+        const result = { email: email, id: credential.user }
+        const type = 'apple'
+        result['type'] = type
 
-        const { email, familyName, givenName } = credential;
-        const result = { email: email, id: credential.user };
-        const type = 'apple';
-        result["type"] = type;
-
-
-        setTimeout(() =>
-          navigation.navigate('Name', { result, familyName, givenName, type }), 1000
-        );
-      });
+        setTimeout(
+          () =>
+            navigation.navigate('Name', {
+              result,
+              familyName,
+              givenName,
+              type,
+            }),
+          1000
+        )
+      })
     } catch (e) {
       if (e.code === 'ERR_CANCELED') {
         // handle that the user canceled the sign-in flow
-        console.log('Error occured');
+        console.log('Error occured')
       } else {
         // handle other errors
       }
     }
-  };
+  }
 
   const signOutApple = async () => {
-    const ebukaId = '001364.1a655f1ef31342e59f99743f70d156a6.1735';
+    const ebukaId = '001364.1a655f1ef31342e59f99743f70d156a6.1735'
     try {
       AppleAuthentication.refreshAsync({
         user: ebukaId,
-      }).then(credential => { });
+      }).then((credential) => {})
 
-      console.log(' referesh', credential);
+      console.log(' referesh', credential)
     } catch (e) {
       if (e.code === 'ERR_CANCELED') {
         // handle that the user canceled the sign-in flow
-        console.log('Error occured tyring to sign out');
+        console.log('Error occured tyring to sign out')
       } else {
         // handle other errors
       }
     }
-  };
+  }
 
   const handleGoogleSignIn = async () => {
-    setGoogleSubmitting(true);
-    console.log('test sign in');
+    setGoogleSubmitting(true)
+    console.log('test sign in')
 
     const config = {
       iosClientId:
@@ -92,35 +97,35 @@ export default function LandingPage({ navigation }) {
         '724006010963-er1i8nf3hsoeibm6vg8m01au6gqq8bhb.apps.googleusercontent.com',
 
       // scopes: ['profile', 'email'],
-    };
+    }
 
     // console.log('config google  =====>>> ', config);
 
     Google.logInAsync(config)
       .then(async (result) => {
-        const { type, user, accessToken } = result;
-        await Google.logOutAsync({ accessToken, ...config });
+        const { type, user, accessToken } = result
+        await Google.logOutAsync({ accessToken, ...config })
         if (type === 'success') {
-          console.log('result', result);
-          const { familyName, givenName } = user;
+          console.log('result', result)
+          const { familyName, givenName } = user
 
-          const type = 'google';
-          result["type"] = 'google';
+          const type = 'google'
+          result['type'] = 'google'
           setTimeout(() =>
-            navigation.navigate('Name', { result, familyName, givenName, type }),
-          );
+            navigation.navigate('Name', { result, familyName, givenName, type })
+          )
 
-          return result.accessToken;
+          return result.accessToken
         } else {
-          return { cancelled: true };
+          return { cancelled: true }
         }
       })
-      .catch(error => {
-        console.log('Hi i got an error trying to sign in');
-        console.log(error);
-        setGoogleSubmitting(false);
-      });
-  };
+      .catch((error) => {
+        console.log('Hi i got an error trying to sign in')
+        console.log(error)
+        setGoogleSubmitting(false)
+      })
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -138,7 +143,8 @@ export default function LandingPage({ navigation }) {
             height: 430,
             alignItems: 'center',
             // marginRight: 18,
-          }}>
+          }}
+        >
           <LandingPageImage witdth="100%" />
         </View>
         <View
@@ -151,7 +157,8 @@ export default function LandingPage({ navigation }) {
             justifyContent: 'flex-end',
             // marginLeft: 30,
             marginBottom: 20,
-          }}>
+          }}
+        >
           <View style={{ width: windowWidth * 0.9, marginVertical: 8 }}>
             <GoogleButtonWithIcon
               onPress={() => handleGoogleSignIn(navigation)}
@@ -163,7 +170,7 @@ export default function LandingPage({ navigation }) {
         </View>
       </View>
     </SafeAreaView>
-  );
+  )
   //}
 }
 
@@ -175,4 +182,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
   },
-});
+})

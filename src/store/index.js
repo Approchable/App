@@ -1,17 +1,16 @@
-import { createStore, combineReducers, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
+import { createStore, combineReducers, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk'
 import {
   AuthReducer,
   NavReducer,
   CreatePostsReducer,
   GetPostsReducer,
   GetConnectionsReducer,
-  getConnectionUserReducer
-} from './reducers.js';
-import { postsReducer } from "./posts/posts.js";
-import WaitlistReducer from './WaitList/Waitlist.js';
-import {RequestReducer ,userRequestsReducer} from './Requests/Requests.js';
-
+  getConnectionUserReducer,
+} from './reducers.js'
+import { postsReducer } from './posts/posts.js'
+import WaitlistReducer from './WaitList/Waitlist.js'
+import { RequestReducer, userRequestsReducer } from './Requests/Requests.js'
 
 const RootReducer = combineReducers({
   ///
@@ -24,7 +23,7 @@ const RootReducer = combineReducers({
   RequestReducer,
   userRequestsReducer,
   GetConnectionsReducer,
-  getConnectionUserReducer
-});
+  getConnectionUserReducer,
+})
 
-export const store = createStore(RootReducer, applyMiddleware(thunk));
+export const store = createStore(RootReducer, applyMiddleware(thunk))
