@@ -7,6 +7,7 @@ import {
   RefreshControl,
   Modal,
   TouchableWithoutFeedback,
+  ScrollView,
 } from 'react-native'
 import { RegularBoldText } from '../../components/Texts'
 import { NormalButton } from '../../components/Buttons'
@@ -20,38 +21,31 @@ import {
   TabType,
 } from '../../components/config/Constant'
 
-import Post, { PostModal } from '../../components/Utility/Post'
+import Post, { PostModal } from '../../components/Post'
 import AppHeader from '../../components/Utility/AppHeader'
 import { useSelector } from 'react-redux'
 import { getPosts } from '../../store/posts/posts'
 import SkeletonContent from 'react-native-skeleton-content'
 import MyStatusBar from '../../components/MyStatusBar'
 import { sendJoinRequest } from '../../store/Requests/Requests'
+import { useFocusEffect } from '@react-navigation/native'
 
 //GetPostsReducer
 function Explore({ navigation }) {
   var posts = useSelector((state) => state.GetPostsReducer.posts)
   var loading = useSelector((state) => state.GetPostsReducer.loading)
   var error = useSelector((state) => state.GetPostsReducer.error)
-
+  //loading = true
   const [refreshing, setRefreshing] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
   const [modalPost, setModalPost] = useState(null)
 
   const onRefresh = () => {
-    setRefreshing(true)
-    // _getPosts();
-
-    setTimeout(() => {
-      setRefreshing(false)
-    }, 1000)
+    _getPosts()
   }
   const dispatch = useDispatch()
 
-  const [user, setUser] = useState(null)
-
-  const _getPosts = async () => {
-    // dispatch fetch new post to properly update old posts
+  const _getPosts = () => {
     dispatch(getPosts())
   }
 
@@ -66,111 +60,61 @@ function Explore({ navigation }) {
   }
 
   useEffect(() => {
-    _getPosts()
-  }, [])
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('focsed on explore ')
+      _getPosts()
+    })
+  }, [navigation])
 
-  if (loading == true) {
-    return (
-      <View
-        style={{ flex: 1, justifyContent: 'center', backgroundColor: 'white' }}>
-        <ActivityIndicator size="large" color="#44BFBA" />
-      </View>
-    )
-  } else if (posts.length > 0 && loading == false) {
-    return (
-      <View style={styles.container}>
-        {/* <MyStatusBar backgroundColor="white" />
-        <AppHeader moreStyles={{flex: 0.1}} /> */}
-        <MyStatusBar backgroundColor="#F6F6F6" />
-        <AppHeader moreStyles={{ flex: 0.1 }} />
-        <View style={{ flex: 1, borderRadius: 16 }}>
+  return (
+    <View style={styles.container}>
+      <MyStatusBar backgroundColor="#F6F6F6" />
+      <AppHeader moreStyles={{ flex: 0.1 }} />
+      <View style={{ flex: 1, borderRadius: 16 }}>
+        {loading ? (
+          <ExploreLoader loading={loading} />
+        ) : (
           <FlatList
             style={{
-              marginTop: 0,
+              marginTop: 20,
               backgroundColor: 'white',
               borderRadius: 16,
             }}
             data={posts}
             keyExtractor={(item) => item.id}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              <RefreshControl refreshing={loading} onRefresh={onRefresh} />
             }
             renderItem={({ item }) => (
-              // <SkeletonContent
-              //   key={item.id}
-              //   containerStyle={{
-              //     flexDirection: 'row',
-              //     alignItems: 'center',
-              //     justifyContent: 'center',
-              //     height: 80,
-              //     width: screenWidth.width85,
-              //     margin: 10,
-              //   }}
-              //   layout={[
-              //     // long line
-              //     {
-              //       width: 44,
-              //       height: 44,
-              //       resizeMode: 'contain',
-              //       borderRadius: 22,
-              //       alignItems: 'center',
-              //       // marginBottom: 10,
-              //     },
-              //     {
-              //       children: [
-              //         {
-              //           width: screenWidth.width65,
-              //           height: 20,
-              //           marginBottom: 6,
-              //           marginLeft: 10,
-              //           marginTop: 10,
-              //         },
-              //         {
-              //           width: screenWidth.width65,
-              //           height: 50,
-              //           marginLeft: 10,
-              //           marginTop: 10,
-              //           marginBottom: 10,
-              //         },
-              //       ],
-              //     },
-              //   ]}
-              //   isVisible={false}
-              //   isLoading={false}
-              //   animationType="pulse"
-              //   animationDirection="horizontalRight">
-                <Post
-                  userName={item.user.name}
-                  title={item.headline}
-                  description={item.description}
-                  imageUrl={item.imageUrl}
-                  location={item.location}
-                  screeningQuestion={item.screeningQuestion || ''}
-                  startDateTime={item.startDateTime}
-                  endDateTime={item.endDateTime}
-                  addressResult={item.addressResult}
-                  profileImage={item.user.photoUrl}
-                  postId={item.postId}
-                  onPress={() => {
-                    handleJoin(item)
-                  }}
-                  usersWhoRequested={item.usersWhoRequested}
-                />
-             // </SkeletonContent>
+              <Post
+                userName={item.user.name}
+                title={item.headline}
+                description={item.description}
+                imageUrl={item.imageUrl}
+                location={item.location}
+                screeningQuestion={item.screeningQuestion || ''}
+                startDateTime={item.startDateTime}
+                endDateTime={item.endDateTime}
+                addressResult={item.addressResult}
+                profileImage={item.user.photoUrl}
+                postId={item.postId}
+                onPress={() => {
+                  handleJoin(item)
+                }}
+                usersWhoRequested={item.usersWhoRequested}
+              />
             )}
           />
+        )}
 
-          <JoinModal
-            visible={modalVisible}
-            onCancel={() => handleCancel()}
-            postObject={modalPost}
-          />
-        </View>
+        <JoinModal
+          visible={modalVisible}
+          onCancel={() => handleCancel()}
+          postObject={modalPost}
+        />
       </View>
-    )
-  } else {
-    return <NoPost navigation={navigation} />
-  }
+    </View>
+  )
 }
 
 function NoPost({ navigation }) {
@@ -243,6 +187,70 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
       </TouchableWithoutFeedback>
     </Modal>
   )
+}
+
+const ExploreLoader = (props) => {
+  const { loading } = props
+
+  const itemArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+  if (loading) {
+    return (
+      <ScrollView>
+        {itemArr.map((item) => {
+          return (
+            <SkeletonContent
+              key={item.id}
+              containerStyle={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 300,
+                width: screenWidth.width85,
+                margin: 10,
+              }}
+              layout={[
+                // long line
+                {
+                  width: 44,
+                  height: 44,
+                  resizeMode: 'contain',
+                  borderRadius: 22,
+                  alignItems: 'center',
+                  // marginBottom: 10,
+                  marginLeft: 15,
+                },
+                {
+                  children: [
+                    {
+                      width: screenWidth.width80,
+                      height: 40,
+                      marginBottom: 6,
+                      marginLeft: 10,
+                      marginTop: 10,
+                    },
+                    {
+                      width: screenWidth.width80,
+                      height: 200,
+                      marginLeft: 10,
+                      marginTop: 10,
+                      marginBottom: 10,
+                    },
+                  ],
+                },
+              ]}
+              isVisible={true}
+              isLoading={true}
+              animationType="pulse"
+              animationDirection="horizontalRight"
+            />
+          )
+        })}
+      </ScrollView>
+    )
+  } else {
+    return <></>
+  }
 }
 
 const ModalBarTop = () => {

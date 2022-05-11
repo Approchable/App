@@ -66,7 +66,6 @@ export const getPosts = () => {
       if (posts !== null) {
         dispatch({
           type: GET_POSTS,
-
           payload: {
             posts: posts,
             loading: false,
@@ -180,8 +179,39 @@ export const postsReducer = (state = initialPostObject, action) => {
       return {
         ...state,
       }
-    
+
     default:
       return state
+  }
+}
+
+const getPostInitialState = {
+  posts: [],
+  loading: true,
+};
+
+
+export function GetPostsReducer(state = getPostInitialState, action) {
+  switch (action.type) {
+    case GET_POSTS:
+      return {
+        ...state,
+        posts: action.payload.posts,
+        loading: action.payload.loading,
+      };
+    case GET_POSTS_LOADING:
+      console.log('GET_POSTS_LOADING');
+      return {
+        ...state,
+        loading: action.payload.loading,
+      };
+    case GET_POSTS_ERROR:
+      return {
+        ...state,
+        error: action.payload.error,
+        loading: action.payload.loading,
+      };
+    default:
+      return state;
   }
 }
