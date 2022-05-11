@@ -141,32 +141,29 @@ function PostHeader({
 }) {
   return (
     <KeyboardAwareScrollView extraHeight={100}>
-    <View
-    
-      style={{
-        ...styles.PostHeaderView,
-        flexDirection: 'row',
-        ...moreStyles,
+      <View
+        style={{
+          ...styles.PostHeaderView,
+          flexDirection: 'row',
+          ...moreStyles,
 
-        justifyContent: 'space-between',
-      }}
-    >
-
-      <View style={{ flexDirection: 'row' }}>
-        <PostProfileImage imageUrl={profileImage} />
-        <View style={{ marginLeft: 10 }}>
-          <PostUserName userName={userName} />
-          <PostLocation
-            location={location}
-            addressResult={addressResult}
-            showJoinButton
-          />
+          justifyContent: 'space-between',
+        }}
+      >
+        <View style={{ flexDirection: 'row' }}>
+          <PostProfileImage imageUrl={profileImage} />
+          <View style={{ marginLeft: 10 }}>
+            <PostUserName userName={userName} />
+            <PostLocation
+              location={location}
+              addressResult={addressResult}
+              showJoinButton
+            />
+          </View>
         </View>
+
+        <ExploreReport moreStyles={{}} handleModalOpen={handleModalOpen} />
       </View>
-
-      <ExploreReport moreStyles={{}} handleModalOpen={handleModalOpen} />
-
-    </View>
     </KeyboardAwareScrollView>
   )
 }

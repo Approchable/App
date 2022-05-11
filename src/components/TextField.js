@@ -11,13 +11,12 @@ export function NormalTextField({
 }) {
   var ref = useRef('null')
   return (
-
     <View style={{ ...styles.textInputView, ...moreStyles }}>
       <TextInput
         ref={ref}
         autoFocus={autoFocus}
         value={value}
-        placeholderTextColor='#696969'
+        placeholderTextColor="#696969"
         style={{ ...styles.textInput }}
         placeholder={placeholder}
         onChangeText={onChangeText}
