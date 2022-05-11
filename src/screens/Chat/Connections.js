@@ -6,7 +6,7 @@ import {
   Dimensions,
   Modal,
   TouchableOpacity,
-  TextInput,
+  TextInput
 } from 'react-native'
 
 import { useDispatch, useSelector } from 'react-redux'
@@ -28,13 +28,14 @@ import { SafeAreaView } from 'react-native'
 import { Image } from 'react-native'
 import SkeletonContent from 'react-native-skeleton-content'
 import { getRequests } from '../../store/Requests/Requests'
-import moment from 'moment'
 import { dateDifference } from '../../components/Utility/Helper'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { async } from '@firebase/util'
 
 const DataArray = [
   {
     name: 'Jane',
-    lastMassage: 'Amet minim mollit non deser ull..',
+    lastMassage: 'hi!',
     time: '2h',
     count: 8,
   },
@@ -96,6 +97,7 @@ export default function Connections({ navigation }) {
   const [isFetchedRequest, setIsFetchedRequest] = useState(true)
   const [connectionsArray, setConnectionsArray] = useState(DataArray)
   const [requestArray, setRequestsArray] = useState(requests)
+  const [currentUserId, setCurrentUserId] = useState(undefined);
 
   const dispatch = useDispatch()
 
@@ -115,9 +117,28 @@ export default function Connections({ navigation }) {
   }
 
   const _getRequests = async () => {
-    dispatch(getRequests())
+    // get current user from the local aync storage
+    console.log(`aaaaa.`);
+    await _getCurrentUserId()
+    console.log(`hhhhh.`);
+
+    if (currentUserId != undefined && currentUserId != null) {
+      console.log(`trying to fetch the current logged in user(${currentUserId}) requests`);
+      dispatch(getRequests(currentUserId))
+    } else {
+      console.log(`unable to fetch current logged in user ID.`);
+    }
   }
 
+  const _getCurrentUserId = async () => {
+
+    const user = await AsyncStorage.getItem('user');
+    const userId = JSON.parse(user).id;
+    console.log('user id is', userId);
+
+    setCurrentUserId(userId)
+    console.log('dddd.');
+  }
 
 
   const onClickChatButton = async () => {
@@ -222,15 +243,17 @@ export default function Connections({ navigation }) {
                   animationDirection="horizontalRight"
                   layout={[styles.userIconShimmer, { children: [styles.titleShimmer, styles.messageShimmer], }, styles.countShimmer]}>
                   <TouchableOpacity activeOpacity={0.5} style={styles.connectionsView}>
-                    <Image style={styles.userImage} source={ImageSet.profile} />
-                    <View>
-                      <Text style={styles.userName}>{item.name}</Text>
-                      <View style={styles.lastMessageView}>
-                        <Text numberOfLines={1} style={styles.lastMessageText}>
-                          {item.lastMassage}
-                        </Text>
-                        <Text style={styles.time}>{'  ' + item.time}</Text>
+                    <View style={styles.centerRowAlign}>
+                      <Image style={styles.userImage} source={ImageSet.profile} />
+                      <View>
+                        <Text style={styles.userName}>{item.name}</Text>
+                        <View style={styles.lastMessageView}>
+                          <Text numberOfLines={1} style={styles.lastMessageText}>
+                            {item.lastMassage}
+                          </Text>
+                        </View>
                       </View>
+                      <Text style={styles.time}>{'  ' + item.time}</Text>
                     </View>
                     {(item.count && (
                       <View style={styles.messageCountView}>
@@ -258,7 +281,8 @@ export default function Connections({ navigation }) {
             {requestArray.map((item, index) => {
               const data = item.userSendingRequest
               const time = dateDifference(item.createdAt.seconds)
-              // console.log('time ====>>>> ', time);
+              const status = item.requestStatus
+              console.log('request status ====>>>> ', status);
 
               return (
                 <SkeletonContent
@@ -270,23 +294,25 @@ export default function Connections({ navigation }) {
                   animationDirection="horizontalRight"
                   layout={[styles.userIconShimmer, { children: [styles.titleShimmer, styles.messageShimmer], }, styles.countShimmer]}>
                   <TouchableOpacity activeOpacity={0.5} style={styles.requestsView}>
-                    {/* {item.lastMassage &&
-                      <Image style={styles.dotIconForNewRequests} source={ImageSet.dot} />
-                    } */}
-                    <Image style={styles.userImage} source={{ uri: data.photoUrl }} />
-                    <View>
-                      <Text style={styles.userName}>{data.givenName}</Text>
-                      <View style={styles.lastMessageView}>
-                        <Text numberOfLines={1}
-                          style={[
-                            styles.lastMessageText,
-                            { width: item.lastMassage ? screenWidth.width60 : screenWidth.width65, }
-                          ]}>
-                          {item.comments ? item.comments : data.givenName + ' ' + "is Approachable! start the chat."}
-                        </Text>
-                        <Text style={styles.time}>{'12h'}</Text>
+                    <View style={[styles.centerRowAlign]}>
+                      {status == 'pending' && <Image style={styles.dotIconForNewRequests} source={ImageSet.dot} />}
+                      <Image style={styles.userImage} source={{ uri: data.photoUrl }} />
+                      <View>
+                        <Text style={styles.userName}>{data.givenName}</Text>
+                        <View style={[styles.lastMessageView,]}>
+                          <Text numberOfLines={1}
+                            style={[
+                              styles.lastMessageText,
+                              {
+                                width: time == 'just now' ? screenWidth.width55 : screenWidth.width65
+                              }
+                            ]}>
+                            {item.comments ? item.comments : data.givenName + ' ' + "is Approachable! start the chat."}
+                          </Text>
+                        </View>
                       </View>
                     </View>
+                    <Text style={styles.time}>{time}</Text>
                   </TouchableOpacity>
                 </SkeletonContent>
               )
@@ -375,7 +401,6 @@ const styles = StyleSheet.create({
   lastMessageView: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: screenWidth.width65,
   },
   lastMessageText: {
     fontSize: 14,
@@ -389,22 +414,34 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 24,
     color: ColorSet.gray,
+    alignSelf: 'flex-end',
   },
   connectionsView: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    justifyContent: 'space-between',
     borderBottomColor: ColorSet.chatPopupGray,
     borderBottomWidth: 1,
-    paddingBottom: 10
+    paddingBottom: 10,
+    width: screenWidth.width85
+  },
+  centerRowAlign: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  jSpaceBetween: {
+    justifyContent: 'space-between',
+    width: '100%'
   },
   messageCountView: {
-    width: 20,
+    minWidth: 20,
+    maxWidth: 100,
     height: 20,
     backgroundColor: ColorSet.defaultTheme,
     borderRadius: 100,
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: 10,
   },
   messageCount: {
     fontSize: 12,
@@ -470,10 +507,11 @@ const styles = StyleSheet.create({
   requestsView: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    justifyContent: 'space-between',
     borderBottomColor: ColorSet.chatPopupGray,
     borderBottomWidth: 1,
-    paddingBottom: 10
+    paddingBottom: 10,
+    width: screenWidth.width85
   },
   dotIconForNewRequests: {
     width: 8,
@@ -482,4 +520,5 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginRight: 10
   },
+
 })

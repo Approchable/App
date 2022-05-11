@@ -174,8 +174,8 @@ export async function getConnectionById(connectionId) {
 }
 
 // get user Requests by id
-export async function getUserRequests() {
-  const requestsRef = collection(fireStore, 'users', '113582845232411943502', 'usersWhoRequested');
+export async function getUserRequests(usedId) {
+  const requestsRef = collection(fireStore, 'users', usedId, 'usersWhoRequested');
   try {
     const querySnapshot = await getDocs(requestsRef);
     const data = querySnapshot.docs.map(doc => doc.data());

@@ -42,12 +42,54 @@ export function setDataByDate(array) {
     return groupArrays
 }
 
+export function monthDiff(d1, d2) {
+    var months;
+    months = (d2.getFullYear() - d1.getFullYear()) * 12;
+    months -= d1.getMonth();
+    months += d2.getMonth();
+    return months <= 0 ? 0 : months;
+}
+
 
 export function dateDifference(date2) {
-    const currentDate = new Date();
-    const date1 = currentDate.getTime();
+    var timeFormat;
 
-    console.log('date 1 ==>> ', date1);
-    console.log('date 2 ==>> ', date2);
-    // return;
+    const past = new Date(date2 * 1000);
+    const today = new Date();
+
+    const currentDate = moment.utc(today).format("YYYY-MM-DD")
+    const pastDate = moment.utc(past).format("YYYY-MM-DD")
+    //const checkDate = currentDate == pastDate
+
+    var diffMs = (today - past); // milliseconds between today & past
+    var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+    var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+    //var diffSecs = Math.round(((diffMs % 86400000) % 3600000) / 60000 / 60000); // seconds
+
+    const diffYrs = moment().diff(pastDate, 'years');
+    const diffMons = moment().diff(pastDate, 'months');
+    const diffDys = moment().diff(pastDate, 'days');
+
+    if (diffDys == 0) {
+        if (diffHrs == 0) {
+            if (diffMins == 0) {
+                timeFormat = 'just now'
+            } else {
+                timeFormat = `${diffMins}m`
+            }
+        } else {
+            timeFormat = `${diffHrs}h`
+        }
+    } else {
+        if (diffYrs == 0) {
+            if (diffMons == 0) {
+                timeFormat = `${diffDys}d`
+            } else {
+                timeFormat = `${diffMons}m`
+            }
+        } else {
+            timeFormat = `${diffYrs}y`
+        }
+    }
+    return timeFormat;
 }

@@ -130,10 +130,10 @@ export const getusersWhoRequested = (postId) => {
 
 // get all requests actions are here
 
-export const getRequests = () => {
+export const getRequests = (userId) => {
   return async (dispatch) => {
     try {
-      const requests = await getUserRequests()
+      const requests = await getUserRequests(userId)
       // console.log('api response of requests ===>>> ', requests);
       if (requests.length > 0) {
         dispatch({
