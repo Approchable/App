@@ -6,18 +6,18 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import * as Location from 'expo-location';
-import {SmallerText} from '../Texts';
-import {Icon, Icons} from './Icons';
-import {NormalButton} from '../Buttons';
-import {NormalTextField} from '..//TextField.js';
+import {SmallerText} from './Texts';
+import {Icon, Icons} from './Utility/Icons';
+import {NormalButton} from './Buttons';
+import {NormalTextField} from './TextField.js';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import FastImage from 'react-native-fast-image';
-import {getusersWhoRequested} from '../..//store//Requests//Requests';
+import {getusersWhoRequested} from '../store/Requests/Requests';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ExploreReport} from '../Report';
+import {ExploreReport} from './Report';
 var dayjs = require('dayjs');
 
 export default function Post({
@@ -62,7 +62,7 @@ export default function Post({
   );
 }
 
-export function PostModal({post, onPressSend}) {
+export function PostModal({post, onPressSend , setComment}) {
   const dispatch = useDispatch();
   if (post === null || post === undefined) {
     return null;
@@ -72,11 +72,12 @@ export function PostModal({post, onPressSend}) {
   const [hasJoined, setHasJoined] = useState(false);
 
   const handleButtonActive = () => {
-    if (description === null || description === '') {
-      setButtonActive(false);
-    } else {
-      setButtonActive(true);
-    }
+    // if (description === null || description === '') {
+    //   setButtonActive(false);
+    // } else {
+    //   setButtonActive(true);
+    // }
+    setButtonActive(true)
   };
   useEffect(() => {
     handleButtonActive();
@@ -110,7 +111,7 @@ export function PostModal({post, onPressSend}) {
           <NormalTextField
             placeholder="Break the ice with a comment"
             moreStyles={{marginBottom: 60}}
-            onChangeText={text => setDescription(text)}
+            onChangeText={text => setComment(text)}
             autoFocus={false}
           />
           <NormalButton
@@ -165,11 +166,11 @@ function PostLocation({location, addressResult}) {
   const [loading, setLoading] = useState(true);
   const [address, setAddress] = useState(addressResult);
 
-  useEffect(() => {
-    getLocationAndTurnToAdress();
-  }, []);
 
-  const getLocationAndTurnToAdress = async () => {
+
+
+  // perfom expensive calculation once
+  useMemo(async () =>   {
     if (location === null || location === '' || location === undefined) {
       setAddress('No Location!');
       return;
@@ -184,7 +185,9 @@ function PostLocation({location, addressResult}) {
     // console.log('addressResult', addressResult);
     setAddress(String(addressResult[0].name));
     setLoading(false);
-  };
+  },[location.coords])
+
+
   return (
     <View style={styles.PostLocationView}>
       <SmallerText

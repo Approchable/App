@@ -58,34 +58,7 @@ export function NavReducer(state = navInitilaState, action) {
       return state;
   }
 }
-const getPostInitialState = {
-  posts: [],
-  loading: false,
-};
 
-export function GetPostsReducer(state = getPostInitialState, action) {
-  switch (action.type) {
-    case GET_POSTS:
-      return {
-        ...state,
-        posts: action.payload.posts,
-        loading: action.payload.loading,
-      };
-    case GET_POSTS_LOADING:
-      return {
-        ...state,
-        loading: action.payload.loading,
-      };
-    case GET_POSTS_ERROR:
-      return {
-        ...state,
-        error: action.payload.error,
-        loading: action.payload.loading,
-      };
-    default:
-      return state;
-  }
-}
 
 const createPostInitialState = {
   ref: null,
