@@ -1,248 +1,147 @@
-import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  ScrollView,
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  Modal,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import {RegularBoldText} from '../../components/Texts';
-import {NormalButton} from '../../components/Buttons';
-import EmptyCreatePost from '../../assets/images/assets/EmptyCreatePost.svg';
-import {useDispatch} from 'react-redux';
-import SucessLogo from '../../assets/images/assets/SucessLogo.svg';
-import {NavigateToCreate} from '../../store/actions';
-import Post, {PostModal} from '../../components/Utility/Post';
-import AppHeader from '../../components/Utility/AppHeader';
-import {useSelector} from 'react-redux';
-import {getPosts} from '../../store/actions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import MyStatusBar from '../../components/MyStatusBar';
-import {sendJoinRequest} from '../../store/Requests/Requests';
-import * as Random from 'expo-random';
-import uuid from 'react-native-uuid';
-//GetPostsReducer
-function Map({navigation}) {
-  var posts = useSelector(state => state.GetPostsReducer.posts);
-  var loading = useSelector(state => state.GetPostsReducer.loading);
-  var error = useSelector(state => state.GetPostsReducer.error);
+import React, {useState, useEffect, useRef} from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+import MapView, { Marker, Callout } from 'react-native-maps';
+import * as Location from 'expo-location';
+import moment from 'moment';
+import { getRegion } from '../../components/config/map';
+import {View,Text,StyleSheet,TextInput,TouchableOpacity,} from 'react-native';
+import {NativeModules} from 'react-native';
+const {StatusBarManager} = NativeModules;
 
-  const [refreshing, setRefreshing] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalPost, setModalPost] = useState(null);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    _getPosts();
-
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  };
-  const dispatch = useDispatch();
-
-  const [user, setUser] = useState(null);
-
-  const _getPosts = async () => {
-    // dispatch fetch new post to properly update old posts
-    dispatch(getPosts());
-  };
-
-  const handleJoin = postObject => {
-    setModalVisible(true);
-    setModalPost(postObject);
-  };
-
-  const handleCancel = () => {
-    _getPosts();
-    setModalVisible(false);
-
-  }
-
+function Map() {
+ 
+  const [sendButton,setSendButton]=useState(false)
+  const [messageText,setMessageText]=useState(false)
+   const [messages, setMessage] = useState([
+     {id:1, message:"hi",latitude:"12222", longitude:"123345"},
+     {id:2, message:"hi",latitude:"12222", longitude:"123345"},
+     {id:3, message:"hi",latitude:"12222", longitude:"123345"}
+   ]);
+   const [userlocation,setUserLocation] =useState({})
+   const map =useRef(null)
+   const marker =useRef(null)
   useEffect(() => {
-    _getPosts();
-  }, []);
+  getLocation()
+  },[]);
 
-  const postCount = 0;
-  const Postdata = {
-    userName: 'Linda',
-    title: "Linda's Hangout",
-    description:
-      'I’m at Nick’s Pub for happy hour, and would love to make some new friends while i’m here. Open to going anywhere nearby.',
-  };
-  if (loading == true) {
-    return (
-      <View
-        style={{flex: 1, justifyContent: 'center', backgroundColor: 'white'}}>
-        <ActivityIndicator size="large" color="#44BFBA" />
-      </View>
-    );
-  } else if (posts.length > 0 && loading == false) {
-    return (
-      <View style={styles.container}>
-        {/* <MyStatusBar backgroundColor="white" />
-        <AppHeader moreStyles={{flex: 0.1}} /> */}
-        <MyStatusBar backgroundColor="#F6F6F6" />
-        <AppHeader moreStyles={{flex: 0.1}} />
-        <View style={{flex: 1, borderRadius: 16}}>
-          <FlatList
-            style={{
-              marginTop: 0,
-              backgroundColor: 'white',
-              borderRadius: 16,
-            }}
-            data={posts}
-            keyExtractor={item => item.id}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            renderItem={({item}) => (
-              <Post
-                userName={item.user.name}
-                title={item.headline}
-                description={item.description}
-                imageUrl={item.imageUrl}
-                location={item.location}
-                screeningQuestion={item.screeningQuestion || ''}
-                startDateTime={item.startDateTime}
-                endDateTime={item.endDateTime}
-                addressResult={item.addressResult}
-                profileImage={item.user.photoUrl}
-                postId={item.postId}
-                onPress={() => {
-                  handleJoin(item);
-                }}
-                usersWhoRequested={item.usersWhoRequested}
-              />
-            )}
-          />
 
-          <JoinModal
-            visible={modalVisible}
-            onCancel={() => handleCancel()}
-            postObject={modalPost}
-          />
-        </View>
-      </View>
-    );
-  } else {
-    return <NoPost navigation={navigation} />;
+  const getLocation = async () => {
+ 
+     let { status } = await Location.requestBackgroundPermissionsAsync();
+
+    if (status === 'granted') {
+      let location = await Location.getCurrentPositionAsync({});
+
+      setUserLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude
+       } );
+
+
+
+      //  map.animateToRegion(getRegion(location.coords.latitude, location.coords.longitude, 16000));
+    }
   }
-}
 
-function NoPost({navigation}) {
-  const dispatch = useDispatch();
 
-  const postCount = 0;
-
-  const NavigateToCreateInExplore = () => {
-    navigation.navigate('Create');
-  };
+  const onChangeText=(messageText) => {
+   if(messageText) {
+    setMessageText(messageText)
+    setSendButton(true)
+   }
+   else{
+    setSendButton(false)
+     console.log("please put a location")
+   }
+   
+  }
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          //height: 300,
-          marginTop: 90,
-          marginHorizontal: 16,
-          justifyContent: 'center',
-
-          flex: 1,
-          alignItems: 'center',
-        }}>
-        <EmptyCreatePost witdth="100%" />
-      </View>
-      <View style={{flex: 0.8}}>
-        <RegularBoldText
-          content="No hangouts yet? Be the first to post!"
-          moreStyles={{textAlign: 'center'}}
+      <View style={styles.inputWrapper}>
+        <TextInput
+          style={styles.input}
+          placeholder="Type your message here"
+         onChangeText={messageText => onChangeText(messageText)}
+          value={messageText}
         />
-
-        <View style={{flex: 0.3, marginHorizontal: 60, marginTop: -15}}>
-          <NormalButton
-            hollow={false}
-            text="Create Hangout"
-            onPress={() => NavigateToCreateInExplore()}
-            inActive={true}
-          />
+        <View style={{ ...styles.sendButton, ...(sendButton ? styles.sendButtonActive : {}) }}>
+        
+          <TouchableOpacity >
+            <MaterialIcons name="search" size={32} color="#030E01" />
+          </TouchableOpacity>
         </View>
       </View>
+      <MapView
+        ref={map}
+        style={styles.map}
+        initialRegion={getRegion(48.860831, 2.341129, 160000)}
+      >
+        {messages.map((message, index) => {
+          let { latitude, longitude, text, timestamp } = message;
+
+          return (
+            <Marker
+              ref={marker}
+              key={index}
+              identifier={'marker_' + index}
+              coordinate={{ latitude, longitude }}
+            >
+              <Callout>
+                <View>
+                  <Text>{text}</Text>
+                  <Text style={{ 'color': '#999' }}>{moment(timestamp).fromNow()}</Text>
+                </View>
+              </Callout>
+            </Marker>
+          )
+        })}
+      </MapView>
     </View>
+ 
   );
+
+
 }
-
-const JoinModal = ({visible, postObject, onCancel}) => {
-  const dispatch = useDispatch();
-  const handleSendRequest = post => {
-    console.log('add join dispacth function here');
-    dispatch(sendJoinRequest(post));
-    onCancel();
-  };
-
-  return (
-    <Modal visible={visible} transparent animationType="slide">
-      <View
-        style={{
-          ...styles.modal,
-        }}>
-        <ModalBarTop post={postObject} />
-
-        <PostModal
-          post={postObject}
-          onPressSend={() => {
-            handleSendRequest(postObject);
-          }}
-        />
-      </View>
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.modalBG} />
-      </TouchableWithoutFeedback>
-    </Modal>
-  );
-};
-
-const ModalBarTop = () => {
-  return (
-    <View
-      style={{
-        backgroundColor: '#ECEEF2',
-        height: 4,
-        width: 70,
-        borderRadius: 13,
-        alignSelf: 'center',
-        marginTop: 10,
-      }}></View>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  modal: {
+  map: {
+    ...StyleSheet.absoluteFillObject
+  },
+  inputWrapper: {
+    width: '100%',
     position: 'absolute',
-    bottom: 0,
+    padding: 10,
+    top: Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT,
     left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    zIndex: 1000,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    zIndex: 100
   },
-  modalBG: {
+  input: {
+    height: 46,
+    paddingVertical: 10,
+    paddingRight: 50,
+    paddingLeft: 10,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 6,
+    borderColor: '#ccc',
+    backgroundColor: '#fff'
+  },
+  sendButton: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    height: 900, // change this to height of screen later
+    top: 17,
+    right: 20,
+    opacity: 0.4
   },
+  sendButtonActive: {
+    opacity: 1
+  }
 });
+
 export default Map;
