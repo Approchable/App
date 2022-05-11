@@ -62,7 +62,7 @@ function Explore({ navigation }) {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       console.log('focsed on explore ')
-      _getPosts()
+      // _getPosts()
     })
   }, [navigation])
 
