@@ -64,6 +64,7 @@ function Explore({ navigation }) {
       console.log('focsed on explore ')
       // _getPosts()
     })
+   _getPosts()
   }, [navigation])
 
   return (
