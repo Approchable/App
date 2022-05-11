@@ -4,11 +4,15 @@ import React from 'react'
 
 // Report UI that will link to the report page
 export function ExploreReport(props) {
-  const { objectToReport, moreStyles, handleModalOpen } = props
-
+  const { objectToReport, moreStyles, handleModalOpen, setCurrentReportPost } =
+    props
+  const handleModalPress = () => {
+    setCurrentReportPost(objectToReport)
+    handleModalOpen()
+  }
   return (
     <>
-      <TouchableOpacity onPress={handleModalOpen}>
+      <TouchableOpacity onPress={handleModalPress}>
         <Image
           style={{ ...styles.icon, ...moreStyles }}
           source={ImageSet.threeDots}

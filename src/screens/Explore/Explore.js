@@ -37,7 +37,7 @@ function Explore({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false)
   const [reportModalVisible, setReportModalVisible] = useState(false)
   const [modalPost, setModalPost] = useState(null)
-
+  const [currentReportPost, setCurrentReportPost] = useState(null)
   const onRefresh = () => {
     setRefreshing(true)
     _getPosts()
@@ -122,6 +122,7 @@ function Explore({ navigation }) {
                 addressResult={item.addressResult}
                 profileImage={item.user.photoUrl}
                 handleModalOpen={handleModalOpen}
+                setCurrentReportPost={setCurrentReportPost}
                 postId={item.postId}
                 onPress={() => {
                   handleJoin(item)
@@ -137,6 +138,7 @@ function Explore({ navigation }) {
             postObject={modalPost}
           />
           <ReportModal
+            currentReportPost={currentReportPost}
             visible={reportModalVisible}
             onCancel={onCancelReportModal}
           />

@@ -139,3 +139,13 @@ export async function getPostsFromFireStore() {
     return null
   }
 }
+export async function sendReportToFireStore(report) {
+  const reportRef = await collection(fireStore, 'reports')
+  try {
+    const docRef = await addDoc(reportRef, report)
+    return docRef
+  } catch (error) {
+    console.log('Error sending report to firebase ', error)
+    return null
+  }
+}

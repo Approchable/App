@@ -11,7 +11,7 @@ import {
 import { postsReducer } from './posts/posts.js'
 import WaitlistReducer from './WaitList/Waitlist.js'
 import { RequestReducer, userRequestsReducer } from './Requests/Requests.js'
-
+import { ReportReducer } from './Report/Report.js'
 const RootReducer = combineReducers({
   ///
   AuthReducer,
@@ -24,6 +24,7 @@ const RootReducer = combineReducers({
   userRequestsReducer,
   GetConnectionsReducer,
   getConnectionUserReducer,
+  ReportReducer,
 })
 
 export const store = createStore(RootReducer, applyMiddleware(thunk))

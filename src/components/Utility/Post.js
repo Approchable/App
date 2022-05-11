@@ -34,15 +34,18 @@ export default function Post({
   postId,
   usersWhoRequested,
   handleModalOpen,
+  setCurrentReportPost,
 }) {
   return (
     <View style={styles.PostView}>
       <PostHeader
         userName={userName}
+        postId={postId}
         location={location}
         addressResult={addressResult}
         profileImage={profileImage}
         handleModalOpen={handleModalOpen}
+        setCurrentReportPost={setCurrentReportPost}
         moreStyles={{
           marginBottom: 8,
           marginTop: 16,
@@ -91,6 +94,7 @@ export function PostModal({ post, onPressSend }) {
           location={post.location}
           addressResult={post.addressResult}
           profileImage={post.user.photoUrl}
+          postId={postId}
           moreStyles={{
             marginBottom: 8,
             marginTop: 16,
@@ -138,6 +142,8 @@ function PostHeader({
   profileImage,
   moreStyles,
   handleModalOpen,
+  setCurrentReportPost,
+  postId,
 }) {
   return (
     <KeyboardAwareScrollView extraHeight={100}>
@@ -162,7 +168,11 @@ function PostHeader({
           </View>
         </View>
 
-        <ExploreReport moreStyles={{}} handleModalOpen={handleModalOpen} />
+        <ExploreReport
+          objectToReport={{ postId, userName }}
+          handleModalOpen={handleModalOpen}
+          setCurrentReportPost={setCurrentReportPost}
+        />
       </View>
     </KeyboardAwareScrollView>
   )

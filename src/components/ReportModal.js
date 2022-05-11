@@ -6,15 +6,18 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  SafeAreaView,
   Alert,
 } from 'react-native'
 
+import { useDispatch } from 'react-redux'
+import { sendReport } from '..//store//Report//Report'
 import { ImageSet } from './config/Constant'
 import { NormalButton } from './Buttons'
 import { NormalTextField } from './TextField'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import ModalWrapper from './Shared/ModalWrapper'
+import uuid from 'react-native-uuid'
+
 const reportReasons = [
   'This is spam',
   'I just don’t like it or find it offensive',
@@ -26,25 +29,82 @@ const reportReasons = [
   'Other',
 ]
 
-const ReportModal = ({ visible, onCancel }) => {
+const ReportModal = ({ visible, onCancel, currentReportPost }) => {
   const [currentStep, setCurrentStep] = useState('STEP_ONE')
-  const [reason, setReason] = useState(null)
-  const onSubmit = () => {
-    alertOptions()
-    handleCancel()
-  }
+  const [additonalReason, setAdditionalReason] = useState(null)
+  const [currentReportReason, setCurrentReportReason] = useState(7)
+  const dispatch = useDispatch()
   const goToStepTwo = () => {
     setCurrentStep('STEP_TWO')
   }
-  const goToStepThree = () => {
+  const goToStepThree = (idx) => {
+    setCurrentReportReason(idx)
     setCurrentStep('STEP_THREE')
   }
   const handleCancel = () => {
     onCancel()
     setCurrentStep('STEP_ONE')
   }
+  const onSubmit = () => {
+    handleSendReport()
+    alertOptions()
+    handleCancel()
+  }
+  const handleSendReport = () => {
+    let report = {
+      reportReason: reportReasons[currentReportReason],
+      additionalReportReason: additonalReason,
+      reportID: uuid.v4().toString(),
+      postId: currentReportPost?.postId,
+      nameOfReporter: currentReportPost?.userName,
+      emailOfReporter: '',
+      nameOfPersonReported: '',
+      emailOfPersonReported: '',
+      timeOfReport: new Date().toLocaleString(),
+    }
+    dispatch(sendReport(report))
+  }
+  const alertOptions = () => Alert.alert('Your report has been sent!')
+  const StepOne = () => {
+    return (
+      <TouchableOpacity onPress={goToStepTwo} style={styles.reportButton}>
+        <Image
+          style={{ width: 25, height: 25, marginRight: 10 }}
+          source={ImageSet.warning}
+        />
+        <Text style={styles.options}>Report</Text>
+      </TouchableOpacity>
+    )
+  }
+  const StepTwo = () => {
+    return (
+      <>
+        <View style={styles.titleDesc}>
+          <Text style={styles.reportText}>Report</Text>
+          <Text style={styles.reportDescription}>
+            Select a reason for reporting this account. Your report is
+            anonymous. If someone is in immediate danger, call the local
+            emergency services - don’t wait.
+          </Text>
+        </View>
 
-  const StepThree = ({ onSubmit, setReason }) => {
+        <ScrollView>
+          {reportReasons.map((reason, idx) => (
+            <TouchableOpacity
+              style={styles.reportButton}
+              onPress={() => {
+                goToStepThree(idx)
+              }}
+              key={idx}
+            >
+              <Text style={styles.options}>{reason}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </>
+    )
+  }
+  const StepThree = () => {
     return (
       <KeyboardAwareScrollView extraHeight={60}>
         <View style={{ ...styles.titleDesc, marginTop: 20, flex: 1 }}>
@@ -55,7 +115,8 @@ const ReportModal = ({ visible, onCancel }) => {
           </Text>
           <NormalTextField
             placeholder="Optional"
-            onChangeText={(text) => setReason(text)}
+            autoFocus={false}
+            onChangeText={setAdditionalReason}
           />
           <NormalButton
             text={'Send Report'}
@@ -70,55 +131,12 @@ const ReportModal = ({ visible, onCancel }) => {
       </KeyboardAwareScrollView>
     )
   }
-
-  const alertOptions = () => Alert.alert('Your report has been sent!')
   return (
-    <SafeAreaView>
-      <ModalWrapper visible={visible} transparent animationType="slide">
-        {currentStep == 'STEP_ONE' && <StepOne goToStepTwo={goToStepTwo} />}
-        {currentStep == 'STEP_TWO' && <StepTwo goToStepThree={goToStepThree} />}
-        {currentStep == 'STEP_THREE' && (
-          <StepThree onSubmit={onSubmit} setReason={setReason} />
-        )}
-      </ModalWrapper>
-    </SafeAreaView>
-  )
-}
-const StepOne = ({ goToStepTwo }) => {
-  return (
-    <TouchableOpacity onPress={goToStepTwo} style={styles.reportButton}>
-      <Image
-        style={{ width: 25, height: 25, marginRight: 10 }}
-        source={ImageSet.warning}
-      />
-      <Text style={styles.options}>Report</Text>
-    </TouchableOpacity>
-  )
-}
-const StepTwo = ({ goToStepThree }) => {
-  return (
-    <>
-      <View style={styles.titleDesc}>
-        <Text style={styles.reportText}>Report</Text>
-        <Text style={styles.reportDescription}>
-          Select a reason for reporting this account. Your report is anonymous.
-          If someone is in immediate danger, call the local emergency services -
-          don’t wait.
-        </Text>
-      </View>
-
-      <ScrollView>
-        {reportReasons.map((reason, idx) => (
-          <TouchableOpacity
-            style={styles.reportButton}
-            onPress={goToStepThree}
-            key={idx}
-          >
-            <Text style={styles.options}>{reason}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </>
+    <ModalWrapper visible={visible} transparent animationType="slide">
+      {currentStep == 'STEP_ONE' && <StepOne  />}
+      {currentStep == 'STEP_TWO' && <StepTwo  />}
+      {currentStep == 'STEP_THREE' && <StepThree/>}
+    </ModalWrapper>
   )
 }
 
