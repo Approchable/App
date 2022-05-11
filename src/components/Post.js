@@ -62,7 +62,7 @@ export default function Post({
   );
 }
 
-export function PostModal({post, onPressSend}) {
+export function PostModal({post, onPressSend , setComment}) {
   const dispatch = useDispatch();
   if (post === null || post === undefined) {
     return null;
@@ -72,11 +72,12 @@ export function PostModal({post, onPressSend}) {
   const [hasJoined, setHasJoined] = useState(false);
 
   const handleButtonActive = () => {
-    if (description === null || description === '') {
-      setButtonActive(false);
-    } else {
-      setButtonActive(true);
-    }
+    // if (description === null || description === '') {
+    //   setButtonActive(false);
+    // } else {
+    //   setButtonActive(true);
+    // }
+    setButtonActive(true)
   };
   useEffect(() => {
     handleButtonActive();
@@ -110,7 +111,7 @@ export function PostModal({post, onPressSend}) {
           <NormalTextField
             placeholder="Break the ice with a comment"
             moreStyles={{marginBottom: 60}}
-            onChangeText={text => setDescription(text)}
+            onChangeText={text => setComment(text)}
             autoFocus={false}
           />
           <NormalButton
