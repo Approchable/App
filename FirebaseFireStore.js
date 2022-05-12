@@ -35,6 +35,9 @@ export async function sendPostToFireStore(postObject) {
 }
 
 export async function sendRequestToFireStore(request) {
+  if (request.userSendingRequest.id  === request.userReciving.id) {
+    return null;
+  }
   const userRef = await collection(fireStore, 'users');
   const userDocRef = await doc(userRef, request.userReciving.id);
   const requestRef = await collection(userDocRef, 'usersWhoRequested');
