@@ -1,8 +1,5 @@
 import {StatusBar} from 'expo-status-bar';
 import {StyleSheet, Text, View} from 'react-native';
-import LandingPage from './src/screens/Onboarding/LandingPage';
-import NormalButton from './src/components/Buttons';
-import Name from './src/screens/Onboarding/Name';
 import RootNavigator from './src/navigation/RootNavigator';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -12,10 +9,7 @@ import {UserContext, UserProvider} from './src/context/UserContext';
 import {Provider, useSelector} from 'react-redux';
 import AppHeader from './src/components/Utility/AppHeader';
 import {store} from './src/store/index';
-import Waitlist from './src/screens/Waitlist/Waitlist';
-import CreatePost2 from './src/screens/Create/CreatePost2';
-import CreatePost3 from './src/screens/Create/CreatePost3';
-import MyStatusBar from './src/components/MyStatusBar';
+
 
 export default function App() {
   return (
