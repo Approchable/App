@@ -29,14 +29,14 @@ const TabArr = [
     inActiveIcon: 'pluscircle',
     component: CreateStack,
   },
-  {
-    route: 'Connections',
-    label: 'Connections',
-    type: Icons.FontAwesome, //TODO: we need to replace the icon with actual in figma
-    activeIcon: 'comments',
-    inActiveIcon: 'comments',
-    component: Connections,
-  },
+  // {
+  //   route: 'Connections',
+  //   label: 'Connections',
+  //   type: Icons.FontAwesome, //TODO: we need to replace the icon with actual in figma
+  //   activeIcon: 'comments',
+  //   inActiveIcon: 'comments',
+  //   component: Connections,
+  // },
   {
     route: 'Profile',
     label: 'Profile',
