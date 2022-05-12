@@ -38,7 +38,8 @@ requestObject =
 }
 */
 
-export const sendJoinRequest = (post) => {
+export const sendJoinRequest = (post, comment) => {
+  console.log(comment , 'comment')
   return async (dispatch) => {
     dispatch({ type: SEND_REQUEST_LOADING })
     const user = await AsyncStorage.getItem('user')
@@ -58,6 +59,8 @@ export const sendJoinRequest = (post) => {
       requestID: uuid.v4().toString(),
       userReciving: post.user,
       userSendingRequest: userObject,
+      createdAt: new Date().toISOString(),
+      comment: comment || 'No message with this request',
     }
     console.log('postUserId ', post.user.id)
     console.log('userSendingRequestObjectId ', userObject.id)

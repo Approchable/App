@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
-  TextInput,
-  ScrollView,
-  ActivityIndicator,
   FlatList,
   RefreshControl,
   Modal,
   TouchableWithoutFeedback,
+  ScrollView,
 } from 'react-native'
 import { RegularBoldText } from '../../components/Texts'
 import { NormalButton } from '../../components/Buttons'
@@ -17,7 +14,7 @@ import EmptyCreatePost from '../../assets/images/assets/EmptyCreatePost.svg'
 import { useDispatch } from 'react-redux'
 import SucessLogo from '../../assets/images/assets/SucessLogo.svg'
 import { NavigateToCreate } from '../../store/actions'
-import Post, { PostModal } from '../../components/Utility/Post'
+import Post, { PostModal } from '../../components/Post'
 import AppHeader from '../../components/Utility/AppHeader'
 import { useSelector } from 'react-redux'
 import { getPosts } from '../../store/actions'
@@ -27,6 +24,10 @@ import { sendJoinRequest } from '../../store/Requests/Requests'
 import * as Random from 'expo-random'
 import uuid from 'react-native-uuid'
 import ReportModal from '../../components/ReportModal'
+import SkeletonContent from 'react-native-skeleton-content'
+import {
+  screenWidth,
+} from '../../components/config/Constant'
 //GetPostsReducer
 function Explore({ navigation }) {
   var posts = useSelector((state) => state.GetPostsReducer.posts)
@@ -72,42 +73,31 @@ function Explore({ navigation }) {
   }
 
   useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('focsed on explore ')
+      // _getPosts()
+    })
     _getPosts()
-  }, [])
+  }, [navigation])
 
-  const postCount = 0
-  const Postdata = {
-    userName: 'Linda',
-    title: "Linda's Hangout",
-    description:
-      'I’m at Nick’s Pub for happy hour, and would love to make some new friends while i’m here. Open to going anywhere nearby.',
-  }
-  if (loading == true) {
-    return (
-      <View
-        style={{ flex: 1, justifyContent: 'center', backgroundColor: 'white' }}
-      >
-        <ActivityIndicator size="large" color="#44BFBA" />
-      </View>
-    )
-  } else if (posts.length > 0 && loading == false) {
-    return (
-      <View style={styles.container}>
-        {/* <MyStatusBar backgroundColor="white" />
-        <AppHeader moreStyles={{flex: 0.1}} /> */}
-        <MyStatusBar backgroundColor="#F6F6F6" />
-        <AppHeader moreStyles={{ flex: 0.1 }} />
-        <View style={{ flex: 1, borderRadius: 16 }}>
+  return (
+    <View style={styles.container}>
+      <MyStatusBar backgroundColor="#F6F6F6" />
+      <AppHeader moreStyles={{ flex: 0.1 }} />
+      <View style={{ flex: 1, borderRadius: 16 }}>
+        {loading ? (
+          <ExploreLoader loading={loading} />
+        ) : (
           <FlatList
             style={{
-              marginTop: 0,
+              marginTop: 20,
               backgroundColor: 'white',
               borderRadius: 16,
             }}
             data={posts}
             keyExtractor={(item) => item.id}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              <RefreshControl refreshing={loading} onRefresh={onRefresh} />
             }
             renderItem={({ item }) => (
               <Post
@@ -131,6 +121,7 @@ function Explore({ navigation }) {
               />
             )}
           />
+        )}
 
           <JoinModal
             visible={modalVisible}
@@ -145,9 +136,6 @@ function Explore({ navigation }) {
         </View>
       </View>
     )
-  } else {
-    return <NoPost navigation={navigation} />
-  }
 }
 
 function NoPost({ navigation }) {
@@ -195,9 +183,10 @@ function NoPost({ navigation }) {
 
 const JoinModal = ({ visible, postObject, onCancel }) => {
   const dispatch = useDispatch()
-  const handleSendRequest = (post) => {
+  const [comment, setComment] = useState('')
+  const handleSendRequest = (post , comment="") => {
     console.log('add join dispacth function here')
-    dispatch(sendJoinRequest(post))
+    dispatch(sendJoinRequest(post , comment))
     onCancel()
   }
 
@@ -211,9 +200,10 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
         <ModalBarTop post={postObject} />
 
         <PostModal
+          setComment={setComment}
           post={postObject}
           onPressSend={() => {
-            handleSendRequest(postObject)
+            handleSendRequest(postObject , comment)
           }}
         />
       </View>
@@ -222,6 +212,70 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
       </TouchableWithoutFeedback>
     </Modal>
   )
+}
+
+const ExploreLoader = (props) => {
+  const { loading } = props
+
+  const itemArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+  if (loading) {
+    return (
+      <ScrollView>
+        {itemArr.map((item) => {
+          return (
+            <SkeletonContent
+              key={item.id}
+              containerStyle={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 300,
+                width: screenWidth.width85,
+                margin: 10,
+              }}
+              layout={[
+                // long line
+                {
+                  width: 44,
+                  height: 44,
+                  resizeMode: 'contain',
+                  borderRadius: 22,
+                  alignItems: 'center',
+                  // marginBottom: 10,
+                  marginLeft: 15,
+                },
+                {
+                  children: [
+                    {
+                      width: screenWidth.width80,
+                      height: 40,
+                      marginBottom: 6,
+                      marginLeft: 10,
+                      marginTop: 10,
+                    },
+                    {
+                      width: screenWidth.width80,
+                      height: 200,
+                      marginLeft: 10,
+                      marginTop: 10,
+                      marginBottom: 10,
+                    },
+                  ],
+                },
+              ]}
+              isVisible={true}
+              isLoading={true}
+              animationType="pulse"
+              animationDirection="horizontalRight"
+            />
+          )
+        })}
+      </ScrollView>
+    )
+  } else {
+    return <></>
+  }
 }
 
 const ModalBarTop = () => {

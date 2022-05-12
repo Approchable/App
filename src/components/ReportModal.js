@@ -17,6 +17,7 @@ import { NormalTextField } from './TextField'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import ModalWrapper from './Shared/ModalWrapper'
 import uuid from 'react-native-uuid'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const reportReasons = [
   'This is spam',
@@ -31,7 +32,7 @@ const reportReasons = [
 
 const ReportModal = ({ visible, onCancel, currentReportPost }) => {
   const [currentStep, setCurrentStep] = useState('STEP_ONE')
-  const [additonalReason, setAdditionalReason] = useState(null)
+  const [additonalReason, setAdditionalReason] = useState('')
   const [currentReportReason, setCurrentReportReason] = useState(7)
   const dispatch = useDispatch()
   const goToStepTwo = () => {
@@ -50,16 +51,16 @@ const ReportModal = ({ visible, onCancel, currentReportPost }) => {
     alertOptions()
     handleCancel()
   }
-  const handleSendReport = () => {
+  const handleSendReport = async() => {
+    const user = await AsyncStorage.getItem('user')
+    const userId = JSON.parse(user).id
     let report = {
       reportReason: reportReasons[currentReportReason],
       additionalReportReason: additonalReason,
       reportID: uuid.v4().toString(),
       postId: currentReportPost?.postId,
       nameOfReporter: currentReportPost?.userName,
-      emailOfReporter: '',
-      nameOfPersonReported: '',
-      emailOfPersonReported: '',
+      userId: userId,
       timeOfReport: new Date().toLocaleString(),
     }
     dispatch(sendReport(report))
@@ -116,7 +117,8 @@ const ReportModal = ({ visible, onCancel, currentReportPost }) => {
           <NormalTextField
             placeholder="Optional"
             autoFocus={false}
-            onChangeText={setAdditionalReason}
+
+            onChangeText={text=>setAdditionalReason(text)}
           />
           <NormalButton
             text={'Send Report'}

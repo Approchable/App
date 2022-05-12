@@ -4,11 +4,10 @@ import {
   AuthReducer,
   NavReducer,
   CreatePostsReducer,
-  GetPostsReducer,
   GetConnectionsReducer,
   getConnectionUserReducer,
 } from './reducers.js'
-import { postsReducer } from './posts/posts.js'
+import { postsReducer, GetPostsReducer } from './posts/posts.js'
 import WaitlistReducer from './WaitList/Waitlist.js'
 import { RequestReducer, userRequestsReducer } from './Requests/Requests.js'
 import { ReportReducer } from './Report/Report.js'
