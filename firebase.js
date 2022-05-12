@@ -9,7 +9,9 @@ import {
   orderBy,
   where,
   query,
-  Timestamp
+  Timestamp,
+  updateDoc,
+  doc
 } from 'firebase/firestore';
 import { getDatabase, ref, set, get, child } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
@@ -174,11 +176,13 @@ export async function getConnectionById(connectionId) {
 }
 
 // get user Requests by id
-export async function getUserRequests(usedId) {
-  const requestsRef = collection(fireStore, 'users', usedId, 'usersWhoRequested');
+export async function getUserRequests(userId) {
+  // console.log("sdsds");
+  const requestsRef = collection(fireStore, 'users', userId, 'usersWhoRequested');
   try {
     const querySnapshot = await getDocs(requestsRef);
     const data = querySnapshot.docs.map(doc => doc.data());
+    // console.log('data requests ===>>> ', data);
     return data
     // if (data.length > 0) {
     //   return data[0]
@@ -190,6 +194,22 @@ export async function getUserRequests(usedId) {
     return null;
   }
 }
+
+export async function updateRequestStatus(userId, id) {
+  // console.log("sdsds");
+
+  try {
+    const requestsCollectionRef = collection(fireStore, 'users', userId, 'usersWhoRequested');
+    const requestDoc = await doc(requestsCollectionRef, id);
+    await updateDoc(requestDoc, { "requestStatus": "opened" });
+    console.log('docRes sucessfully  =====>>> ');
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error);
+    return null;
+  }
+}
+
+
 
 export async function getAllMessagesForConnectionId(conId) {
 

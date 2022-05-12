@@ -1,36 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  Modal,
-  TouchableOpacity,
-  TextInput
-} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { ActivityIndicator } from 'react-native'
 import { getConnections, getConnectionUser, logout } from '../../store/actions'
-import { NormalTextField } from '../../components/TextField'
-import {
-  ImageSet,
-  Routes,
-  screenWidth,
-  ColorSet,
-  TabType,
-} from '../../components/config/Constant'
-import AppHeader from '../../components/Utility/AppHeader'
+import { ImageSet, Routes, screenWidth, ColorSet, TabType, } from '../../components/config/Constant'
 import MyStatusBar from '../../components/MyStatusBar'
-import Loader from '../../components/Loader'
-import { getConnectionById, getUserRequests } from '../../../firebase'
+import { getConnectionById, updateRequestStatus } from '../../../firebase'
 import { SafeAreaView } from 'react-native'
 import { Image } from 'react-native'
 import SkeletonContent from 'react-native-skeleton-content'
 import { getRequests } from '../../store/Requests/Requests'
 import { dateDifference } from '../../components/Utility/Helper'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { async } from '@firebase/util'
 
 const DataArray = [
   {
@@ -77,9 +58,7 @@ const RequestsDataArray = [
 ]
 
 export default function Connections({ navigation }) {
-  const requests = useSelector(
-    (state) => state.getAllRequestsReducer.requests
-  )
+  const requests = useSelector((state) => state.getAllRequestsReducer.requests)
   const connections = useSelector(
     (state) => state.GetConnectionsReducer.connections
   )
@@ -94,7 +73,8 @@ export default function Connections({ navigation }) {
   const [connectionTab, setConnectionTab] = useState(true)
   const [requestTab, setRequestTab] = useState(false)
   const [isFetched, setIsFetched] = useState(true)
-  const [isFetchedRequest, setIsFetchedRequest] = useState(true)
+  const [isFetchedRequest, setIsFetchedRequest] = useState(false)
+  const [requestStatus, setRequestStatus] = useState(true)
   const [connectionsArray, setConnectionsArray] = useState(DataArray)
   const [requestArray, setRequestsArray] = useState(requests)
   const [currentUserId, setCurrentUserId] = useState(undefined);
@@ -105,41 +85,33 @@ export default function Connections({ navigation }) {
     const unsubscribe = navigation.addListener('focus', () => {
       _getRequests()
       _getConnections()
+      checkStatus()
       setTimeout(() => {
         setIsFetched(false)
       }, 2000)
     })
+    _getRequests()
+    checkStatus()
     return unsubscribe
   }, [])
+
 
   const _getConnections = async () => {
     dispatch(getConnections(conId))
   }
 
   const _getRequests = async () => {
-    // get current user from the local aync storage
-    console.log(`aaaaa.`);
-    await _getCurrentUserId()
-    console.log(`hhhhh.`);
 
-    if (currentUserId != undefined && currentUserId != null) {
-      console.log(`trying to fetch the current logged in user(${currentUserId}) requests`);
-      dispatch(getRequests(currentUserId))
+    const user = await AsyncStorage.getItem('user');
+    const userId = JSON.parse(user).id;
+
+    if (userId) {
+      console.log(`trying to fetch the current logged in user(${userId}) requests`);
+      dispatch(getRequests(userId))
     } else {
       console.log(`unable to fetch current logged in user ID.`);
     }
   }
-
-  const _getCurrentUserId = async () => {
-
-    const user = await AsyncStorage.getItem('user');
-    const userId = JSON.parse(user).id;
-    console.log('user id is', userId);
-
-    setCurrentUserId(userId)
-    console.log('dddd.');
-  }
-
 
   const onClickChatButton = async () => {
     _getConnections()
@@ -153,6 +125,16 @@ export default function Connections({ navigation }) {
     }
   }
 
+  const onClickRequestButton = async () => {
+    const user = await AsyncStorage.getItem('user');
+    const userId = JSON.parse(user).id;
+    // TODO : Change the docId of the requests to same as relative requestID 
+    // const requestId = '392884e6-601c-4614-aea6-858102a897c8'
+    const requestId = 'Q2s6R0llkdPlbIY7Ga4x'
+    updateRequestStatus(userId, requestId)
+    navigation.navigate(Routes.Chat, { routeCheck: false, data: connections })
+  }
+
   const tabsChangingHandler = (tabType) => {
     if (tabType == TabType.connections) {
       setIsFetched(true)
@@ -163,7 +145,6 @@ export default function Connections({ navigation }) {
       }, 2000)
     }
     if (tabType == TabType.requests) {
-      _getRequests()
       setIsFetchedRequest(true)
       setRequestTab(true)
       setConnectionTab(false)
@@ -174,6 +155,26 @@ export default function Connections({ navigation }) {
     }
   }
 
+  const checkStatus = async () => {
+    // if (requestArray.length > 0) {
+    // console.log('=============== this function working fine ===============');
+    setIsFetchedRequest(true)
+
+    for (let i = 0; i < requestArray.length; i++) {
+      console.log('i.requestStatus ======>>> ', requestArray[i].requestStatus);
+      if (requestArray[i].requestStatus == 'pending') {
+        console.log('===============  pending  ');
+        setRequestStatus(true)
+      } else {
+        console.log('===============  opened  ');
+        setRequestStatus(false)
+      }
+    }
+    // }
+    setTimeout(() => {
+      setIsFetchedRequest(false)
+    }, 2000)
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -225,7 +226,7 @@ export default function Connections({ navigation }) {
             ]}>
             Requests
           </Text>
-          <Image style={styles.dotIcon} source={ImageSet.dot} />
+          {requestStatus && <Image style={styles.dotIcon} source={ImageSet.dot} />}
         </TouchableOpacity>
       </View>
 
@@ -282,8 +283,7 @@ export default function Connections({ navigation }) {
               const data = item.userSendingRequest
               const time = dateDifference(item.createdAt.seconds)
               const status = item.requestStatus
-              console.log('request status ====>>>> ', status);
-
+              // console.log('request status ====>>>> ', status);
               return (
                 <SkeletonContent
                   key={index}
@@ -293,7 +293,9 @@ export default function Connections({ navigation }) {
                   animationType="pulse"
                   animationDirection="horizontalRight"
                   layout={[styles.userIconShimmer, { children: [styles.titleShimmer, styles.messageShimmer], }, styles.countShimmer]}>
-                  <TouchableOpacity activeOpacity={0.5} style={styles.requestsView}>
+                  <TouchableOpacity
+                    onPress={onClickRequestButton}
+                    activeOpacity={0.5} style={styles.requestsView}>
                     <View style={[styles.centerRowAlign]}>
                       {status == 'pending' && <Image style={styles.dotIconForNewRequests} source={ImageSet.dot} />}
                       <Image style={styles.userImage} source={{ uri: data.photoUrl }} />
@@ -304,7 +306,7 @@ export default function Connections({ navigation }) {
                             style={[
                               styles.lastMessageText,
                               {
-                                width: time == 'just now' ? screenWidth.width55 : screenWidth.width65
+                                width: time == 'just now' ? screenWidth.width55 : status == 'pending' ? screenWidth.width60 : screenWidth.width65
                               }
                             ]}>
                             {item.comments ? item.comments : data.givenName + ' ' + "is Approachable! start the chat."}
@@ -325,7 +327,6 @@ export default function Connections({ navigation }) {
           </View>
         )
       ) : null}
-      {/* <Loader isVisible={loading} /> */}
     </SafeAreaView>
   )
 }
