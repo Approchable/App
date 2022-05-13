@@ -47,11 +47,13 @@ const alertOptions = () =>
 Alert.alert('Your report has been sent!')
   return (
     <SafeAreaView>
-    <Modal visible={visible} transparent animationType="slide">
+    <Modal visible={visible} transparent animationType="slide" style={{ }}>
       
       <View
         style={{
           ...styles.modal,
+          maxHeight: '65%',
+          minHeight: 165,
         }}
       >
         <ModalBarTop />
@@ -166,6 +168,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 16,
     paddingBottom: 30,
+   
   },
   modalBG: {
     position: 'absolute',

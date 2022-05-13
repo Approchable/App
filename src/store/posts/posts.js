@@ -19,13 +19,10 @@ export const CREATE_POST_LOADING = 'CREATE_POST_LOADING'
 export const CREATE_POST_ERROR = 'CREATE_POST_ERROR'
 export const UPDATE_POST_OBJECT = 'UPDATE_POST_OBJECT'
 
-<<<<<<< HEAD
 export const FETCH_NEW_POST = 'FETCH_NEW_POST'
 export const FETCH_NEW_POST_LOADING = 'FETCH_NEW_POST_LOADING'
 export const FETCH_NEW_POST_ERROR = 'FETCH_NEW_POST_ERROR'
 
-=======
->>>>>>> ReportUserExperience
 const initialPostObject = {}
 
 //actions
@@ -53,7 +50,6 @@ export const updatePostObject = (someObject) => {
   // have another variable for loading
   //call the varible fetchLoading
 }
-<<<<<<< HEAD
 
 // adding old actions not connected yet to the// please connect these actions in the future and also remove them from actions.js
 
@@ -121,8 +117,6 @@ export const createPosts = (postObject) => {
     }
   }
 }
-=======
->>>>>>> ReportUserExperience
 
 const fetchNewPosts = () => {
   return async (dispatch) => {
@@ -185,7 +179,6 @@ export const postsReducer = (state = initialPostObject, action) => {
       return {
         ...state,
       }
-<<<<<<< HEAD
 
     default:
       return state
@@ -218,8 +211,6 @@ export function GetPostsReducer(state = getPostInitialState, action) {
         error: action.payload.error,
         loading: action.payload.loading,
       };
-=======
->>>>>>> ReportUserExperience
     default:
       return state
   }

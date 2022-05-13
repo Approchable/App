@@ -14,10 +14,10 @@ import EmptyCreatePost from '../../assets/images/assets/EmptyCreatePost.svg'
 import { useDispatch } from 'react-redux'
 import SucessLogo from '../../assets/images/assets/SucessLogo.svg'
 import { NavigateToCreate } from '../../store/actions'
-import Post, { PostModal } from '../../components/Utility/Post'
+import Post, { PostModal } from '../../components/Post'
 import AppHeader from '../../components/Utility/AppHeader'
 import { useSelector } from 'react-redux'
-import { getPosts } from '../../store/actions'
+import { getPosts } from '../../store/posts/posts'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import MyStatusBar from '../../components/MyStatusBar'
 import { sendJoinRequest } from '../../store/Requests/Requests'
@@ -25,11 +25,9 @@ import * as Random from 'expo-random'
 import uuid from 'react-native-uuid'
 import ReportModal from '../../components/ReportModal'
 
-
 import { screenWidth } from '../../components/config/Constant'
 
 import SkeletonContent from 'react-native-skeleton-content'
-
 
 //GetPostsReducer
 function Explore({ navigation }) {
@@ -43,9 +41,7 @@ function Explore({ navigation }) {
   const [modalPost, setModalPost] = useState(null)
 
   const onRefresh = () => {
-    
     _getPosts()
-
   }
   const dispatch = useDispatch()
 
@@ -122,18 +118,18 @@ function Explore({ navigation }) {
           />
         )}
 
-          <JoinModal
-            visible={modalVisible}
-            onCancel={() => handleCancel()}
-            postObject={modalPost}
-          />
-          <ReportModal
-            visible={reportModalVisible}
-            onCancel={onCancelReportModal}
-          />
-        </View>
+        <JoinModal
+          visible={modalVisible}
+          onCancel={() => handleCancel()}
+          postObject={modalPost}
+        />
+        <ReportModal
+          visible={reportModalVisible}
+          onCancel={onCancelReportModal}
+        />
       </View>
-    )
+    </View>
+  )
 }
 
 function NoPost({ navigation }) {
@@ -156,8 +152,7 @@ function NoPost({ navigation }) {
 
           flex: 1,
           alignItems: 'center',
-        }}
-      >
+        }}>
         <EmptyCreatePost witdth="100%" />
       </View>
       <View style={{ flex: 0.8 }}>
@@ -182,9 +177,9 @@ function NoPost({ navigation }) {
 const JoinModal = ({ visible, postObject, onCancel }) => {
   const dispatch = useDispatch()
   const [comment, setComment] = useState('')
-  const handleSendRequest = (post , comment="") => {
+  const handleSendRequest = (post, comment = '') => {
     console.log('add join dispacth function here')
-    dispatch(sendJoinRequest(post , comment))
+    dispatch(sendJoinRequest(post, comment))
     onCancel()
   }
 
@@ -193,15 +188,14 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
       <View
         style={{
           ...styles.modal,
-        }}
-      >
+        }}>
         <ModalBarTop post={postObject} />
 
         <PostModal
           setComment={setComment}
           post={postObject}
           onPressSend={() => {
-            handleSendRequest(postObject , comment)
+            handleSendRequest(postObject, comment)
           }}
         />
       </View>
