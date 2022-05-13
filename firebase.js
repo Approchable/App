@@ -195,13 +195,13 @@ export async function getUserRequests(userId) {
   }
 }
 
-export async function updateRequestStatus(userId, id) {
+export async function updateRequestStatus(userId, requestId, requestStatus) {
   // console.log("sdsds");
 
   try {
     const requestsCollectionRef = collection(fireStore, 'users', userId, 'usersWhoRequested');
-    const requestDoc = await doc(requestsCollectionRef, id);
-    await updateDoc(requestDoc, { "requestStatus": "opened" });
+    const requestDoc = await doc(requestsCollectionRef, requestId);
+    await updateDoc(requestDoc, { "requestStatus": requestStatus });
     console.log('docRes sucessfully  =====>>> ');
   } catch (error) {
     console.log('Error getting connections from firebase ', error);

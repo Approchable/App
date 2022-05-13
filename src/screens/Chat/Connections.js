@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-nativ
 
 import { useDispatch, useSelector } from 'react-redux'
 import { getConnections, getConnectionUser, logout } from '../../store/actions'
-import { ImageSet, Routes, screenWidth, ColorSet, TabType, } from '../../components/config/Constant'
+import { ImageSet, Routes, screenWidth, ColorSet, TabType, RequestStatus } from '../../components/config/Constant'
 import MyStatusBar from '../../components/MyStatusBar'
 import { getConnectionById, updateRequestStatus } from '../../../firebase'
 import { SafeAreaView } from 'react-native'
@@ -125,13 +125,11 @@ export default function Connections({ navigation }) {
     }
   }
 
-  const onClickRequestButton = async () => {
+  const onClickRequestButton = async (requestID) => {
     const user = await AsyncStorage.getItem('user');
     const userId = JSON.parse(user).id;
-    // TODO : Change the docId of the requests to same as relative requestID 
-    // const requestId = '392884e6-601c-4614-aea6-858102a897c8'
-    const requestId = 'Q2s6R0llkdPlbIY7Ga4x'
-    updateRequestStatus(userId, requestId)
+    console.log(`selected request ID:- ${requestID}`)
+    updateRequestStatus(userId, requestID, RequestStatus.opened)
     navigation.navigate(Routes.Chat, { routeCheck: false, data: connections })
   }
 
@@ -162,11 +160,11 @@ export default function Connections({ navigation }) {
 
     for (let i = 0; i < requestArray.length; i++) {
       console.log('i.requestStatus ======>>> ', requestArray[i].requestStatus);
-      if (requestArray[i].requestStatus == 'pending') {
+      if (requestArray[i].requestStatus == RequestStatus.pending) {
         console.log('===============  pending  ');
         setRequestStatus(true)
       } else {
-        console.log('===============  opened  ');
+        console.log('===============  not pending  ');
         setRequestStatus(false)
       }
     }
@@ -283,7 +281,8 @@ export default function Connections({ navigation }) {
               const data = item.userSendingRequest
               const time = dateDifference(item.createdAt.seconds)
               const status = item.requestStatus
-              // console.log('request status ====>>>> ', status);
+              const postRequestID = item.requestID
+              console.log('request ID ====>>>> ', postRequestID);
               return (
                 <SkeletonContent
                   key={index}
@@ -294,10 +293,10 @@ export default function Connections({ navigation }) {
                   animationDirection="horizontalRight"
                   layout={[styles.userIconShimmer, { children: [styles.titleShimmer, styles.messageShimmer], }, styles.countShimmer]}>
                   <TouchableOpacity
-                    onPress={onClickRequestButton}
+                    onPress={() => onClickRequestButton(postRequestID)}
                     activeOpacity={0.5} style={styles.requestsView}>
                     <View style={[styles.centerRowAlign]}>
-                      {status == 'pending' && <Image style={styles.dotIconForNewRequests} source={ImageSet.dot} />}
+                      {status == RequestStatus.pending && <Image style={styles.dotIconForNewRequests} source={ImageSet.dot} />}
                       <Image style={styles.userImage} source={{ uri: data.photoUrl }} />
                       <View>
                         <Text style={styles.userName}>{data.givenName}</Text>
@@ -306,7 +305,7 @@ export default function Connections({ navigation }) {
                             style={[
                               styles.lastMessageText,
                               {
-                                width: time == 'just now' ? screenWidth.width55 : status == 'pending' ? screenWidth.width60 : screenWidth.width65
+                                width: time == 'just now' ? screenWidth.width55 : status == RequestStatus.pending ? screenWidth.width60 : screenWidth.width65
                               }
                             ]}>
                             {item.comments ? item.comments : data.givenName + ' ' + "is Approachable! start the chat."}

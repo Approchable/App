@@ -10,7 +10,9 @@ import {
 import uuid from 'react-native-uuid'
 import { GET_ALL_REQUESTS, GET_ALL_REQUESTS_ERROR } from '../actionTypes'
 import { getUserRequests } from '../../../firebase'
+import { RequestStatus } from '../../components/config/Constant'
 
+//TODO: these below actions types should be move to ../actionTypes
 const SEND_REQUEST_LOADING = 'SET_REQUEST_LOADING'
 const SEND_REQUEST_SUCCESS = 'SET_REQUEST_SUCCESS'
 const SEND_REQUEST_FAILURE = 'SET_REQUEST_FAILURE'
@@ -35,7 +37,7 @@ const GET_REQUESTS_FAILURE = 'GET_REQUESTS_FAILURE'
 requestObject =
 {
     postObject
-    requestStatus =  rejected | pending | accepted | completed
+    requestStatus =  RequestStatus from ~/../../components/config/Constant
     requestID
 
 }
@@ -59,12 +61,12 @@ export const sendJoinRequest = (post, comment) => {
     const userObject = JSON.parse(user)
     const requestObject = {
       postObject: post,
-      requestStatus: 'pending',
+      requestStatus: RequestStatus.pending,
       requestID: uuid.v4().toString(),
       userReciving: post.user,
       userSendingRequest: userObject,
-      createdAt: new Date().toISOString(),
-      comment: comment || 'No message with this request',
+      createdAt: new Date(), // this should be current date
+      comment: comment || '', // defualt comment will be empty
     }
     console.log('postUserId ', post.user.id)
     console.log('userSendingRequestObjectId ', userObject.id)
