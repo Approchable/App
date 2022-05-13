@@ -33,6 +33,7 @@ export default function Post({
   onPress,
   postId,
   usersWhoRequested,
+  handleModalOpen,
 }) {
   return (
     <View style={styles.PostView}>
@@ -41,6 +42,7 @@ export default function Post({
         location={location}
         addressResult={addressResult}
         profileImage={profileImage}
+        handleModalOpen={handleModalOpen}
         moreStyles={{
           marginBottom: 8,
           marginTop: 16,
@@ -59,17 +61,17 @@ export default function Post({
         usersWhoRequested={usersWhoRequested}
       />
     </View>
-  );
+  )
 }
 
 export function PostModal({post, onPressSend , setComment}) {
   const dispatch = useDispatch();
   if (post === null || post === undefined) {
-    return null;
+    return null
   }
-  const [description, setDescription] = useState(null);
-  const [buttonActive, setButtonActive] = useState(false);
-  const [hasJoined, setHasJoined] = useState(false);
+  const [description, setDescription] = useState(null)
+  const [buttonActive, setButtonActive] = useState(false)
+  const [hasJoined, setHasJoined] = useState(false)
 
   const handleButtonActive = () => {
     // if (description === null || description === '') {
@@ -80,8 +82,8 @@ export function PostModal({post, onPressSend , setComment}) {
     setButtonActive(true)
   };
   useEffect(() => {
-    handleButtonActive();
-  }, [description]);
+    handleButtonActive()
+  }, [description])
   return (
     <KeyboardAwareScrollView extraHeight={60}>
       <View style={styles.PostView}>
@@ -107,7 +109,8 @@ export function PostModal({post, onPressSend , setComment}) {
           style={{
             marginTop: 20,
             marginBottom: 10,
-          }}>
+          }}
+        >
           <NormalTextField
             placeholder="Break the ice with a comment"
             moreStyles={{marginBottom: 60}}
@@ -126,7 +129,7 @@ export function PostModal({post, onPressSend , setComment}) {
         </View>
       </View>
     </KeyboardAwareScrollView>
-  );
+  )
 }
 
 function PostHeader({
@@ -135,19 +138,24 @@ function PostHeader({
   addressResult = 'No location',
   profileImage,
   moreStyles,
+  handleModalOpen,
 }) {
   return (
+    <KeyboardAwareScrollView extraHeight={100}>
     <View
+    
       style={{
         ...styles.PostHeaderView,
         flexDirection: 'row',
         ...moreStyles,
-        
+
         justifyContent: 'space-between',
-      }}>
-      <View style={{flexDirection: 'row'}}>
+      }}
+    >
+
+      <View style={{ flexDirection: 'row' }}>
         <PostProfileImage imageUrl={profileImage} />
-        <View style={{marginLeft: 10}}>
+        <View style={{ marginLeft: 10 }}>
           <PostUserName userName={userName} />
           <PostLocation
             location={location}
@@ -157,14 +165,16 @@ function PostHeader({
         </View>
       </View>
 
-      <ExploreReport moreStyles={{ }} />
+      <ExploreReport moreStyles={{}} handleModalOpen={handleModalOpen} />
+
     </View>
-  );
+    </KeyboardAwareScrollView>
+  )
 }
 
-function PostLocation({location, addressResult}) {
-  const [loading, setLoading] = useState(true);
-  const [address, setAddress] = useState(addressResult);
+function PostLocation({ location, addressResult }) {
+  const [loading, setLoading] = useState(true)
+  const [address, setAddress] = useState(addressResult)
 
 
 
@@ -172,16 +182,16 @@ function PostLocation({location, addressResult}) {
   // perfom expensive calculation once
   useMemo(async () =>   {
     if (location === null || location === '' || location === undefined) {
-      setAddress('No Location!');
-      return;
+      setAddress('No Location!')
+      return
     }
-    let {status} = await Location.requestForegroundPermissionsAsync();
+    let { status } = await Location.requestForegroundPermissionsAsync()
     if (status !== 'granted') {
-      setErrorMsg('Permission to access location was denied');
-      Alert.alert('Error', 'Permission to access location was denied');
-      return;
+      setErrorMsg('Permission to access location was denied')
+      Alert.alert('Error', 'Permission to access location was denied')
+      return
     }
-    let addressResult = await Location.reverseGeocodeAsync(location.coords);
+    let addressResult = await Location.reverseGeocodeAsync(location.coords)
     // console.log('addressResult', addressResult);
     setAddress(String(addressResult[0].name));
     setLoading(false);
@@ -192,154 +202,156 @@ function PostLocation({location, addressResult}) {
     <View style={styles.PostLocationView}>
       <SmallerText
         content={address}
-        moreStyles={{marginBottom: -3, marginTop: -3}}
+        moreStyles={{ marginBottom: -3, marginTop: -3 }}
       />
     </View>
-  );
+  )
 }
-function PostDescription({description}) {
+function PostDescription({ description }) {
   return (
     <View style={styles.PostDescriptionView}>
       <SmallerText
-        moreStyles={{marginBottom: 8, marginTop: 4}}
-        content={description}></SmallerText>
+        moreStyles={{ marginBottom: 8, marginTop: 4 }}
+        content={description}
+      ></SmallerText>
     </View>
-  );
+  )
 }
-function PostTitle({title}) {
+function PostTitle({ title }) {
   return (
     <View style={styles.PostTitleView}>
       <Text style={styles.PostTitleText}>{title}</Text>
     </View>
-  );
+  )
 }
-function PostUserName({userName}) {
+function PostUserName({ userName }) {
   return (
     <View style={styles.PostUserNameView}>
       <Text style={styles.PostUserNameText}>@{userName}</Text>
     </View>
-  );
+  )
 }
 
-function PostProfileImage({imageUrl}) {
-  const [loading, setLoading] = useState(true);
+function PostProfileImage({ imageUrl }) {
+  const [loading, setLoading] = useState(true)
 
   return (
     <View style={styles.PostProfileImageView}>
       <LoadingScreen visible={loading} />
       <Image
         style={styles.postProfileImage}
-        source={{uri: imageUrl}}
+        source={{ uri: imageUrl }}
         onLoadStart={() => setLoading(true)}
         onLoadEnd={() => setLoading(false)}
       />
     </View>
-  );
+  )
 }
 
-function PostImage({imageUrl}) {
+function PostImage({ imageUrl }) {
   // chnage image here to fast image from  https://github.com/DylanVann/react-native-fast-image for cahed and faster reloads
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true)
   if (imageUrl === null || imageUrl === '' || imageUrl === undefined) {
-    return <></>;
+    return <></>
   } else {
     return (
       <View style={styles.PostImageView}>
         <LoadingScreen visible={loading} />
         <Image
           style={styles.PostImage}
-          source={{uri: imageUrl}}
+          source={{ uri: imageUrl }}
           fadeDuration={300}
           onLoadStart={() => setLoading(true)}
           onLoadEnd={() => setLoading(false)}
         />
       </View>
-    );
+    )
   }
 }
 
-function LoadingScreen({visible}) {
+function LoadingScreen({ visible }) {
   return (
     visible === true && (
       <View
-        style={{flex: 1, justifyContent: 'center', backgroundColor: 'white'}}>
+        style={{ flex: 1, justifyContent: 'center', backgroundColor: 'white' }}
+      >
         <ActivityIndicator size="large" color="#44BFBA" />
       </View>
     )
-  );
+  )
 }
 
-function PostTime({startDateTime, endDateTime}) {
+function PostTime({ startDateTime, endDateTime }) {
   if (
     startDateTime !== null ||
     startDateTime !== '' ||
     startDateTime !== undefined
   ) {
-    startDateTime = dayjs(startDateTime.toDate());
+    startDateTime = dayjs(startDateTime.toDate())
   }
 
   if (endDateTime === null || endDateTime === '' || endDateTime === undefined) {
-    endDateTime = dayjs(new Date());
+    endDateTime = dayjs(new Date())
   } else {
-    endDateTime = dayjs(endDateTime.toDate());
+    endDateTime = dayjs(endDateTime.toDate())
   }
 
-  var relativeTime = require('dayjs/plugin/relativeTime');
-  dayjs.extend(relativeTime);
-  const formatDateToDayJs = dayjs(startDateTime);
+  var relativeTime = require('dayjs/plugin/relativeTime')
+  dayjs.extend(relativeTime)
+  const formatDateToDayJs = dayjs(startDateTime)
 
   const [startRelativeTime, setStartRelativeTime] = useState(
-    dayjs().to(formatDateToDayJs),
-  );
+    dayjs().to(formatDateToDayJs)
+  )
   const [endRelativeTime, setEndRelativeTime] = useState(
-    dayjs().to(formatDateToDayJs),
-  );
+    dayjs().to(formatDateToDayJs)
+  )
 
-  const [startTimeFormated, setStartTimeFormated] = useState('00:00');
-  const [endTimeFormated, setEndTimeFormated] = useState('00:00');
+  const [startTimeFormated, setStartTimeFormated] = useState('00:00')
+  const [endTimeFormated, setEndTimeFormated] = useState('00:00')
 
   const [startTimeGreaterThanEndTime, setStartTimeGreaterThanEndTime] =
-    useState(true);
+    useState(true)
   const getStartTime = () => {
     if (
       startDateTime === null ||
       startDateTime === '' ||
       startDateTime === undefined
     ) {
-      setStartRelativeTime(dayjs().to(Date.now()));
-      return;
+      setStartRelativeTime(dayjs().to(Date.now()))
+      return
     }
-    const startTime = dayjs(startDateTime);
-    setStartRelativeTime(dayjs().to(startTime));
-  };
+    const startTime = dayjs(startDateTime)
+    setStartRelativeTime(dayjs().to(startTime))
+  }
 
-  const formatTime = time => {
+  const formatTime = (time) => {
     if (time === undefined || time === null || time === '') {
-      return null;
+      return null
     }
-    var timeFormat = dayjs(time);
-    return timeFormat.format('h:mm a');
-  };
+    var timeFormat = dayjs(time)
+    return timeFormat.format('h:mm a')
+  }
   const formatAllTimes = () => {
-    setStartTimeFormated(formatTime(startDateTime));
-    setEndTimeFormated(formatTime(endDateTime));
-  };
+    setStartTimeFormated(formatTime(startDateTime))
+    setEndTimeFormated(formatTime(endDateTime))
+  }
   const isStartTimegreaterThanCurrentTime = () => {
-    const startTime = dayjs(startDateTime);
-    return dayjs().isAfter(startTime);
-  };
+    const startTime = dayjs(startDateTime)
+    return dayjs().isAfter(startTime)
+  }
 
-  const getColor = state => {
-    return true;
-  };
+  const getColor = (state) => {
+    return true
+  }
   useEffect(() => {
     // console.log(startDateTime , endDateTime , "end date time in posts");
     // startDateTime = new Date(startDateTime)
     // endDateTime = new Date(endDateTime)
-    getStartTime();
-    setStartTimeGreaterThanEndTime(isStartTimegreaterThanCurrentTime());
-    formatAllTimes();
-  }, []);
+    getStartTime()
+    setStartTimeGreaterThanEndTime(isStartTimegreaterThanCurrentTime())
+    formatAllTimes()
+  }, [])
 
   return (
     <View
@@ -348,8 +360,9 @@ function PostTime({startDateTime, endDateTime}) {
         height: 40,
 
         justifyContent: 'center',
-      }}>
-      <View style={{flexDirection: 'row'}}>
+      }}
+    >
+      <View style={{ flexDirection: 'row' }}>
         <View>
           <Icon
             type={Icons.Entypo}
@@ -358,48 +371,49 @@ function PostTime({startDateTime, endDateTime}) {
             size={24}
           />
         </View>
-        <View style={{justifyContent: 'center', marginLeft: 8}}>
+        <View style={{ justifyContent: 'center', marginLeft: 8 }}>
           <Text
             style={{
               ...styles.PostTimeText,
-            }}>
+            }}
+          >
             {startTimeFormated}
           </Text>
         </View>
 
         {startTimeGreaterThanEndTime == false && (
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{alignItems: 'center'}}> - </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={{ alignItems: 'center' }}> - </Text>
             <Text style={styles.PostTimeText}>{endTimeFormated}</Text>
           </View>
         )}
       </View>
     </View>
-  );
+  )
 }
 
-function PostJoinButton({onPress, postId, usersWhoRequested}) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isUserRequested, setisUserRequested] = useState(false);
-  const [message, setMessage] = useState('');
+function PostJoinButton({ onPress, postId, usersWhoRequested }) {
+  const [isLoading, setIsLoading] = useState(false)
+  const [isUserRequested, setisUserRequested] = useState(false)
+  const [message, setMessage] = useState('')
 
   const checkIfUserRequested = async () => {
-    const user = await AsyncStorage.getItem('user');
-    const userId = JSON.parse(user).id;
-    console.log('user id is', userId);
+    const user = await AsyncStorage.getItem('user')
+    const userId = JSON.parse(user).id
+    console.log('user id is', userId)
 
     if (usersWhoRequested.includes(userId)) {
-      setisUserRequested(true);
-      setMessage('Request Sent');
+      setisUserRequested(true)
+      setMessage('Request Sent')
     } else {
-      setisUserRequested(false);
-      setMessage('Join');
+      setisUserRequested(false)
+      setMessage('Join')
     }
-  };
+  }
 
   useEffect(() => {
-    checkIfUserRequested();
-  }, []);
+    checkIfUserRequested()
+  }, [])
   if (isUserRequested == true) {
     return (
       <View style={styles.PostJoinButtonView}>
@@ -422,7 +436,7 @@ function PostJoinButton({onPress, postId, usersWhoRequested}) {
           inActive={false}
         />
       </View>
-    );
+    )
     // ngoId : 113992437978529065350
     // ebuka egbunam : 101432345899135768743
     //ebuka egb:107841417840884772453
@@ -447,7 +461,7 @@ function PostJoinButton({onPress, postId, usersWhoRequested}) {
           loading={isLoading}
         />
       </View>
-    );
+    )
   }
 }
 
@@ -460,7 +474,7 @@ function PostFooter({
   usersWhoRequested,
 }) {
   return (
-    <View style={{...styles.PostFooterView, flexDirection: 'row'}}>
+    <View style={{ ...styles.PostFooterView, flexDirection: 'row' }}>
       <PostTime
         time="time test"
         startDateTime={startDateTime}
@@ -474,7 +488,7 @@ function PostFooter({
         />
       )}
     </View>
-  );
+  )
 }
 const styles = StyleSheet.create({
   PostView: {
@@ -520,4 +534,4 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 12,
   },
-});
+})

@@ -3,8 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
-  Modal,
   TouchableOpacity,
   TextInput,
 } from 'react-native'
@@ -132,7 +130,8 @@ export default function Connections({ navigation }) {
                 : ColorSet.textBlack,
             },
           ]}
-          onPress={() => tabsChangingHandler(TabType.connections)}>
+          onPress={() => tabsChangingHandler(TabType.connections)}
+        >
           <Text
             style={[
               styles.tabsText,
@@ -141,7 +140,8 @@ export default function Connections({ navigation }) {
                   ? ColorSet.defaultTheme
                   : ColorSet.textBlack,
               },
-            ]}>
+            ]}
+          >
             Connections
           </Text>
           <Image style={styles.dotIcon} source={ImageSet.dot} />
@@ -155,14 +155,16 @@ export default function Connections({ navigation }) {
                 : ColorSet.textBlack,
             },
           ]}
-          onPress={() => tabsChangingHandler(TabType.requests)}>
+          onPress={() => tabsChangingHandler(TabType.requests)}
+        >
           <Text
             style={[
               styles.tabsText,
               {
                 color: requestTab ? ColorSet.defaultTheme : ColorSet.textBlack,
               },
-            ]}>
+            ]}
+          >
             Requests
           </Text>
           <Image style={styles.dotIcon} source={ImageSet.dot} />
@@ -175,7 +177,8 @@ export default function Connections({ navigation }) {
               flex: 1,
               paddingVertical: 16,
               paddingHorizontal: 16,
-            }}>
+            }}
+          >
             {connectionsArray.map((item, index) => {
               return (
                 <SkeletonContent
@@ -223,7 +226,8 @@ export default function Connections({ navigation }) {
                       borderRadius: 10,
                       marginLeft: 10,
                     },
-                  ]}>
+                  ]}
+                >
                   <TouchableOpacity key={index} style={styles.connectionsView}>
                     <Image style={styles.userImage} source={ImageSet.profile} />
                     <View>

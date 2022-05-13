@@ -147,7 +147,8 @@ const Chat = ({ route, navigation }) => {
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}>
+        style={styles.container}
+      >
         <MyStatusBar backgroundColor="white" />
         <View style={{ flex: 1 }}>
           <View style={[styles.topBar]}>
@@ -181,7 +182,8 @@ const Chat = ({ route, navigation }) => {
                 flex: 1,
                 justifyContent: 'flex-end',
                 paddingBottom: 10,
-              }}>
+              }}
+            >
               {messageArray.map((item, index) => {
                 let today = moment().format('YYYY-MM-DD')
                 let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD')
@@ -217,7 +219,8 @@ const Chat = ({ route, navigation }) => {
                                   style={[
                                     styles.dateLabelText,
                                     { marginRight: 10 },
-                                  ]}>
+                                  ]}
+                                >
                                   {msgTime}
                                 </Text>
                                 <Text style={styles.messagesText}>
@@ -235,7 +238,8 @@ const Chat = ({ route, navigation }) => {
                                   style={[
                                     styles.dateLabelText,
                                     { marginLeft: 10 },
-                                  ]}>
+                                  ]}
+                                >
                                   {msgTime}
                                 </Text>
                               </View>
@@ -286,7 +290,8 @@ const Chat = ({ route, navigation }) => {
               )) || (
                 <TouchableOpacity
                   onPress={() => onClickSend()}
-                  style={styles.flexEnd}>
+                  style={styles.flexEnd}
+                >
                   <Image style={[styles.icon]} source={ImageSet.send} />
                 </TouchableOpacity>
               )}
