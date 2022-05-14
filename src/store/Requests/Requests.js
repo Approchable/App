@@ -4,11 +4,15 @@ import {
   joinPostRequest,
   sendRequestToFireStore,
   getAllRequestIDs,
+  getAllRequest,
 } from '../../../FirebaseFireStore'
 
 import uuid from 'react-native-uuid'
-// action types
+import { GET_ALL_REQUESTS, GET_ALL_REQUESTS_ERROR } from '../actionTypes'
+import { getUserRequests } from '../../../firebase'
+import { RequestStatus } from '../../components/config/Constant'
 
+//TODO: these below actions types should be move to ../actionTypes
 const SEND_REQUEST_LOADING = 'SET_REQUEST_LOADING'
 const SEND_REQUEST_SUCCESS = 'SET_REQUEST_SUCCESS'
 const SEND_REQUEST_FAILURE = 'SET_REQUEST_FAILURE'
@@ -33,7 +37,7 @@ const GET_REQUESTS_FAILURE = 'GET_REQUESTS_FAILURE'
 requestObject =
 {
     postObject
-    requestStatus =  rejected | pending | accepted | completed
+    requestStatus =  RequestStatus from ~/../../components/config/Constant
     requestID
 
 }
@@ -41,7 +45,7 @@ requestObject =
 */
 
 export const sendJoinRequest = (post, comment) => {
-  console.log(comment , 'comment')
+  console.log(comment, 'comment')
   return async (dispatch) => {
     dispatch({ type: SEND_REQUEST_LOADING })
     const user = await AsyncStorage.getItem('user')
@@ -57,12 +61,12 @@ export const sendJoinRequest = (post, comment) => {
     const userObject = JSON.parse(user)
     const requestObject = {
       postObject: post,
-      requestStatus: 'pending',
+      requestStatus: RequestStatus.pending,
       requestID: uuid.v4().toString(),
       userReciving: post.user,
       userSendingRequest: userObject,
-      createdAt: new Date().toISOString(),
-      comment: comment || 'No message with this request',
+      createdAt: new Date(), // this should be current date
+      comment: comment || '', // defualt comment will be empty
     }
     console.log('postUserId ', post.user.id)
     console.log('userSendingRequestObjectId ', userObject.id)
@@ -126,6 +130,33 @@ export const getusersWhoRequested = (postId) => {
   }
 }
 
+// get all requests actions are here
+
+export const getRequests = (userId) => {
+  return async (dispatch) => {
+    try {
+      const requests = await getUserRequests(userId)
+      // console.log('api response of requests ===>>> ', requests);
+      if (requests.length > 0) {
+        dispatch({
+          type: GET_ALL_REQUESTS,
+          payload: {
+            requests: requests,
+          },
+        })
+      }
+    } catch (err) {
+      console.log(err)
+      dispatch({
+        type: GET_ALL_REQUESTS_ERROR,
+        payload: {
+          error: err,
+        },
+      })
+    }
+  }
+}
+
 //reducers
 const requestInitialState = {
   requestObject: {},
@@ -185,6 +216,31 @@ export function userRequestsReducer(
       return {
         ...state,
         isLoading: false,
+        errorMessage: action.payload.errorMessage,
+      }
+    default:
+      return state
+  }
+}
+
+const getAllRequestsInitialState = {
+  requests: [],
+  errorMessage: '',
+}
+
+export function getAllRequestsReducer(
+  state = getAllRequestsInitialState,
+  action
+) {
+  switch (action.type) {
+    case GET_ALL_REQUESTS:
+      return {
+        ...state,
+        requests: action.payload.requests,
+      }
+    case GET_ALL_REQUESTS_ERROR:
+      return {
+        ...state,
         errorMessage: action.payload.errorMessage,
       }
     default:
