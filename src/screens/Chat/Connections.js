@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getConnections, getConnectionUser, logout } from '../../store/actions'
 import { ImageSet, Routes, screenWidth, ColorSet, TabType, RequestStatus } from '../../components/config/Constant'
 import MyStatusBar from '../../components/MyStatusBar'
-import { getConnectionById, updateRequestStatus } from '../../../firebase'
+import { getConnectionById, getUserRequests, updateRequestStatus } from '../../../firebase'
 import { SafeAreaView } from 'react-native'
 import { Image } from 'react-native'
 import SkeletonContent from 'react-native-skeleton-content'
@@ -74,9 +74,9 @@ export default function Connections({ navigation }) {
   const [requestTab, setRequestTab] = useState(false)
   const [isFetched, setIsFetched] = useState(true)
   const [isFetchedRequest, setIsFetchedRequest] = useState(false)
-  const [requestStatus, setRequestStatus] = useState(true)
+  const [requestStatus, setRequestStatus] = useState(false)
   const [connectionsArray, setConnectionsArray] = useState(DataArray)
-  const [requestArray, setRequestsArray] = useState(requests)
+  const [requestArray, setRequestsArray] = useState([])
   const [currentUserId, setCurrentUserId] = useState(undefined);
 
   const dispatch = useDispatch()
@@ -85,14 +85,16 @@ export default function Connections({ navigation }) {
     const unsubscribe = navigation.addListener('focus', () => {
       _getRequests()
       _getConnections()
-      checkStatus()
       setTimeout(() => {
+        // checkStatus()
         setIsFetched(false)
       }, 2000)
     })
-    _getRequests()
-    checkStatus()
     return unsubscribe
+  }, [])
+
+  useEffect(() => {
+    console.log('requestArray.length ===>>> ', requestArray.length);
   }, [])
 
 
@@ -101,13 +103,18 @@ export default function Connections({ navigation }) {
   }
 
   const _getRequests = async () => {
-
     const user = await AsyncStorage.getItem('user');
     const userId = JSON.parse(user).id;
-
     if (userId) {
       console.log(`trying to fetch the current logged in user(${userId}) requests`);
       dispatch(getRequests(userId))
+      const requestsData = await getUserRequests(userId)
+      setRequestsArray(requestArray)
+      setTimeout(() => {
+        let checker = requestsData.every(i => i.requestStatus === RequestStatus.opened);
+        console.log('requestsData checker ===>>> ', checker);
+        setRequestStatus(checker ? false : true)
+      }, 500);
     } else {
       console.log(`unable to fetch current logged in user ID.`);
     }
@@ -125,13 +132,30 @@ export default function Connections({ navigation }) {
     }
   }
 
-  const onClickRequestButton = async (requestID) => {
+  const onClickRequestButton = async (request, index) => {
+
+    const requestStatus = request.requestStatus
+    const requestID = request.requestID
+
     const user = await AsyncStorage.getItem('user');
     const userId = JSON.parse(user).id;
-    console.log(`selected request ID:- ${requestID}`)
-    updateRequestStatus(userId, requestID, RequestStatus.opened)
-    navigation.navigate(Routes.Chat, { routeCheck: false, data: connections })
+
+    // update request status to `opened` if the request status is `pending`
+    if (requestStatus == RequestStatus.pending) {
+      updateRequestStatus(userId, requestID, RequestStatus.opened)
+      var updateRequest = requestArray
+      var pack = updateRequest[index]
+      pack['requestStatus'] = RequestStatus.opened
+      updateRequest[index] = pack
+      setRequestsArray(updateRequest)
+      dispatch(getRequests(userId))
+      checkStatus()
+    }
+
+    navigation.navigate(Routes.Chat, { isRequestRoute: true, connection: connections, request: request })
+
   }
+
 
   const tabsChangingHandler = (tabType) => {
     if (tabType == TabType.connections) {
@@ -154,24 +178,9 @@ export default function Connections({ navigation }) {
   }
 
   const checkStatus = async () => {
-    // if (requestArray.length > 0) {
-    // console.log('=============== this function working fine ===============');
-    setIsFetchedRequest(true)
-
-    for (let i = 0; i < requestArray.length; i++) {
-      console.log('i.requestStatus ======>>> ', requestArray[i].requestStatus);
-      if (requestArray[i].requestStatus == RequestStatus.pending) {
-        console.log('===============  pending  ');
-        setRequestStatus(true)
-      } else {
-        console.log('===============  not pending  ');
-        setRequestStatus(false)
-      }
-    }
-    // }
-    setTimeout(() => {
-      setIsFetchedRequest(false)
-    }, 2000)
+    let checker = requestArray.every(i => i.requestStatus === RequestStatus.opened);
+    console.log(' checker ========>>>> ', checker);
+    setRequestStatus(checker ? false : true)
   }
 
   return (
@@ -278,11 +287,11 @@ export default function Connections({ navigation }) {
         requestArray.length > 0 ? (
           <View style={styles.mainView}>
             {requestArray.map((item, index) => {
-              const data = item.userSendingRequest
-              const time = dateDifference(item.createdAt.seconds)
-              const status = item.requestStatus
-              const postRequestID = item.requestID
-              console.log('request ID ====>>>> ', postRequestID);
+              const request = item
+              const data = request.userSendingRequest
+              const time = dateDifference(request.createdAt.seconds)
+              const status = request.requestStatus
+
               return (
                 <SkeletonContent
                   key={index}
@@ -293,7 +302,7 @@ export default function Connections({ navigation }) {
                   animationDirection="horizontalRight"
                   layout={[styles.userIconShimmer, { children: [styles.titleShimmer, styles.messageShimmer], }, styles.countShimmer]}>
                   <TouchableOpacity
-                    onPress={() => onClickRequestButton(postRequestID)}
+                    onPress={() => onClickRequestButton(request, index)}
                     activeOpacity={0.5} style={styles.requestsView}>
                     <View style={[styles.centerRowAlign]}>
                       {status == RequestStatus.pending && <Image style={styles.dotIconForNewRequests} source={ImageSet.dot} />}

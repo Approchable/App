@@ -1,11 +1,10 @@
-import React, {useContext, useState, useEffect, useRef} from 'react';
-import {View, Text, StyleSheet, Alert, Platform, SafeAreaView} from 'react-native';
-import {HeaderText, RegularText, SmallerText} from '../../components/Texts';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, Platform, SafeAreaView } from 'react-native';
+import { HeaderText, RegularText, SmallerText } from '../../components/Texts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SucessLogo from '../../assets/images/assets/SucessLogo.svg';
-import {NormalButton} from '../../components/Buttons';
-import {UserContext} from '../..//context/UserContext';
-import {deleteUserData} from '../../../firebase';
+import { NormalButton } from '../../components/Buttons';
+import { deleteUserData } from '../../../firebase';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import MyStatusBar from '../../components/MyStatusBar';
@@ -18,7 +17,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export default function Sucess({navigation}) {
+export default function Sucess({ navigation }) {
   // const [user, setUser] = useContext(UserContext);
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
@@ -60,16 +59,16 @@ export default function Sucess({navigation}) {
       console.log(exception);
     }
   }
-  const user =  AsyncStorage.getItem('user');
+  const user = AsyncStorage.getItem('user');
 
   if (user !== undefined && user !== null) {
     return (
       <SafeAreaView style={styles.container}>
         <MyStatusBar backgroundColor="white" />
         <View style={styles.container}>
-          <View style={{marginHorizontal: 18, marginTop: 20, flex: 1}}>
+          <View style={{ marginHorizontal: 18, marginTop: 20, flex: 1 }}>
             {/* <HeaderText content={user.givenName + " is now Approached!"} /> */}
-            <View style={{flex: 1}}>
+            <View style={{ flex: 1 }}>
               <HeaderText content="Approached!" />
               <SmallerText
                 content={
@@ -78,7 +77,7 @@ export default function Sucess({navigation}) {
                   '. We will let you know once your pod is ready. Stay tuned by enabling notifications.'
                 }
               />
-              <View style={{marginTop: -20}}>
+              <View style={{ marginTop: -20 }}>
                 <SmallerText content="Already done? Sit tight and we will approach you! " />
               </View>
             </View>
@@ -91,7 +90,7 @@ export default function Sucess({navigation}) {
               <SucessLogo witdth="100%" />
             </View>
 
-            <View style={{flex: 0.3, marginBottom: 40}}>
+            <View style={{ flex: 0.3, marginBottom: 40 }}>
               {/* <NormalButton
                 text="Delete yourself!"
                 onPress={() => (buttonActive ? removeItemValue('user') : null)} //clode app
@@ -116,9 +115,9 @@ export default function Sucess({navigation}) {
       <SafeAreaView style={styles.container}>
         <MyStatusBar backgroundColor="white" />
         <View style={styles.container}>
-          <View style={{marginHorizontal: 18, marginTop: 20, flex: 1}}>
+          <View style={{ marginHorizontal: 18, marginTop: 20, flex: 1 }}>
             {/* <HeaderText content={user.givenName + " is now Approached!"} /> */}
-            <View style={{flex: 1}}>
+            <View style={{ flex: 1 }}>
               <HeaderText content="Signed Out!" />
               <SmallerText content={'Restart the app to sign in again. '} />
             </View>
@@ -160,7 +159,7 @@ async function sendPushNotification(expoPushToken) {
     sound: 'default',
     title: 'Hi there,',
     body: 'Welcome to Approachable',
-    data: {someData: 'goes here'},
+    data: { someData: 'goes here' },
   };
 
   await fetch('https://exp.host/--/api/v2/push/send', {
@@ -177,10 +176,10 @@ async function sendPushNotification(expoPushToken) {
 async function registerForPushNotificationsAsync() {
   let token;
   if (Device.isDevice) {
-    const {status: existingStatus} = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
-      const {status} = await Notifications.requestPermissionsAsync();
+      const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {

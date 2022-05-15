@@ -42,8 +42,9 @@ import moment from 'moment'
 const width = (Dimensions.get('window').width - 36) / 3.5
 
 const Chat = ({ route, navigation }) => {
-  const connection = route.params.data
-  const routeCheck = route.params.routeCheck
+  const connection = route.params.connection
+  const request = route.params.request
+  const isRequestRoute = route.params.isRequestRoute
   // const connectedUser = useSelector(state => state.getConnectionUserReducer.connectedUser);
   // const connections = useSelector(state => state.GetConnectionsReducer.connections);
   //TODO: Need to fetch the current user from secure items or aysnc storage
@@ -57,46 +58,57 @@ const Chat = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  // console.log('connectionData chat screen ===>>> ', connections);
-
-  // console.log('connectionData chat screen participentId ===>>> ', participentId);
-
   const [inputHeight, setInputHeight] = useState(0)
   const dispatch = useDispatch()
 
   useEffect(() => {
     getUserData()
     getChat()
+    console.log('isRequestRoute =====>>>> ', isRequestRoute);
   }, [])
 
   const getUserData = async () => {
-    setLoading(true)
-    console.log('connection chat screen 1234 ===>>> ', connection)
-    const participentId = connection.participants_id.find(
-      (i) => i != user.userId
-    )
-    console.log('get other user Id ===>>> ', participentId)
-    const userData = await getUserDataById(participentId)
-    console.log('userData ===>>> ', userData)
-    if (userData) {
-      setConnectedUser(userData)
+    if (!isRequestRoute) {
+      setLoading(true)
+      console.log('connection chat screen 1234 ===>>> ', connection)
+      const participentId = connection.participants_id.find(
+        (i) => i != user.userId
+      )
+      console.log('get other user Id ===>>> ', participentId)
+      const userData = await getUserDataById(participentId)
+      console.log('userData ===>>> ', userData)
+      if (userData) {
+        setConnectedUser(userData)
+      }
       setLoading(false)
     } else {
-      setLoading(false)
+      // is from the request route
+      console.log('connection request screen 1234 ===>>> ', request)
+      const userSendingReq = request.userSendingRequest
+      console.log('connection sending req screen ===>>> ', userSendingReq)
+
+      const givenName = userSendingReq.givenName
+      setConnectedUser(userSendingReq)
+
+
     }
   }
+
   const getChat = async () => {
-    const connectionId = connection.id
-    const chat = await getAllMessagesForConnectionId(connectionId)
-    if (chat) {
-      // console.log('chat ============== : ', chat);
-      setMessageArray(chat)
+    if (!isRequestRoute) {
+      const connectionId = connection.id
+      const chat = await getAllMessagesForConnectionId(connectionId)
+      if (chat) {
+        // console.log('chat ============== : ', chat);
+        setMessageArray(chat)
+      }
+    } else {
+
     }
   }
 
   const onClickSend = () => {
     // let currentTime = getCurrentTime();
-
     const today = getCurrentDate()
     const connectionId = connection.id
     const msgId = `msgid_${today.getMilliseconds()}`
@@ -124,20 +136,10 @@ const Chat = ({ route, navigation }) => {
           name: senderName,
         },
       }
-
       sendChatMessage(newMessage)
-
       getChat() // TODO: Might need to get updated messages from firestorer
       setMessage('')
     }
-  }
-
-  const getCurrentTime = () => {
-    let today = new Date()
-    let hours = (today.getHours() < 10 ? '0' : '') + today.getHours()
-    let minutes = (today.getMinutes() < 10 ? '0' : '') + today.getMinutes()
-    let seconds = (today.getSeconds() < 10 ? '0' : '') + today.getSeconds()
-    return hours + ':' + minutes
   }
 
   const onBackButton = async () => {
@@ -183,7 +185,7 @@ const Chat = ({ route, navigation }) => {
                 justifyContent: 'flex-end',
                 paddingBottom: 10,
               }}>
-              {routeCheck && messageArray.map((item, index) => {
+              {!isRequestRoute && messageArray.map((item, index) => {
                 let today = moment().format('YYYY-MM-DD')
                 let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD')
                 const time = moment(item.date).format('ddd, MMMM DD')
