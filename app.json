@@ -25,7 +25,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
@@ -38,6 +40,7 @@
       }
     },
     "android": {
+      "package": "com.approachable.approachablenative",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"

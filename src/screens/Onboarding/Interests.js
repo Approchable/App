@@ -13,7 +13,6 @@ import Center from '../../components/Utility/Center';
 import { HeaderText, RegularText, SmallerText } from '../../components/Texts';
 import LandingPage from '../Onboarding/LandingPage';
 import HowItWorks from './HowItWorks';
-import Animated, { exp, set } from 'react-native-reanimated';
 import { useState, useEffect, useContext, useRef } from 'react';
 import { writeUserData } from '../../../firebase';
 import CategoryItem from '../../components/CategoryItem';
@@ -124,7 +123,7 @@ export default function Interests({ navigation, route }) {
         finalResult['photoUrl'] = ImageSet.defaultProfileImage;
       }
       console.log('finalResult', finalResult);
-      
+
 
 
       navigation.navigate('Waitlist', finalResult);

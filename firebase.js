@@ -14,7 +14,7 @@ import {
   doc
 } from 'firebase/firestore';
 import { getDatabase, ref, set, get, child } from 'firebase/database';
-import { getStorage } from 'firebase/storage';
+import { getStorage, ref as storageRef } from 'firebase/storage';
 import { setDataByDate } from './src/components/Utility/Helper';
 
 
@@ -40,9 +40,9 @@ const realTimeDB = getDatabase(app);
 // Initialize Firebase Storage
 const storage = getStorage(app);
 
-createStorageUrlfromImage(
-  'file:///Users/ebukaegbunam/Library/Developer/CoreSimulator/Devices/71080F92-B428-460B-8F59-ABCE4268910B/data/Containers/Data/Application/A0E0666A-CBFB-41DD-8C25-54B5F263AFA9/Library/Caches/ExponentExperienceData/%2540ebukaegb%252FApproachableNative/ImagePicker/01D82213-8999-4C29-BFA4-69338B4734D1.jpg',
-);
+// createStorageUrlfromImage(
+//   'file:///Users/ebukaegbunam/Library/Developer/CoreSimulator/Devices/71080F92-B428-460B-8F59-ABCE4268910B/data/Containers/Data/Application/A0E0666A-CBFB-41DD-8C25-54B5F263AFA9/Library/Caches/ExponentExperienceData/%2540ebukaegb%252FApproachableNative/ImagePicker/01D82213-8999-4C29-BFA4-69338B4734D1.jpg',
+// );
 
 // Firebase Storage Methods
 
@@ -51,7 +51,7 @@ async function createStorageUrlfromImage(localUri) {
   try {
     const imageId = +Date.now() + localUri.split('/').pop() || 'test.jpg';
 
-    const imageRef = storage.ref('images/' + imageId);
+    const imageRef = storageRef('images/' + imageId);
     const imageUrl = await imageRef.getDownloadURL();
     console.log('image url: ' + imageUrl);
     return imageUrl;
