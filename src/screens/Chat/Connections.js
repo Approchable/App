@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { getConnections, getConnectionUser, logout } from '../../store/actions'
-import { ImageSet, Routes, screenWidth, ColorSet, TabType, RequestStatus } from '../../components/config/Constant'
+import {
+  ImageSet,
+  Routes,
+  screenWidth,
+  ColorSet,
+  TabType,
+  RequestStatus,
+} from '../../components/config/Constant'
 import MyStatusBar from '../../components/MyStatusBar'
-import { getConnectionById, getUserRequests, updateRequestStatus } from '../../../firebase'
+import {
+  getConnectionById,
+  getUserRequests,
+  updateRequestStatus,
+} from '../../../firebase'
 import { SafeAreaView } from 'react-native'
 import { Image } from 'react-native'
 import SkeletonContent from 'react-native-skeleton-content'
@@ -42,7 +59,8 @@ const DataArray = [
 const RequestsDataArray = [
   {
     name: 'Kristin',
-    lastMassage: 'That sounds fun! I’d love to join That sounds fun! I’d love to join That sounds fun! I’d love to join ',
+    lastMassage:
+      'That sounds fun! I’d love to join That sounds fun! I’d love to join That sounds fun! I’d love to join ',
     time: '14h',
   },
   {
@@ -63,7 +81,6 @@ export default function Connections({ navigation }) {
     (state) => state.GetConnectionsReducer.connections
   )
 
-
   const connectedUser = useSelector(
     (state) => state.getConnectionUserReducer.connectedUser
   )
@@ -77,7 +94,7 @@ export default function Connections({ navigation }) {
   const [requestStatus, setRequestStatus] = useState(false)
   const [connectionsArray, setConnectionsArray] = useState(DataArray)
   const [requestArray, setRequestsArray] = useState([])
-  const [currentUserId, setCurrentUserId] = useState(undefined);
+  const [currentUserId, setCurrentUserId] = useState(undefined)
 
   const dispatch = useDispatch()
 
@@ -94,29 +111,32 @@ export default function Connections({ navigation }) {
   }, [])
 
   useEffect(() => {
-    console.log('requestArray.length ===>>> ', requestArray.length);
+    console.log('requestArray.length ===>>> ', requestArray.length)
   }, [])
-
 
   const _getConnections = async () => {
     dispatch(getConnections(conId))
   }
 
   const _getRequests = async () => {
-    const user = await AsyncStorage.getItem('user');
-    const userId = JSON.parse(user).id;
+    const user = await AsyncStorage.getItem('user')
+    const userId = JSON.parse(user).id
     if (userId) {
-      console.log(`trying to fetch the current logged in user(${userId}) requests`);
+      console.log(
+        `trying to fetch the current logged in user(${userId}) requests`
+      )
       dispatch(getRequests(userId))
       const requestsData = await getUserRequests(userId)
       setRequestsArray(requestArray)
       setTimeout(() => {
-        let checker = requestsData.every(i => i.requestStatus === RequestStatus.opened);
-        console.log('requestsData checker ===>>> ', checker);
+        let checker = requestsData.every(
+          (i) => i.requestStatus === RequestStatus.opened
+        )
+        console.log('requestsData checker ===>>> ', checker)
         setRequestStatus(checker ? false : true)
-      }, 500);
+      }, 500)
     } else {
-      console.log(`unable to fetch current logged in user ID.`);
+      console.log(`unable to fetch current logged in user ID.`)
     }
   }
 
@@ -133,12 +153,11 @@ export default function Connections({ navigation }) {
   }
 
   const onClickRequestButton = async (request, index) => {
-
     const requestStatus = request.requestStatus
     const requestID = request.requestID
 
-    const user = await AsyncStorage.getItem('user');
-    const userId = JSON.parse(user).id;
+    const user = await AsyncStorage.getItem('user')
+    const userId = JSON.parse(user).id
 
     // update request status to `opened` if the request status is `pending`
     if (requestStatus == RequestStatus.pending) {
@@ -152,10 +171,12 @@ export default function Connections({ navigation }) {
       checkStatus()
     }
 
-    navigation.navigate(Routes.Chat, { isRequestRoute: true, connection: connections, request: request })
-
+    navigation.navigate(Routes.Chat, {
+      isRequestRoute: true,
+      connection: connections,
+      request: request,
+    })
   }
-
 
   const tabsChangingHandler = (tabType) => {
     if (tabType == TabType.connections) {
@@ -178,8 +199,10 @@ export default function Connections({ navigation }) {
   }
 
   const checkStatus = async () => {
-    let checker = requestArray.every(i => i.requestStatus === RequestStatus.opened);
-    console.log(' checker ========>>>> ', checker);
+    let checker = requestArray.every(
+      (i) => i.requestStatus === RequestStatus.opened
+    )
+    console.log(' checker ========>>>> ', checker)
     setRequestStatus(checker ? false : true)
   }
 
@@ -192,7 +215,7 @@ export default function Connections({ navigation }) {
           // value={value}
           style={styles.textInput}
           placeholder={'Search'}
-        // onChangeText={onChangeText}
+          // onChangeText={onChangeText}
         />
         <Image style={styles.filterIcon} source={ImageSet.filter} />
       </View>
@@ -202,15 +225,19 @@ export default function Connections({ navigation }) {
           style={[
             styles.tabs,
             {
-              borderColor: connectionTab ? ColorSet.defaultTheme : ColorSet.dimGray,
-              borderBottomWidth: connectionTab && 1.5
+              borderColor: connectionTab
+                ? ColorSet.defaultTheme
+                : ColorSet.dimGray,
+              borderBottomWidth: connectionTab && 1.5,
             },
           ]}
           onPress={() => tabsChangingHandler(TabType.connections)}>
           <Text
             style={[
               styles.tabsText,
-              { color: connectionTab ? ColorSet.defaultTheme : ColorSet.dimGray },
+              {
+                color: connectionTab ? ColorSet.defaultTheme : ColorSet.dimGray,
+              },
             ]}>
             Connections
           </Text>
@@ -221,8 +248,10 @@ export default function Connections({ navigation }) {
           style={[
             styles.tabs,
             {
-              borderColor: requestTab ? ColorSet.defaultTheme : ColorSet.dimGray,
-              borderBottomWidth: requestTab && 1.5
+              borderColor: requestTab
+                ? ColorSet.defaultTheme
+                : ColorSet.dimGray,
+              borderBottomWidth: requestTab && 1.5,
             },
           ]}
           onPress={() => tabsChangingHandler(TabType.requests)}>
@@ -233,7 +262,9 @@ export default function Connections({ navigation }) {
             ]}>
             Requests
           </Text>
-          {requestStatus && <Image style={styles.dotIcon} source={ImageSet.dot} />}
+          {requestStatus && (
+            <Image style={styles.dotIcon} source={ImageSet.dot} />
+          )}
         </TouchableOpacity>
       </View>
 
@@ -249,14 +280,25 @@ export default function Connections({ navigation }) {
                   isVisible={true}
                   animationType="pulse"
                   animationDirection="horizontalRight"
-                  layout={[styles.userIconShimmer, { children: [styles.titleShimmer, styles.messageShimmer], }, styles.countShimmer]}>
-                  <TouchableOpacity activeOpacity={0.5} style={styles.connectionsView}>
+                  layout={[
+                    styles.userIconShimmer,
+                    { children: [styles.titleShimmer, styles.messageShimmer] },
+                    styles.countShimmer,
+                  ]}>
+                  <TouchableOpacity
+                    activeOpacity={0.5}
+                    style={styles.connectionsView}>
                     <View style={styles.centerRowAlign}>
-                      <Image style={styles.userImage} source={ImageSet.profile} />
+                      <Image
+                        style={styles.userImage}
+                        source={ImageSet.profile}
+                      />
                       <View>
                         <Text style={styles.userName}>{item.name}</Text>
                         <View style={styles.lastMessageView}>
-                          <Text numberOfLines={1} style={styles.lastMessageText}>
+                          <Text
+                            numberOfLines={1}
+                            style={styles.lastMessageText}>
                             {item.lastMassage}
                           </Text>
                         </View>
@@ -300,24 +342,47 @@ export default function Connections({ navigation }) {
                   isVisible={true}
                   animationType="pulse"
                   animationDirection="horizontalRight"
-                  layout={[styles.userIconShimmer, { children: [styles.titleShimmer, styles.messageShimmer], }, styles.countShimmer]}>
+                  layout={[
+                    styles.userIconShimmer,
+                    { children: [styles.titleShimmer, styles.messageShimmer] },
+                    styles.countShimmer,
+                  ]}>
                   <TouchableOpacity
                     onPress={() => onClickRequestButton(request, index)}
-                    activeOpacity={0.5} style={styles.requestsView}>
+                    activeOpacity={0.5}
+                    style={styles.requestsView}>
                     <View style={[styles.centerRowAlign]}>
-                      {status == RequestStatus.pending && <Image style={styles.dotIconForNewRequests} source={ImageSet.dot} />}
-                      <Image style={styles.userImage} source={{ uri: data.photoUrl }} />
+                      {status == RequestStatus.pending && (
+                        <Image
+                          style={styles.dotIconForNewRequests}
+                          source={ImageSet.dot}
+                        />
+                      )}
+                      <Image
+                        style={styles.userImage}
+                        source={{ uri: data.photoUrl }}
+                      />
                       <View>
                         <Text style={styles.userName}>{data.givenName}</Text>
-                        <View style={[styles.lastMessageView,]}>
-                          <Text numberOfLines={1}
+                        <View style={[styles.lastMessageView]}>
+                          <Text
+                            numberOfLines={1}
                             style={[
                               styles.lastMessageText,
                               {
-                                width: time == 'just now' ? screenWidth.width55 : status == RequestStatus.pending ? screenWidth.width60 : screenWidth.width65
-                              }
+                                width:
+                                  time == 'just now'
+                                    ? screenWidth.width55
+                                    : status == RequestStatus.pending
+                                    ? screenWidth.width60
+                                    : screenWidth.width65,
+                              },
                             ]}>
-                            {item.comments ? item.comments : data.givenName + ' ' + "is Approachable! start the chat."}
+                            {item.comments
+                              ? item.comments
+                              : data.givenName +
+                                ' ' +
+                                'is Approachable! start the chat.'}
                           </Text>
                         </View>
                       </View>
@@ -400,7 +465,7 @@ const styles = StyleSheet.create({
     height: 45,
     resizeMode: 'contain',
     borderRadius: 150,
-    marginRight: 10
+    marginRight: 10,
   },
   userName: {
     fontSize: 14,
@@ -432,7 +497,7 @@ const styles = StyleSheet.create({
     borderBottomColor: ColorSet.chatPopupGray,
     borderBottomWidth: 1,
     paddingBottom: 10,
-    width: screenWidth.width85
+    width: screenWidth.width85,
   },
   centerRowAlign: {
     flexDirection: 'row',
@@ -440,7 +505,7 @@ const styles = StyleSheet.create({
   },
   jSpaceBetween: {
     justifyContent: 'space-between',
-    width: '100%'
+    width: '100%',
   },
   messageCountView: {
     minWidth: 20,
@@ -520,14 +585,13 @@ const styles = StyleSheet.create({
     borderBottomColor: ColorSet.chatPopupGray,
     borderBottomWidth: 1,
     paddingBottom: 10,
-    width: screenWidth.width85
+    width: screenWidth.width85,
   },
   dotIconForNewRequests: {
     width: 8,
     height: 8,
     resizeMode: 'contain',
     marginTop: 5,
-    marginRight: 10
+    marginRight: 10,
   },
-
 })

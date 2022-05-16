@@ -38,6 +38,7 @@ import {
   getTimeFromMilliseconds,
 } from '../../components/Utility/Helper'
 import moment from 'moment'
+import { Button } from 'react-native-elements'
 
 const width = (Dimensions.get('window').width - 36) / 3.5
 
@@ -59,12 +60,20 @@ const Chat = ({ route, navigation }) => {
   const [message, setMessage] = useState('')
 
   const [inputHeight, setInputHeight] = useState(0)
+  const [isSendMsgEnabled, setIsSendMsgEnabled] = useState(false)
   const dispatch = useDispatch()
 
   useEffect(() => {
     getUserData()
     getChat()
-    console.log('isRequestRoute =====>>>> ', isRequestRoute);
+    console.log('isRequestRoute =====>>>> ', isRequestRoute)
+
+    if (isRequestRoute) {
+      setIsSendMsgEnabled(false)
+    } else {
+      setIsSendMsgEnabled(true)
+    }
+    console.log('isSendMsgEnable =>', isSendMsgEnabled)
   }, [])
 
   const getUserData = async () => {
@@ -89,8 +98,6 @@ const Chat = ({ route, navigation }) => {
 
       const givenName = userSendingReq.givenName
       setConnectedUser(userSendingReq)
-
-
     }
   }
 
@@ -103,7 +110,7 @@ const Chat = ({ route, navigation }) => {
         setMessageArray(chat)
       }
     } else {
-
+      //
     }
   }
 
@@ -185,78 +192,119 @@ const Chat = ({ route, navigation }) => {
                 justifyContent: 'flex-end',
                 paddingBottom: 10,
               }}>
-              {!isRequestRoute && messageArray.map((item, index) => {
-                let today = moment().format('YYYY-MM-DD')
-                let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD')
-                const time = moment(item.date).format('ddd, MMMM DD')
-                return (
-                  <View key={index}>
-                    <View style={[styles.centerJustify, { marginVertical: 5 }]}>
-                      <Text style={styles.dateLabelText}>
-                        {item.date == today
-                          ? 'Today'
-                          : item.date == yesterday
-                            ? 'Yesterday'
-                            : time}
+              {isRequestRoute && (
+                <React.Fragment>
+                  <View style={styles.requestTopContainer}></View>
+                  <View style={styles.requestMainContainer}>
+                    <Image
+                      style={styles.userImage}
+                      source={{ uri: connectedUser && connectedUser.photoUrl }}
+                    />
+                    <View>
+                      <Text style={styles.userNameApproachableText}>
+                        {connectedUser && connectedUser.givenName} is
+                        Approachable!
+                      </Text>
+                      <Text style={styles.approachableConnectText}>
+                        Do you want to connect?
                       </Text>
                     </View>
-                    {/* {item.unRead == true && (
+                  </View>
+                  <View style={styles.acceptRejectBtnContainer}>
+                    <Image
+                      style={[styles.iconButton]}
+                      source={ImageSet.rejected}
+                    />
+                    <Image
+                      style={[styles.iconButton]}
+                      source={ImageSet.accepted}
+                    />
+                  </View>
+                </React.Fragment>
+              )}
+              {!isRequestRoute &&
+                messageArray.map((item, index) => {
+                  let today = moment().format('YYYY-MM-DD')
+                  let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD')
+                  const time = moment(item.date).format('ddd, MMMM DD')
+                  return (
+                    <View key={index}>
+                      <View
+                        style={[styles.centerJustify, { marginVertical: 5 }]}>
+                        <Text style={styles.dateLabelText}>
+                          {item.date == today
+                            ? 'Today'
+                            : item.date == yesterday
+                            ? 'Yesterday'
+                            : time}
+                        </Text>
+                      </View>
+                      {/* {item.unRead == true && (
                       <View style={styles.unReadMessagesIndication}>
                         <View style={styles.border} />
                         <Text style={styles.dateLabelText}>Unread messages</Text>
                         <View style={styles.border} />
                       </View>
                     )} */}
-                    {item.messages.map((subItem, index) => {
-                      const msgTime = getTimeFromMilliseconds(
-                        subItem.sent_at.seconds
-                      )
-                      return (
-                        <View key={index}>
-                          {subItem.sender.id === user.userId ? (
-                            <View style={styles.rightMessageView}>
-                              <View style={styles.rightMessageText}>
-                                <Text
-                                  style={[
-                                    styles.dateLabelText,
-                                    { marginRight: 10 },
-                                  ]}>
-                                  {msgTime}
-                                </Text>
-                                <Text style={styles.messagesText}>
-                                  {subItem.message}
-                                </Text>
+                      {item.messages.map((subItem, index) => {
+                        const msgTime = getTimeFromMilliseconds(
+                          subItem.sent_at.seconds
+                        )
+                        return (
+                          <View key={index}>
+                            {subItem.sender.id === user.userId ? (
+                              <View style={styles.rightMessageView}>
+                                <View style={styles.rightMessageText}>
+                                  <Text
+                                    style={[
+                                      styles.dateLabelText,
+                                      { marginRight: 10 },
+                                    ]}>
+                                    {msgTime}
+                                  </Text>
+                                  <Text style={styles.messagesText}>
+                                    {subItem.message}
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
-                          ) : (
-                            <View style={styles.leftMessageView}>
-                              <View style={styles.leftMessageText}>
-                                <Text style={styles.messagesText}>
-                                  {subItem.message}
-                                </Text>
-                                <Text
-                                  style={[
-                                    styles.dateLabelText,
-                                    { marginLeft: 10 },
-                                  ]}>
-                                  {msgTime}
-                                </Text>
+                            ) : (
+                              <View style={styles.leftMessageView}>
+                                <View style={styles.leftMessageText}>
+                                  <Text style={styles.messagesText}>
+                                    {subItem.message}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.dateLabelText,
+                                      { marginLeft: 10 },
+                                    ]}>
+                                    {msgTime}
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
-                          )}
-                        </View>
-                      )
-                    })}
-                  </View>
-                )
-              })}
+                            )}
+                          </View>
+                        )
+                      })}
+                    </View>
+                  )
+                })}
             </ScrollView>
           </View>
 
           <View style={styles.bottomBar}>
             <View style={styles.inputView}>
-              <TouchableOpacity style={styles.flexEnd}>
-                <Image style={[styles.icon]} source={ImageSet.plus} />
+              <TouchableOpacity
+                disable={!isSendMsgEnabled}
+                style={styles.flexEnd}>
+                <Image
+                  style={
+                    isSendMsgEnabled
+                      ? [styles.icon, styles.enableElement]
+                      : [styles.icon, styles.disabledElement]
+                  }
+                  source={ImageSet.plus}
+                />
               </TouchableOpacity>
               <TextInput
                 value={message}
@@ -267,6 +315,7 @@ const Chat = ({ route, navigation }) => {
                 }}
                 placeholder={'Start typing'}
                 placeholderTextColor={ColorSet.gray}
+                editable={isSendMsgEnabled}
                 style={[
                   styles.textInput,
                   {
@@ -279,20 +328,47 @@ const Chat = ({ route, navigation }) => {
               />
               {(message == '' && (
                 <View style={styles.sendIconView}>
-                  <TouchableOpacity style={styles.flexEnd}>
-                    <Image style={[styles.icon]} source={ImageSet.mic} />
+                  <TouchableOpacity
+                    activeOpacity={isSendMsgEnabled ? 1.0 : 0.2}
+                    disabled={!isSendMsgEnabled}
+                    style={styles.flexEnd}>
+                    <Image
+                      style={
+                        isSendMsgEnabled
+                          ? [styles.icon, styles.enableElement]
+                          : [styles.icon, styles.disabledElement]
+                      }
+                      source={ImageSet.mic}
+                    />
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.flexEnd}>
-                    <Image style={[styles.icon]} source={ImageSet.send} />
+                  <TouchableOpacity
+                    disabled={!isSendMsgEnabled}
+                    style={styles.flexEnd}>
+                    <Image
+                      style={
+                        isSendMsgEnabled
+                          ? [styles.icon, styles.enableElement]
+                          : [styles.icon, styles.disabledElement]
+                      }
+                      source={ImageSet.send}
+                    />
                   </TouchableOpacity>
                 </View>
               )) || (
-                  <TouchableOpacity
-                    onPress={() => onClickSend()}
-                    style={styles.flexEnd}>
-                    <Image style={[styles.icon]} source={ImageSet.send} />
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity
+                  disabled={!isSendMsgEnabled}
+                  onPress={() => onClickSend()}
+                  style={styles.flexEnd}>
+                  <Image
+                    style={
+                      isSendMsgEnabled
+                        ? [styles.icon, styles.enableElement]
+                        : [styles.icon, styles.disabledElement]
+                    }
+                    source={ImageSet.send}
+                  />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
@@ -352,6 +428,65 @@ const styles = StyleSheet.create({
   icon: {
     width: 25,
     height: 25,
+    resizeMode: 'contain',
+  },
+  requestTopContainer: {
+    height: 120,
+    borderColor: '#ECEEF2',
+    borderWidth: 2,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 10,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    marginLeft: 16,
+    marginRight: 16,
+    marginBottom: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  requestMainContainer: {
+    height: 80,
+    backgroundColor: '#44BFBA33',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 10,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    marginLeft: 16,
+    marginRight: 16,
+    marginBottom: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  userImage: {
+    width: 45,
+    height: 45,
+    resizeMode: 'contain',
+    borderRadius: 150,
+    marginRight: 10,
+  },
+  acceptRejectBtnContainer: {
+    height: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingLeft: 16,
+    paddingRight: 16,
+  },
+  approachableConnectText: {
+    color: ColorSet.textBlack,
+    fontWeight: 'bold',
+    fontSize: 18,
+    lineHeight: 24,
+    fontFamily: 'Poppins_700Bold',
+    fontStyle: 'normal',
+  },
+  iconButton: {
+    width: 44,
+    height: 44,
     resizeMode: 'contain',
   },
   chatSection: {
@@ -446,6 +581,12 @@ const styles = StyleSheet.create({
     width: screenWidth.width25,
     paddingHorizontal: 15,
     alignSelf: 'flex-end',
+  },
+  disabledElement: {
+    opacity: 0.5,
+  },
+  enableElement: {
+    opacity: 1.0,
   },
 })
 
