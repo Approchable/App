@@ -7,25 +7,24 @@ import {
   Dimensions,
   ScrollView,
   SafeAreaView,
-} from 'react-native'
-import { NormalButton } from '../../components/Buttons'
-import Center from '../../components/Utility/Center'
-import { HeaderText, RegularText, SmallerText } from '../../components/Texts'
-import LandingPage from '../Onboarding/LandingPage'
-import HowItWorks from './HowItWorks'
-import Animated, { exp, set } from 'react-native-reanimated'
-import { useState, useEffect, useContext, useRef } from 'react'
-import { writeUserData } from '../../../firebase'
-import CategoryItem from '../../components/CategoryItem'
-import { CategorieContext } from '../..//context/CategorieContext'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { UserContext, UserProvider } from '../../context/UserContext'
-import * as Device from 'expo-device'
-import * as Notifications from 'expo-notifications'
-import { useDispatch } from 'react-redux'
-import { login } from '../../store/actions'
-import MyStatusBar from '../../components/MyStatusBar'
-import { ImageSet } from '../../components/config/Constant'
+} from 'react-native';
+import { NormalButton } from '../../components/Buttons';
+import Center from '../../components/Utility/Center';
+import { HeaderText, RegularText, SmallerText } from '../../components/Texts';
+import LandingPage from '../Onboarding/LandingPage';
+import HowItWorks from './HowItWorks';
+import { useState, useEffect, useContext, useRef } from 'react';
+import { writeUserData } from '../../../firebase';
+import CategoryItem from '../../components/CategoryItem';
+import { CategorieContext } from '../..//context/CategorieContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext, UserProvider } from '../../context/UserContext';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import { useDispatch } from 'react-redux';
+import { login } from '../../store/actions';
+import MyStatusBar from '../../components/MyStatusBar';
+import { ImageSet } from '../../components/config/Constant';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -122,7 +121,9 @@ export default function Interests({ navigation, route }) {
       if (finalResult['photoUrl'] == undefined) {
         finalResult['photoUrl'] = ImageSet.defaultProfileImage
       }
-      console.log('finalResult', finalResult)
+      console.log('finalResult', finalResult);
+
+
 
       navigation.navigate('Waitlist', finalResult)
     })

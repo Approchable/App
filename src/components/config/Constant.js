@@ -87,3 +87,11 @@ export const TabType = {
   connections: 'connections',
   requests: 'requests',
 }
+
+export const RequestStatus = {
+  pending: 'pending',
+  opened: 'opened',
+  accepted: 'accepted',
+  rejected: 'rejected',
+  completed: 'completed'
+}

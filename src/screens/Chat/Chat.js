@@ -43,6 +43,7 @@ const width = (Dimensions.get('window').width - 36) / 3.5
 
 const Chat = ({ route, navigation }) => {
   const connection = route.params.data
+  const routeCheck = route.params.routeCheck
   // const connectedUser = useSelector(state => state.getConnectionUserReducer.connectedUser);
   // const connections = useSelector(state => state.GetConnectionsReducer.connections);
   //TODO: Need to fetch the current user from secure items or aysnc storage
@@ -182,9 +183,8 @@ const Chat = ({ route, navigation }) => {
                 flex: 1,
                 justifyContent: 'flex-end',
                 paddingBottom: 10,
-              }}
-            >
-              {messageArray.map((item, index) => {
+              }}>
+              {routeCheck && messageArray.map((item, index) => {
                 let today = moment().format('YYYY-MM-DD')
                 let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD')
                 const time = moment(item.date).format('ddd, MMMM DD')
@@ -195,8 +195,8 @@ const Chat = ({ route, navigation }) => {
                         {item.date == today
                           ? 'Today'
                           : item.date == yesterday
-                          ? 'Yesterday'
-                          : time}
+                            ? 'Yesterday'
+                            : time}
                       </Text>
                     </View>
                     {/* {item.unRead == true && (
@@ -288,13 +288,12 @@ const Chat = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </View>
               )) || (
-                <TouchableOpacity
-                  onPress={() => onClickSend()}
-                  style={styles.flexEnd}
-                >
-                  <Image style={[styles.icon]} source={ImageSet.send} />
-                </TouchableOpacity>
-              )}
+                  <TouchableOpacity
+                    onPress={() => onClickSend()}
+                    style={styles.flexEnd}>
+                    <Image style={[styles.icon]} source={ImageSet.send} />
+                  </TouchableOpacity>
+                )}
             </View>
           </View>
         </View>
