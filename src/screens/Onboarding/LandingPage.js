@@ -40,6 +40,7 @@ export default function LandingPage({ navigation }) {
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
       }).then((credential) => {
+        console.log(credential, "===credential====")
         const { email, familyName, givenName } = credential
         const result = { email: email, id: credential.user }
         const type = 'apple'
@@ -59,9 +60,10 @@ export default function LandingPage({ navigation }) {
     } catch (e) {
       if (e.code === 'ERR_CANCELED') {
         // handle that the user canceled the sign-in flow
-        console.log('Error occured')
+        console.log('Apple Sign in process was canceled', e)
       } else {
         // handle other errors
+        console.log('Apple Sign in process was interrupted', e)
       }
     }
   }
@@ -130,19 +132,18 @@ export default function LandingPage({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
-      <AppHeader moreStyles={{ height: 50 }} />
+     
       <View style={styles.container}>
         <View style={styles.container}>
           <Center />
 
-          {/* <HeaderText content="Approachable" /> */}
+        
         </View>
 
         <View
           style={{
             height: 430,
-            alignItems: 'center',
-            // marginRight: 18,
+            alignItems: 'center',   // marginRight: 18,
           }}
         >
           <LandingPageImage witdth="100%" />
@@ -155,7 +156,7 @@ export default function LandingPage({ navigation }) {
             width: windowWidth * 0.9,
             alignItems: 'center',
             justifyContent: 'flex-end',
-            // marginLeft: 30,
+          
             marginBottom: 20,
           }}
         >

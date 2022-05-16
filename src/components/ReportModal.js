@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Modal,
   StyleSheet,
@@ -9,7 +9,7 @@ import {
   Image,
   ScrollView,
   SafeAreaView,
-  Alert
+  Alert,
 } from 'react-native'
 import { ImageSet } from './config/Constant'
 import { NormalButton } from './Buttons'
@@ -23,118 +23,123 @@ const reportReasons = [
   'Hate speech or symbols',
   'Violence or dangerous organizations',
   'Bullying or harassment',
+  'Block',
   'Other',
 ]
 
 function ReportModal({ visible, onCancel }) {
-  const [currentStep, setCurrentStep]=useState('STEP_ONE')
+  const [currentStep, setCurrentStep] = useState('STEP_ONE')
   const [reason, setReason] = useState(null)
-  const onSubmit=()=>{
+  const onSubmit = () => {
     alertOptions()
     handleCancel()
   }
-  const goToStepTwo=()=>{
+  const goToStepTwo = () => {
+    console.log('go to step two')
     setCurrentStep('STEP_TWO')
-}
-const goToStepThree=()=>{
-  setCurrentStep('STEP_THREE')
-}
-const handleCancel=()=>{
-  onCancel()
-  setCurrentStep('STEP_ONE')
-}
-const alertOptions = () =>
-Alert.alert('Your report has been sent!')
+  }
+  const goToStepThree = () => {
+    setCurrentStep('STEP_THREE')
+  }
+  const handleCancel = () => {
+    onCancel()
+    setCurrentStep('STEP_ONE')
+  }
+  const alertOptions = () => Alert.alert('Your report has been sent!')
   return (
     <SafeAreaView>
-    <Modal visible={visible} transparent animationType="slide" style={{ }}>
-      
-      <View
-        style={{
-          ...styles.modal,
-          maxHeight: '65%',
-          minHeight: 165,
-        }}
-      >
-        <ModalBarTop />
+      <Modal visible={visible} transparent animationType="slide" style={{}}>
+        <View
+          style={{
+            ...styles.modal,
+          }}>
+          <ModalBarTop />
 
-        {currentStep=='STEP_ONE'&&<StepOne goToStepTwo={goToStepTwo}/>}
-       {currentStep=='STEP_TWO'&& <StepTwo goToStepThree={goToStepThree}/>}
-       {currentStep=='STEP_THREE'&&<StepThree onSubmit={onSubmit}setReason={setReason}/>}
-      </View>
+          {currentStep == 'STEP_ONE' && <StepOne goToStepTwo={goToStepTwo} />}
+          {currentStep == 'STEP_TWO' && (
+            <StepTwo goToStepThree={goToStepThree} />
+          )}
+          {currentStep == 'STEP_THREE' && (
+            <StepThree
+              onSubmit={onSubmit}
+              setReason={setReason}
+              reason={reason}
+            />
+          )}
+        </View>
 
-      <TouchableWithoutFeedback onPress={handleCancel}>
-        <View style={styles.modalBG} />
-      </TouchableWithoutFeedback>
-
-    </Modal>
+        <TouchableWithoutFeedback onPress={handleCancel}>
+          <View style={styles.modalBG} />
+        </TouchableWithoutFeedback>
+      </Modal>
     </SafeAreaView>
   )
 }
-const StepOne=({goToStepTwo})=>{
-
-  return(
-    <TouchableOpacity onPress={goToStepTwo}
-    style={styles.reportButton}
-  >
-    <Image
-      style={{ width: 25, height: 25, marginRight: 10 }}
-      source={ImageSet.warning}
-    />
-    <Text style={styles.options}>Report</Text>
-  </TouchableOpacity>
+const StepOne = ({ goToStepTwo }) => {
+  return (
+    <TouchableOpacity onPress={goToStepTwo} style={styles.reportButton}>
+      <Image
+        style={{ width: 25, height: 25, marginRight: 10 }}
+        source={ImageSet.warning}
+      />
+      <Text style={styles.options}>Report</Text>
+    </TouchableOpacity>
   )
 }
-const StepTwo=({goToStepThree})=>{
-  return(
+const StepTwo = ({ goToStepThree }) => {
+  
+  // check if reason was block and then re-word copy
+  return (
     <>
-  <View style={styles.titleDesc}>
-          <Text style={styles.reportText}>Report</Text>
-          <Text style={styles.reportDescription}>
-            Select a reason for reporting this account. Your report is
-            anonymous. If someone is in immediate danger, call the local
-            emergency services - don’t wait.
-          </Text>
-        </View>
+      <View style={[styles.titleDesc, { maxHeight: '65%', minHeight: 165 }]}>
+        <Text style={styles.reportText}>Report</Text>
+        <Text style={styles.reportDescription}>
+          Select a reason for reporting this account. Your report is anonymous.
+          If someone is in immediate danger, call the local emergency services -
+          don’t wait.
+        </Text>
+      </View>
 
-        <ScrollView>
-          {reportReasons.map((reason,idx) => (
-            <TouchableOpacity style={styles.reportButton} onPress={goToStepThree} key={idx}>
-              <Text style={styles.options}>{reason}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+      <ScrollView>
+        {reportReasons.map((reason, idx) => (
+          <TouchableOpacity
+            style={styles.reportButton}
+            onPress={goToStepThree}
+            key={idx}>
+            <Text style={styles.options}>{reason}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </>
   )
 }
-const StepThree=({onSubmit,setReason})=>{
-  return(
-<KeyboardAwareScrollView extraHeight={60}>
-    <View style={{...styles.titleDesc,marginTop:20,flex: 1}}>
-    <Text style={styles.reportText}>Reason for the report</Text>
-    <Text style={styles.reportDescription}>
-      Is there anything else we should know to help us understand the
-      problem?
-    </Text>
-  
-    <NormalTextField
-      placeholder="Optional"
-      onChangeText={(text) => setReason(text)}
-    />
-     
-   <NormalButton
-      text={'Send Report'}
-      onPress={onSubmit}
-      hollow={true}
-      moreStyles={{
-        marginVertical: 20,
-      }}
-    />
-      <View style={{marginVertical: 50}}/>
-  </View>
+const StepThree = ({ onSubmit, setReason, reason }) => {
+  console.log(reason, "reason")
+  return (
+    <KeyboardAwareScrollView extraHeight={60}>
+      <View style={{ ...styles.titleDesc, marginTop: 20, flex: 1 }}>
+        <Text style={styles.reportText}>Reason for the report</Text>
+        <Text style={styles.reportDescription}>
+          Is there anything else we should know to help us understand the
+          problem?
+        </Text>
 
-  </KeyboardAwareScrollView>
+        <NormalTextField
+          placeholder="Optional"
+          onChangeText={(text) => setReason(text)}
+        />
 
+        <NormalButton
+          text={'Send Report'}
+          onPress={onSubmit}
+          hollow={true}
+          moreStyles={{
+            marginVertical: 20,
+          }}
+        />
+        <View style={{ marginVertical: 50 }} />
+      </View>
+    </KeyboardAwareScrollView>
   )
 }
 const ModalBarTop = () => {
@@ -147,8 +152,7 @@ const ModalBarTop = () => {
         borderRadius: 13,
         alignSelf: 'center',
         marginTop: 10,
-      }}
-    ></View>
+      }}></View>
   )
 }
 
@@ -168,7 +172,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 16,
     paddingBottom: 30,
-   
   },
   modalBG: {
     position: 'absolute',
