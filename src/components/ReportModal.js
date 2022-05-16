@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   Alert,
+  Dimensions
 } from 'react-native'
 
 import { useDispatch } from 'react-redux'
@@ -29,7 +30,7 @@ const reportReasons = [
   'Bullying or harassment',
   'Other',
 ]
-
+const windowHeight = Dimensions.get('window').height;
 const ReportModal = ({ visible, onCancel, currentReportPost }) => {
   const [currentStep, setCurrentStep] = useState('STEP_ONE')
   const [additonalReason, setAdditionalReason] = useState('')
@@ -80,6 +81,7 @@ const ReportModal = ({ visible, onCancel, currentReportPost }) => {
   const StepTwo = () => {
     return (
       <>
+      <View style={{maxHeight:windowHeight*0.8}}>
         <View style={styles.titleDesc}>
           <Text style={styles.reportText}>Report</Text>
           <Text style={styles.reportDescription}>
@@ -102,6 +104,7 @@ const ReportModal = ({ visible, onCancel, currentReportPost }) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
+        </View>
       </>
     )
   }
