@@ -14,6 +14,8 @@ import {
   GET_CONNECTIONS_BY_ID_ERROR,
   CONNECTIONS_USER_DETAILS,
   CONNECTIONS_USER_ERROR,
+  GET_ALL_REQUESTS,
+  GET_ALL_REQUESTS_ERROR,
 } from './actionTypes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -26,7 +28,7 @@ import {
 
 } from '../../firebase';
 
-import { sendPostToFireStore } from '../../FirebaseFireStore';
+import { getAllRequest, sendPostToFireStore } from '../../FirebaseFireStore';
 
 export const Init = () => {
   //console.log('Initing user....');
@@ -211,3 +213,5 @@ export const getConnectionUser = userId => {
     }
   };
 };
+
+

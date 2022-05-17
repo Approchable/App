@@ -9,10 +9,12 @@ import {
   orderBy,
   where,
   query,
-  Timestamp
+  Timestamp,
+  updateDoc,
+  doc
 } from 'firebase/firestore';
 import { getDatabase, ref, set, get, child } from 'firebase/database';
-import { getStorage } from 'firebase/storage';
+import { getStorage, ref as storageRef } from 'firebase/storage';
 import { setDataByDate } from './src/components/Utility/Helper';
 
 
@@ -38,9 +40,9 @@ const realTimeDB = getDatabase(app);
 // Initialize Firebase Storage
 const storage = getStorage(app);
 
-createStorageUrlfromImage(
-  'file:///Users/ebukaegbunam/Library/Developer/CoreSimulator/Devices/71080F92-B428-460B-8F59-ABCE4268910B/data/Containers/Data/Application/A0E0666A-CBFB-41DD-8C25-54B5F263AFA9/Library/Caches/ExponentExperienceData/%2540ebukaegb%252FApproachableNative/ImagePicker/01D82213-8999-4C29-BFA4-69338B4734D1.jpg',
-);
+// createStorageUrlfromImage(
+//   'file:///Users/ebukaegbunam/Library/Developer/CoreSimulator/Devices/71080F92-B428-460B-8F59-ABCE4268910B/data/Containers/Data/Application/A0E0666A-CBFB-41DD-8C25-54B5F263AFA9/Library/Caches/ExponentExperienceData/%2540ebukaegb%252FApproachableNative/ImagePicker/01D82213-8999-4C29-BFA4-69338B4734D1.jpg',
+// );
 
 // Firebase Storage Methods
 
@@ -49,7 +51,7 @@ async function createStorageUrlfromImage(localUri) {
   try {
     const imageId = +Date.now() + localUri.split('/').pop() || 'test.jpg';
 
-    const imageRef = storage.ref('images/' + imageId);
+    const imageRef = storageRef('images/' + imageId);
     const imageUrl = await imageRef.getDownloadURL();
     console.log('image url: ' + imageUrl);
     return imageUrl;
@@ -172,6 +174,42 @@ export async function getConnectionById(connectionId) {
     return null;
   }
 }
+
+// get user Requests by id
+export async function getUserRequests(userId) {
+  // console.log("sdsds");
+  const requestsRef = collection(fireStore, 'users', userId, 'usersWhoRequested');
+  try {
+    const querySnapshot = await getDocs(requestsRef);
+    const data = querySnapshot.docs.map(doc => doc.data());
+    // console.log('data requests ===>>> ', data);
+    return data
+    // if (data.length > 0) {
+    //   return data[0]
+    // } else {
+    //   return null
+    // }
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error);
+    return null;
+  }
+}
+
+export async function updateRequestStatus(userId, requestId, requestStatus) {
+  // console.log("sdsds");
+
+  try {
+    const requestsCollectionRef = collection(fireStore, 'users', userId, 'usersWhoRequested');
+    const requestDoc = await doc(requestsCollectionRef, requestId);
+    await updateDoc(requestDoc, { "requestStatus": requestStatus });
+    console.log('docRes sucessfully  =====>>> ');
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error);
+    return null;
+  }
+}
+
+
 
 export async function getAllMessagesForConnectionId(conId) {
 
