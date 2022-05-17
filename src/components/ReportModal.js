@@ -137,7 +137,7 @@ const ReportModal = ({ visible, onCancel, currentReportPost }) => {
     )
   }
   return (
-    <ModalWrapper visible={visible} transparent animationType="slide">
+    <ModalWrapper visible={visible} transparent animationType="slide"  handleCancel = {onCancel}>
       {currentStep == 'STEP_ONE' && <StepOne  />}
       {currentStep == 'STEP_TWO' && <StepTwo  />}
       {currentStep == 'STEP_THREE' && <StepThree/>}
