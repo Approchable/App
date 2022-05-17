@@ -212,6 +212,6 @@ export function GetPostsReducer(state = getPostInitialState, action) {
         loading: action.payload.loading,
       };
     default:
-      return state;
+      return state
   }
 }

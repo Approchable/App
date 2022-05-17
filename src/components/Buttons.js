@@ -1,37 +1,44 @@
-import {TouchableOpacity, View, Text, StyleSheet , ActivityIndicator} from 'react-native';
+import {
+  TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native'
 import {
   useFonts,
   Poppins_400Regular,
   Poppins_500Regular,
   Poppins_700Bold,
   Poppins_700Normal,
-} from '@expo-google-fonts/poppins';
-import {SocialIcon} from 'react-native-elements';
-import {GoogleIcon, AppleIcon} from './Utility/Icons';
-import {RegularText, SmallerText} from './Texts';
+} from '@expo-google-fonts/poppins'
+import { SocialIcon } from 'react-native-elements'
+import { GoogleIcon, AppleIcon } from './Utility/Icons'
+import { RegularText, SmallerText } from './Texts'
 
-export function TextButton({text, onPress}) {
+export function TextButton({ text, onPress }) {
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
     Poppins_700Bold,
-  });
+  })
   if (fontsLoaded) {
-    return <></>;
+    return <></>
   }
   return (
-    <TouchableOpacity style={{padding: 0}} onPress={onPress}>
+    <TouchableOpacity style={{ padding: 0 }} onPress={onPress}>
       <Text
         style={{
           color: '#44BFBA',
           fontSize: 16,
           fontWeight: 'bold',
-        }}>
+        }}
+      >
         {text}
       </Text>
     </TouchableOpacity>
-  );
+  )
 }
 
 export function NormalButton({
@@ -41,21 +48,23 @@ export function NormalButton({
   onPress,
   inActive,
   textStyles,
-  loading
+  loading,
 }) {
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
     Poppins_700Bold,
-  });
+  })
   if (fontsLoaded) {
-    return <></>;
+    return <></>
   }
-  if (loading){
-    return <>
-      <ActivityIndicator size="small" color="#44BFBA" />
-    </>
+  if (loading) {
+    return (
+      <>
+        <ActivityIndicator size="small" color="#44BFBA" />
+      </>
+    )
   }
 
   if (inActive == false) {
@@ -65,17 +74,19 @@ export function NormalButton({
           ...styles.containerInactive,
           ...moreStyles,
         }}
-        onPress={onPress}>
+        onPress={onPress}
+      >
         <Text
           style={{
             ...styles.textInactive,
             //fontFamily: 'Poppins_500Regular'
             ...textStyles,
-          }}>
+          }}
+        >
           {text}
         </Text>
       </TouchableOpacity>
-    );
+    )
   } else {
     return (
       <TouchableOpacity
@@ -85,30 +96,32 @@ export function NormalButton({
           borderColor: hollow ? 'white' : '#44BFBA',
           ...moreStyles,
         }}
-        onPress={onPress}>
+        onPress={onPress}
+      >
         <Text
           style={{
             ...styles.text,
             color: hollow ? 'white' : '#44BFBA',
             fontFamily: 'Poppins_500Regular',
             ...textStyles,
-          }}>
+          }}
+        >
           {text}
         </Text>
       </TouchableOpacity>
-    );
+    )
   }
 }
 
-export function GoogleButtonWithIcon({onPress, position}) {
+export function GoogleButtonWithIcon({ onPress, position }) {
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
     Poppins_700Bold,
-  });
+  })
   if (fontsLoaded) {
-    return <></>;
+    return <></>
   }
   return (
     <TouchableOpacity onPress={onPress}>
@@ -123,27 +136,28 @@ export function GoogleButtonWithIcon({onPress, position}) {
             fontWeight: '500',
             fontSize: 16,
             lineHeight: 20,
-          }}>
+          }}
+        >
           Continue with Google
         </Text>
       </View>
     </TouchableOpacity>
-  );
+  )
 }
 
-export function AppleButtonWithIcon({onPress}) {
+export function AppleButtonWithIcon({ onPress }) {
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
     Poppins_700Bold,
-  });
+  })
   if (fontsLoaded) {
-    return <></>;
+    return <></>
   }
   return (
     <TouchableOpacity onPress={onPress}>
-      <View style={{...styles.GoogleButton, backgroundColor: 'black'}}>
+      <View style={{ ...styles.GoogleButton, backgroundColor: 'black' }}>
         <AppleIcon />
 
         <Text
@@ -154,13 +168,14 @@ export function AppleButtonWithIcon({onPress}) {
             fontWeight: '500',
             fontSize: 16,
             lineHeight: 20,
-          }}>
+          }}
+        >
           {' '}
           Continue with Apple
         </Text>
       </View>
     </TouchableOpacity>
-  );
+  )
 }
 const styles = StyleSheet.create({
   GoogleButton: {
@@ -212,4 +227,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Poppins_500Regular',
   },
-});
+})

@@ -148,7 +148,8 @@ const Chat = ({ route, navigation }) => {
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}>
+        style={styles.container}
+      >
         <MyStatusBar backgroundColor="white" />
         <View style={{ flex: 1 }}>
           <View style={[styles.topBar]}>
@@ -218,7 +219,8 @@ const Chat = ({ route, navigation }) => {
                                   style={[
                                     styles.dateLabelText,
                                     { marginRight: 10 },
-                                  ]}>
+                                  ]}
+                                >
                                   {msgTime}
                                 </Text>
                                 <Text style={styles.messagesText}>
@@ -236,7 +238,8 @@ const Chat = ({ route, navigation }) => {
                                   style={[
                                     styles.dateLabelText,
                                     { marginLeft: 10 },
-                                  ]}>
+                                  ]}
+                                >
                                   {msgTime}
                                 </Text>
                               </View>
