@@ -95,7 +95,6 @@ export function PostModal({post, onPressSend , setComment}) {
           location={post.location}
           addressResult={post.addressResult}
           profileImage={post.user.photoUrl}
-          postId={postId}
           moreStyles={{
             marginBottom: 8,
             marginTop: 16,

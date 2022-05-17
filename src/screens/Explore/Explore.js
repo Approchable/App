@@ -139,9 +139,6 @@ function Explore({ navigation }) {
 }
 
 function NoPost({ navigation }) {
-  const dispatch = useDispatch()
-
-  const postCount = 0
 
   const NavigateToCreateInExplore = () => {
     navigation.navigate('Create')
