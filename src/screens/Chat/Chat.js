@@ -65,6 +65,8 @@ const Chat = ({ route, navigation }) => {
 
   const [inputHeight, setInputHeight] = useState(0)
   const [isSendMsgEnabled, setIsSendMsgEnabled] = useState(false)
+  const [accepted, setAccepted] = useState(false)
+  const [rejected, setRejected] = useState(false)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -178,13 +180,37 @@ const Chat = ({ route, navigation }) => {
             <ScrollView
               contentContainerStyle={styles.scrollViewMain}>
               {isRequestRoute && (
-                <RequestHangout
-                  headline={postObject.headline}
-                  description={postObject.description}
-                  name={connectedUser && connectedUser.givenName}
-                  source={{ uri: connectedUser && connectedUser.photoUrl }}
-                />
-              )}
+                <>
+                  <RequestHangout
+                    headline={postObject.headline}
+                    description={postObject.description}
+                    name={connectedUser && connectedUser.givenName}
+                    source={{ uri: connectedUser && connectedUser.photoUrl }}
+                    comment={request.comment}
+                    accepted={accepted}
+                    rejected={rejected}
+                    onAccepted={() => setAccepted(true)}
+                  // onRejected={() => setRejected(true)}
+                  />
+                  {accepted &&
+                    <View style={{ alignItems: 'center' }}>
+                      <View style={styles.rightMessageView}>
+                        <View style={[styles.rightMessageText, { backgroundColor: ColorSet.chatLeftPopupGray, paddingHorizontal: 20 }]}>
+                          <Text
+                            style={[
+                              styles.dateLabelText,
+                              { marginRight: 10 },
+                            ]}>
+                            {'12m'}
+                          </Text>
+                          <Text style={styles.messagesText}>
+                            {`Start the chat with ${connectedUser.givenName}`}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  }
+                </>)}
               {!isRequestRoute &&
                 messageArray.map((item, index) => {
                   let today = moment().format('YYYY-MM-DD')

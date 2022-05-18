@@ -230,7 +230,7 @@ export default function Connections({ navigation }) {
               borderColor: connectionTab
                 ? ColorSet.defaultTheme
                 : ColorSet.dimGray,
-              borderBottomWidth: connectionTab && 1.5,
+              borderBottomWidth: connectionTab ? 1.5 : 0,
             },
           ]}
           onPress={() => tabsChangingHandler(TabType.connections)}
@@ -254,7 +254,7 @@ export default function Connections({ navigation }) {
               borderColor: requestTab
                 ? ColorSet.defaultTheme
                 : ColorSet.dimGray,
-              borderBottomWidth: requestTab && 1.5,
+              borderBottomWidth: requestTab ? 1.5 : 0,
             },
           ]}
           onPress={() => tabsChangingHandler(TabType.requests)}
