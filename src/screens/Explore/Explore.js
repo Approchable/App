@@ -12,32 +12,53 @@ import { RegularBoldText } from '../../components/Texts'
 import { NormalButton } from '../../components/Buttons'
 import EmptyCreatePost from '../../assets/images/assets/EmptyCreatePost.svg'
 import { useDispatch } from 'react-redux'
-import { screenWidth } from '../../components/config/Constant'
-
+import SucessLogo from '../../assets/images/assets/SucessLogo.svg'
+import { NavigateToCreate } from '../../store/actions'
 import Post, { PostModal } from '../../components/Post'
 import AppHeader from '../../components/Utility/AppHeader'
 import { useSelector } from 'react-redux'
 import { getPosts } from '../../store/posts/posts'
-import SkeletonContent from 'react-native-skeleton-content'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import MyStatusBar from '../../components/MyStatusBar'
 import { sendJoinRequest } from '../../store/Requests/Requests'
-
+import * as Random from 'expo-random'
+import uuid from 'react-native-uuid'
+import ReportModal from '../../components/ReportModal'
+import SkeletonContent from 'react-native-skeleton-content'
+import {
+  screenWidth,
+} from '../../components/config/Constant'
 //GetPostsReducer
 function Explore({ navigation }) {
   var posts = useSelector((state) => state.GetPostsReducer.posts)
   var loading = useSelector((state) => state.GetPostsReducer.loading)
   var error = useSelector((state) => state.GetPostsReducer.error)
-  //loading = true
+
   const [refreshing, setRefreshing] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
+  const [reportModalVisible, setReportModalVisible] = useState(false)
   const [modalPost, setModalPost] = useState(null)
-
+  const [currentReportPost, setCurrentReportPost] = useState(null)
   const onRefresh = () => {
+    setRefreshing(true)
     _getPosts()
+
+    setTimeout(() => {
+      setRefreshing(false)
+    }, 1000)
   }
   const dispatch = useDispatch()
 
-  const _getPosts = () => {
+  const [user, setUser] = useState(null)
+
+  const handleModalOpen = () => {
+    setReportModalVisible(true)
+  }
+  const onCancelReportModal = () => {
+    setReportModalVisible(false)
+  }
+  const _getPosts = async () => {
+    // dispatch fetch new post to properly update old posts
     dispatch(getPosts())
   }
 
@@ -90,6 +111,8 @@ function Explore({ navigation }) {
                 endDateTime={item.endDateTime}
                 addressResult={item.addressResult}
                 profileImage={item.user.photoUrl}
+                handleModalOpen={handleModalOpen}
+                setCurrentReportPost={setCurrentReportPost}
                 postId={item.postId}
                 onPress={() => {
                   handleJoin(item)
@@ -100,17 +123,23 @@ function Explore({ navigation }) {
           />
         )}
 
-        <JoinModal
-          visible={modalVisible}
-          onCancel={() => handleCancel()}
-          postObject={modalPost}
-        />
+          <JoinModal
+            visible={modalVisible}
+            onCancel={() => handleCancel()}
+            postObject={modalPost}
+          />
+          <ReportModal
+            currentReportPost={currentReportPost}
+            visible={reportModalVisible}
+            onCancel={onCancelReportModal}
+          />
+        </View>
       </View>
-    </View>
-  )
+    )
 }
 
 function NoPost({ navigation }) {
+
   const NavigateToCreateInExplore = () => {
     navigation.navigate('Create')
   }
@@ -126,7 +155,8 @@ function NoPost({ navigation }) {
 
           flex: 1,
           alignItems: 'center',
-        }}>
+        }}
+      >
         <EmptyCreatePost witdth="100%" />
       </View>
       <View style={{ flex: 0.8 }}>
@@ -162,7 +192,8 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
       <View
         style={{
           ...styles.modal,
-        }}>
+        }}
+      >
         <ModalBarTop post={postObject} />
 
         <PostModal
@@ -254,7 +285,8 @@ const ModalBarTop = () => {
         borderRadius: 13,
         alignSelf: 'center',
         marginTop: 10,
-      }}></View>
+      }}
+    ></View>
   )
 }
 

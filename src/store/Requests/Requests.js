@@ -39,9 +39,7 @@ requestObject =
     postObject
     requestStatus =  RequestStatus from ~/../../components/config/Constant
     requestID
-
 }
-
 */
 
 export const sendJoinRequest = (post, comment) => {

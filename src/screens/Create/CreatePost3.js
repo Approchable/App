@@ -10,67 +10,71 @@ import {
   Modal,
   SafeAreaView,
   TouchableWithoutFeedback,
-} from 'react-native';
-import {HeaderText, RegularText, RegularBoldText} from '../../components/Texts';
-import React, {useState, useEffect} from 'react';
-import {NormalButton} from '../../components/Buttons';
-import * as ImagePicker from 'expo-image-picker';
-import {NaviagteOutOfCreate, createPosts} from '../../store/actions';
-import {Camera} from 'expo-camera';
-import {useDispatch, useSelector} from 'react-redux';
-import {addToPostObject} from '..//../store//posts//posts';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import MyStatusBar from '../../components/MyStatusBar';
-import AppHeader from '../../components/Utility/AppHeader';
-import {StackActions} from '@react-navigation/native';
-import {CommonActions} from '@react-navigation/native';
-import uuid from 'react-native-uuid';
+} from 'react-native'
+import {
+  HeaderText,
+  RegularText,
+  RegularBoldText,
+} from '../../components/Texts'
+import React, { useState, useEffect } from 'react'
+import { NormalButton } from '../../components/Buttons'
+import * as ImagePicker from 'expo-image-picker'
+import { NaviagteOutOfCreate, createPosts } from '../../store/actions'
+import { Camera } from 'expo-camera'
+import { useDispatch, useSelector } from 'react-redux'
+import { addToPostObject } from '..//../store//posts//posts'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import MyStatusBar from '../../components/MyStatusBar'
+import AppHeader from '../../components/Utility/AppHeader'
+import { StackActions } from '@react-navigation/native'
+import { CommonActions } from '@react-navigation/native'
+import uuid from 'react-native-uuid'
 
-export default function CreatePost3({navigation}) {
-  const [buttonActive, setButtonActive] = useState(false);
-  const [image, setImage] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const dispatch = useDispatch();
-  var prevPostObject = useSelector(state => state.postsReducer);
+export default function CreatePost3({ navigation }) {
+  const [buttonActive, setButtonActive] = useState(false)
+  const [image, setImage] = useState(null)
+  const [modalVisible, setModalVisible] = useState(false)
+  const dispatch = useDispatch()
+  var prevPostObject = useSelector((state) => state.postsReducer)
 
   const finsihCreatePost3 = async () => {
-    var user = await AsyncStorage.getItem('user');
-    user = JSON.parse(user);
+    var user = await AsyncStorage.getItem('user')
+    user = JSON.parse(user)
     const data = {
       postId: uuid.v4().toString(),
       localImageUrl: image || '',
       user: user,
-      usersWhoRequested:[user.id],
-    };
+      usersWhoRequested: [user.id],
+    }
     const newPostObject = {
       ...prevPostObject,
       ...data,
-    };
+    }
 
     console.log(
-      '===========================Create post in firebase from post screen 3=====================================',
-    );
+      '===========================Create post in firebase from post screen 3====================================='
+    )
 
-    dispatch(createPosts(newPostObject));
+    dispatch(createPosts(newPostObject))
 
     navigation.dispatch(
       CommonActions.reset({
         index: 1,
         routes: [
-          {name: 'Explore'},
+          { name: 'Explore' },
           {
             name: 'Explore',
           },
         ],
-      }),
-    );
-  };
+      })
+    )
+  }
 
   const pickImage = async () => {
     if (Platform.OS === 'android') {
-      const {status} = await ImagePicker.requestCameraRollPermissionsAsync();
+      const { status } = await ImagePicker.requestCameraRollPermissionsAsync()
       if (status !== 'granted') {
-        alert('Sorry, we need camera roll permissions to make this work!');
+        alert('Sorry, we need camera roll permissions to make this work!')
       }
     }
 
@@ -80,55 +84,55 @@ export default function CreatePost3({navigation}) {
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
-    });
+    })
 
-    console.log(result);
+    console.log(result)
 
     if (!result.cancelled) {
-      setImage(result.uri);
+      setImage(result.uri)
     }
-    setModalVisible(false);
-  };
+    setModalVisible(false)
+  }
 
   const openCamera = async () => {
-    const {status} = await Camera.requestPermissionsAsync();
+    const { status } = await Camera.requestPermissionsAsync()
     if (status !== 'granted') {
-      Alert.alert('Sorry, we need camera permissions to make this work!');
-      return;
+      Alert.alert('Sorry, we need camera permissions to make this work!')
+      return
     }
-    const result = await ImagePicker.launchCameraAsync();
-    setImage(result.uri);
-    setModalVisible(false);
-  };
+    const result = await ImagePicker.launchCameraAsync()
+    setImage(result.uri)
+    setModalVisible(false)
+  }
 
   const ButtonModalItems = [
     {
       id: 1,
       name: 'Open Camera',
       onPress: () => {
-        openCamera();
+        openCamera()
       },
     },
     {
       id: 2,
       name: 'Open Gallery',
       onPress: () => {
-        pickImage();
+        pickImage()
       },
     },
-  ];
+  ]
 
   const post = () => {
-    console.log('posting');
+    console.log('posting')
     // dispatch(NaviagteOutOfCreate());
-    navigation.navigate('Explore');
-  };
+    navigation.navigate('Explore')
+  }
   return (
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
       {/* <AppHeader moreStyles={{height: 50}} /> */}
       <ScrollView style={styles.container}>
-        <View style={{marginHorizontal: 16}}>
+        <View style={{ marginHorizontal: 16 }}>
           <HeaderText content="Add to your post" />
 
           {image == null && (
@@ -142,7 +146,8 @@ export default function CreatePost3({navigation}) {
                 borderColor: '#989898',
                 marginTop: 30,
                 height: 250,
-              }}>
+              }}
+            >
               <Text
                 style={{
                   textAlign: 'center',
@@ -152,7 +157,8 @@ export default function CreatePost3({navigation}) {
                   fontWeight: 'bold',
                   fontSize: 16,
                   color: '#44BFBA',
-                }}>
+                }}
+              >
                 Add Photo
               </Text>
             </TouchableOpacity>
@@ -160,7 +166,7 @@ export default function CreatePost3({navigation}) {
 
           {image && (
             <Image
-              source={{uri: image}}
+              source={{ uri: image }}
               style={{
                 flex: 1,
                 backgroundColor: 'white',
@@ -184,7 +190,8 @@ export default function CreatePost3({navigation}) {
                   fontWeight: 'bold',
                   fontSize: 16,
                   color: '#44BFBA',
-                }}>
+                }}
+              >
                 Change Photo
               </Text>
             </TouchableOpacity>
@@ -200,7 +207,8 @@ export default function CreatePost3({navigation}) {
 
               justifyContent: 'flex-end',
               marginBottom: 20,
-            }}>
+            }}
+          >
             <NormalButton
               text="Post"
               onPress={() => (image !== null ? finsihCreatePost3() : null)}
@@ -214,16 +222,17 @@ export default function CreatePost3({navigation}) {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
-const ButtonModal = ({visible, items, onCancel}) => {
+const ButtonModal = ({ visible, items, onCancel }) => {
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View
         style={{
           ...styles.modal,
-        }}>
+        }}
+      >
         <ModalBarTop />
         <Text
           style={{
@@ -233,17 +242,19 @@ const ButtonModal = ({visible, items, onCancel}) => {
             marginBottom: 20,
             marginTop: 14,
             marginLeft: 16,
-          }}>
+          }}
+        >
           Add Phtotos
         </Text>
 
-        {items.map(item => {
+        {items.map((item) => {
           return (
             <View
               style={{
                 marginBottom: 10,
                 marginHorizontal: 16,
-              }}>
+              }}
+            >
               <NormalButton
                 text={item.name}
                 onPress={item.onPress}
@@ -252,13 +263,14 @@ const ButtonModal = ({visible, items, onCancel}) => {
                 moreStyles={{}}
               />
             </View>
-          );
+          )
         })}
         <View
           style={{
             marginBottom: 10,
             marginHorizontal: 16,
-          }}>
+          }}
+        >
           <NormalButton
             text={'Cancel'}
             onPress={onCancel}
@@ -274,8 +286,8 @@ const ButtonModal = ({visible, items, onCancel}) => {
         <View style={styles.modalBG} />
       </TouchableWithoutFeedback>
     </Modal>
-  );
-};
+  )
+}
 
 const ModalBarTop = () => {
   return (
@@ -287,9 +299,10 @@ const ModalBarTop = () => {
         borderRadius: 13,
         alignSelf: 'center',
         marginTop: 10,
-      }}></View>
-  );
-};
+      }}
+    ></View>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -312,4 +325,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.2)',
     height: 900, // change this to height of screen later
   },
-});
+})

@@ -1,15 +1,13 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import LandingPage from '../screens/Onboarding/LandingPage';
-import HowItWorks from '../screens/Onboarding/HowItWorks';
-import Name from '../screens/Onboarding/Name';
-import Interests from '../screens/Onboarding/Interests';
-import Sucess from '../screens/Onboarding/Sucess';
-import {View, Text} from 'react-native';
-import Waitlist from '../screens/Waitlist/Waitlist';
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import LandingPage from '../screens/Onboarding/LandingPage'
+import HowItWorks from '../screens/Onboarding/HowItWorks'
+import Name from '../screens/Onboarding/Name'
+import Interests from '../screens/Onboarding/Interests'
+import Sucess from '../screens/Onboarding/Sucess'
+import { View, Text } from 'react-native'
+import Waitlist from '../screens/Waitlist/Waitlist'
 
-
-
-const Onboarding = createNativeStackNavigator();
+const Onboarding = createNativeStackNavigator()
 
 export default function OnboardingStack() {
   return (
@@ -59,5 +57,5 @@ export default function OnboardingStack() {
         }}
       />
     </Onboarding.Navigator>
-  );
+  )
 }

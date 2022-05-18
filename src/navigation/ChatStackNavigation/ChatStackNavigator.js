@@ -1,9 +1,8 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Chat from '../../screens/Chat/Chat';
-import Connections from '../../screens/Chat/Connections';
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import Chat from '../../screens/Chat/Chat'
+import Connections from '../../screens/Chat/Connections'
 
-
-const ChatStackNavigator = createNativeStackNavigator();
+const ChatStackNavigator = createNativeStackNavigator()
 
 export default function ChatStack() {
   return (
@@ -23,5 +22,5 @@ export default function ChatStack() {
         }}
       />
     </ChatStackNavigator.Navigator>
-  );
+  )
 }
