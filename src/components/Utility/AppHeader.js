@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, StatusBar, SafeAreaView } from 'react-native';
-import React from 'react';
-import NavigationLogo from '../../assets/images/assets/NavigationLogo.svg';
+import { View, Text, StyleSheet, StatusBar, SafeAreaView } from 'react-native'
+import React from 'react'
+import NavigationLogo from '../../assets/images/assets/NavigationLogo.svg'
 
 export default function AppHeader({ moreStyles }) {
   return (
@@ -12,15 +12,15 @@ export default function AppHeader({ moreStyles }) {
           alignItems: 'flex-start',
           justifyContent: 'center',
 
-
           backgroundColor: '#F6F6F6',
-        }}>
+        }}
+      >
         <View style={{ marginLeft: 16 }}>
           <NavigationLogo witdth="100%" />
         </View>
       </View>
     </View>
-  );
+  )
 }
 
 const MyStatusBar = ({ backgroundColor, ...props }) => (
@@ -29,10 +29,10 @@ const MyStatusBar = ({ backgroundColor, ...props }) => (
       <StatusBar translucent backgroundColor={backgroundColor} {...props} />
     </SafeAreaView>
   </View>
-);
+)
 
-const STATUSBAR_HEIGHT = StatusBar.currentHeight;
-const APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
+const STATUSBAR_HEIGHT = StatusBar.currentHeight
+const APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56
 
 const styles = StyleSheet.create({
   container: {
@@ -43,4 +43,4 @@ const styles = StyleSheet.create({
   statusBar: {
     height: STATUSBAR_HEIGHT,
   },
-});
+})

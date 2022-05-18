@@ -1,8 +1,8 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Sucess from '../screens/Onboarding/Sucess';
-import Explore from '../screens/Explore/Explore';
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import Sucess from '../screens/Onboarding/Sucess'
+import Explore from '../screens/Explore/Explore'
 
-const Welcome = createNativeStackNavigator();
+const Welcome = createNativeStackNavigator()
 
 export default function WelcomeStack() {
   return (
@@ -22,5 +22,5 @@ export default function WelcomeStack() {
         }}
       />
     </Welcome.Navigator>
-  );
+  )
 }

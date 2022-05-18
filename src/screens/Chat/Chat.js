@@ -165,7 +165,8 @@ const Chat = ({ route, navigation }) => {
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}>
+        style={styles.container}
+      >
         <MyStatusBar backgroundColor="white" />
         <View style={{ flex: 1 }}>
           <ChatHeader

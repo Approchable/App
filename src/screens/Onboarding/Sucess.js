@@ -1,13 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Platform, SafeAreaView } from 'react-native';
-import { HeaderText, RegularText, SmallerText } from '../../components/Texts';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import SucessLogo from '../../assets/images/assets/SucessLogo.svg';
-import { NormalButton } from '../../components/Buttons';
-import { deleteUserData } from '../../../firebase';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import MyStatusBar from '../../components/MyStatusBar';
+import React, { useContext, useState, useEffect, useRef } from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  Platform,
+  SafeAreaView,
+} from 'react-native'
+import { HeaderText, RegularText, SmallerText } from '../../components/Texts'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import SucessLogo from '../../assets/images/assets/SucessLogo.svg'
+import { NormalButton } from '../../components/Buttons'
+import { UserContext } from '../..//context/UserContext'
+import { deleteUserData } from '../../../firebase'
+import * as Device from 'expo-device'
+import * as Notifications from 'expo-notifications'
+import MyStatusBar from '../../components/MyStatusBar'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -15,51 +23,49 @@ Notifications.setNotificationHandler({
     shouldPlaySound: false,
     shouldSetBadge: false,
   }),
-});
+})
 
 export default function Sucess({ navigation }) {
   // const [user, setUser] = useContext(UserContext);
-  const [expoPushToken, setExpoPushToken] = useState('');
-  const [notification, setNotification] = useState(false);
-  const notificationListener = useRef();
-  const responseListener = useRef();
+  const [expoPushToken, setExpoPushToken] = useState('')
+  const [notification, setNotification] = useState(false)
+  const notificationListener = useRef()
+  const responseListener = useRef()
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+    registerForPushNotificationsAsync().then((token) => setExpoPushToken(token))
 
     // This listener is fired whenever a notification is received while the app is foregrounded
     notificationListener.current =
-      Notifications.addNotificationReceivedListener(notification => {
-        setNotification(notification);
-      });
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification)
+      })
 
     // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
     responseListener.current =
-      Notifications.addNotificationResponseReceivedListener(response => {
-        console.log(response);
-      });
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response)
+      })
 
     return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current,
-      );
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
+      Notifications.removeNotificationSubscription(notificationListener.current)
+      Notifications.removeNotificationSubscription(responseListener.current)
+    }
+  }, [])
 
-  console.log(user);
-  const buttonActive = true;
+  console.log(user)
+  const buttonActive = true
 
   function removeItemValue(key) {
     try {
-      AsyncStorage.removeItem(key);
-      deleteUserData(user.id);
-      setUser(null);
+      AsyncStorage.removeItem(key)
+      deleteUserData(user.id)
+      setUser(null)
     } catch (exception) {
-      console.log(exception);
+      console.log(exception)
     }
   }
-  const user = AsyncStorage.getItem('user');
+  const user = AsyncStorage.getItem('user')
 
   if (user !== undefined && user !== null) {
     return (
@@ -86,7 +92,8 @@ export default function Sucess({ navigation }) {
                 //height: 300,
                 flex: 1.5,
                 alignItems: 'center',
-              }}>
+              }}
+            >
               <SucessLogo witdth="100%" />
             </View>
 
@@ -109,7 +116,7 @@ export default function Sucess({ navigation }) {
           </View>
         </View>
       </SafeAreaView>
-    );
+    )
   } else {
     return (
       <SafeAreaView style={styles.container}>
@@ -141,7 +148,7 @@ export default function Sucess({ navigation }) {
           </View>
         </View>
       </SafeAreaView>
-    );
+    )
   }
 }
 
@@ -150,7 +157,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-});
+})
 
 // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.dev/notifications
 async function sendPushNotification(expoPushToken) {
@@ -160,7 +167,7 @@ async function sendPushNotification(expoPushToken) {
     title: 'Hi there,',
     body: 'Welcome to Approachable',
     data: { someData: 'goes here' },
-  };
+  }
 
   await fetch('https://exp.host/--/api/v2/push/send', {
     method: 'POST',
@@ -170,26 +177,26 @@ async function sendPushNotification(expoPushToken) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(message),
-  });
+  })
 }
 
 async function registerForPushNotificationsAsync() {
-  let token;
+  let token
   if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
+    const { status: existingStatus } = await Notifications.getPermissionsAsync()
+    let finalStatus = existingStatus
     if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
+      const { status } = await Notifications.requestPermissionsAsync()
+      finalStatus = status
     }
     if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
-      return;
+      alert('Failed to get push token for push notification!')
+      return
     }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log(token);
+    token = (await Notifications.getExpoPushTokenAsync()).data
+    console.log(token)
   } else {
-    alert('Must use physical device for Push Notifications');
+    alert('Must use physical device for Push Notifications')
   }
 
   if (Platform.OS === 'android') {
@@ -198,8 +205,8 @@ async function registerForPushNotificationsAsync() {
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
-    });
+    })
   }
 
-  return token;
+  return token
 }

@@ -233,7 +233,8 @@ export default function Connections({ navigation }) {
               borderBottomWidth: connectionTab && 1.5,
             },
           ]}
-          onPress={() => tabsChangingHandler(TabType.connections)}>
+          onPress={() => tabsChangingHandler(TabType.connections)}
+        >
           <Text
             style={[
               styles.tabsText,
@@ -256,7 +257,8 @@ export default function Connections({ navigation }) {
               borderBottomWidth: requestTab && 1.5,
             },
           ]}
-          onPress={() => tabsChangingHandler(TabType.requests)}>
+          onPress={() => tabsChangingHandler(TabType.requests)}
+        >
           <Text
             style={[
               styles.tabsText,

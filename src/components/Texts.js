@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet} from 'react-native';
+import { View, Text, StyleSheet } from 'react-native'
 
 import {
   useFonts,
@@ -6,7 +6,7 @@ import {
   Poppins_500Regular,
   Poppins_700Bold,
   Poppins_700Normal,
-} from '@expo-google-fonts/poppins';
+} from '@expo-google-fonts/poppins'
 
 const fetchFonts = () => {
   let [fontsLoaded] = useFonts({
@@ -14,18 +14,18 @@ const fetchFonts = () => {
     Poppins_500Regular,
     Poppins_700Normal,
     Poppins_700Bold,
-  });
-};
+  })
+}
 
-function HeaderText({content, moreStyles}) {
+function HeaderText({ content, moreStyles }) {
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
     Poppins_700Bold,
-  });
+  })
   if (fontsLoaded) {
-    return <></>;
+    return <></>
   }
   return (
     <View>
@@ -34,22 +34,23 @@ function HeaderText({content, moreStyles}) {
           ...styles.heading,
           ...moreStyles,
           fontFamily: 'Poppins_500Regular',
-        }}>
+        }}
+      >
         {content}
       </Text>
     </View>
-  );
+  )
 }
 
-function RegularText({content, moreStyles}) {
+function RegularText({ content, moreStyles }) {
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
     Poppins_700Bold,
-  });
+  })
   if (fontsLoaded) {
-    return <></>;
+    return <></>
   }
   return (
     <View>
@@ -58,39 +59,40 @@ function RegularText({content, moreStyles}) {
           ...styles.regular,
           ...moreStyles,
           fontFamily: 'Poppins_400Regular',
-        }}>
+        }}
+      >
         {content}
       </Text>
     </View>
-  );
+  )
 }
 
-function RegularBoldText({content, moreStyles}) {
+function RegularBoldText({ content, moreStyles }) {
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
     Poppins_700Bold,
-  });
+  })
   if (fontsLoaded) {
-    return <></>;
+    return <></>
   }
   return (
     <View>
-      <Text style={{...styles.regularBold, ...moreStyles}}>{content}</Text>
+      <Text style={{ ...styles.regularBold, ...moreStyles }}>{content}</Text>
     </View>
-  );
+  )
 }
 
-function SmallerText({content, moreStyles}) {
+function SmallerText({ content, moreStyles }) {
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Regular,
     Poppins_700Normal,
     Poppins_700Bold,
-  });
+  })
   if (fontsLoaded) {
-    return <></>;
+    return <></>
   }
   return (
     <View>
@@ -99,14 +101,15 @@ function SmallerText({content, moreStyles}) {
           ...styles.small,
           ...moreStyles,
           fontFamily: 'Poppins_400Regular',
-        }}>
+        }}
+      >
         {content}
       </Text>
     </View>
-  );
+  )
 }
 
-export {RegularText, HeaderText, SmallerText, RegularBoldText};
+export { RegularText, HeaderText, SmallerText, RegularBoldText }
 
 const styles = StyleSheet.create({
   heading: {
@@ -153,4 +156,4 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     marginVertical: 4,
   },
-});
+})
