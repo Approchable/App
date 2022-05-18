@@ -134,7 +134,8 @@ export const getRequests = (userId) => {
   return async (dispatch) => {
     try {
       const requests = await getUserRequests(userId)
-      // console.log('api response of requests ===>>> ', requests);
+      console.log('api response of requests ===>>> ', requests[0].requestStatus);
+      console.log('api response of requests ===>>> ', requests[1].requestStatus);
       if (requests.length > 0) {
         dispatch({
           type: GET_ALL_REQUESTS,

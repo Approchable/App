@@ -24,6 +24,7 @@ import {
   ColorSet,
   ImageSet,
   Routes,
+  screenHeight,
   screenWidth,
 } from '../../components/config/Constant'
 import MyStatusBar from '../../components/MyStatusBar'
@@ -38,12 +39,17 @@ import {
   getTimeFromMilliseconds,
 } from '../../components/Utility/Helper'
 import moment from 'moment'
+import { Button } from 'react-native-elements'
+import ChatHeader from '../../components/Chat/ChatHeader'
+import RequestHangout from '../../components/Chat/RequestHangout'
+import ChatBox from '../../components/Chat/ChatBox'
 
 const width = (Dimensions.get('window').width - 36) / 3.5
 
 const Chat = ({ route, navigation }) => {
-  const connection = route.params.data
-  const routeCheck = route.params.routeCheck
+  const connection = route.params.connection
+  const request = route.params.request
+  const isRequestRoute = route.params.isRequestRoute
   // const connectedUser = useSelector(state => state.getConnectionUserReducer.connectedUser);
   // const connections = useSelector(state => state.GetConnectionsReducer.connections);
   //TODO: Need to fetch the current user from secure items or aysnc storage
@@ -57,46 +63,66 @@ const Chat = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  // console.log('connectionData chat screen ===>>> ', connections);
-
-  // console.log('connectionData chat screen participentId ===>>> ', participentId);
-
   const [inputHeight, setInputHeight] = useState(0)
+  const [isSendMsgEnabled, setIsSendMsgEnabled] = useState(false)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    getUserData()
-    getChat()
+    const unsubscribe = navigation.addListener('focus', () => {
+      getUserData()
+      getChat()
+      console.log('isRequestRoute =====>>>> ', isRequestRoute)
+      if (isRequestRoute) {
+        setIsSendMsgEnabled(true)
+      } else {
+        setIsSendMsgEnabled(false)
+      }
+    })
+    return unsubscribe
   }, [])
 
+
   const getUserData = async () => {
-    setLoading(true)
-    console.log('connection chat screen 1234 ===>>> ', connection)
-    const participentId = connection.participants_id.find(
-      (i) => i != user.userId
-    )
-    console.log('get other user Id ===>>> ', participentId)
-    const userData = await getUserDataById(participentId)
-    console.log('userData ===>>> ', userData)
-    if (userData) {
-      setConnectedUser(userData)
+    if (!isRequestRoute) {
+      setLoading(true)
+      console.log('connection chat screen 1234 ===>>> ', connection)
+      const participentId = connection.participants_id.find(
+        (i) => i != user.userId
+      )
+      console.log('get other user Id ===>>> ', participentId)
+      const userData = await getUserDataById(participentId)
+      console.log('userData ===>>> ', userData)
+      if (userData) {
+        setConnectedUser(userData)
+      }
       setLoading(false)
     } else {
-      setLoading(false)
+
+      // is from the request route
+      // console.log('connection request screen 1234 ===>>> ', request)
+      const userSendingReq = request.userSendingRequest
+      // console.log('connection sending req screen ===>>> ', userSendingReq)
+      const postObject = request.postObject
+      console.log('postObject ===>>> ', request.postObject)
+      setConnectedUser(userSendingReq)
     }
   }
+
   const getChat = async () => {
-    const connectionId = connection.id
-    const chat = await getAllMessagesForConnectionId(connectionId)
-    if (chat) {
-      // console.log('chat ============== : ', chat);
-      setMessageArray(chat)
+    if (!isRequestRoute) {
+      const connectionId = connection.id
+      const chat = await getAllMessagesForConnectionId(connectionId)
+      if (chat) {
+        // console.log('chat ============== : ', chat);
+        setMessageArray(chat)
+      }
+    } else {
+      //
     }
   }
 
   const onClickSend = () => {
     // let currentTime = getCurrentTime();
-
     const today = getCurrentDate()
     const connectionId = connection.id
     const msgId = `msgid_${today.getMilliseconds()}`
@@ -124,26 +150,17 @@ const Chat = ({ route, navigation }) => {
           name: senderName,
         },
       }
-
       sendChatMessage(newMessage)
-
       getChat() // TODO: Might need to get updated messages from firestorer
       setMessage('')
     }
   }
 
-  const getCurrentTime = () => {
-    let today = new Date()
-    let hours = (today.getHours() < 10 ? '0' : '') + today.getHours()
-    let minutes = (today.getMinutes() < 10 ? '0' : '') + today.getMinutes()
-    let seconds = (today.getSeconds() < 10 ? '0' : '') + today.getSeconds()
-    return hours + ':' + minutes
-  }
-
   const onBackButton = async () => {
     navigation.goBack()
   }
-
+  // console.log('isSendMsgEnabledddddd =>', isSendMsgEnabled)
+  const postObject = request.postObject
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -152,150 +169,97 @@ const Chat = ({ route, navigation }) => {
       >
         <MyStatusBar backgroundColor="white" />
         <View style={{ flex: 1 }}>
-          <View style={[styles.topBar]}>
-            <View style={[styles.center]}>
-              <TouchableOpacity onPress={onBackButton}>
-                <Image style={[styles.backButton]} source={ImageSet.back} />
-              </TouchableOpacity>
-              <Text style={[styles.regularText]}>
-                {connectedUser && connectedUser.givenName}
-              </Text>
-            </View>
-            <View style={[styles.leftIcons]}>
-              <TouchableOpacity //onPress={onBackButton}
-              >
-                <Image style={[styles.icon]} source={ImageSet.phone} />
-              </TouchableOpacity>
-              <TouchableOpacity //onPress={onBackButton}
-              >
-                <Image style={[styles.icon]} source={ImageSet.camera} />
-              </TouchableOpacity>
-              <TouchableOpacity //onPress={onBackButton}
-              >
-                <Image style={[styles.icon]} source={ImageSet.warning} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
+          <ChatHeader
+            isSendMsgEnabled={isSendMsgEnabled}
+            onBackButton={onBackButton}
+            name={connectedUser && connectedUser.name}
+          />
           <View style={[styles.chatSection]}>
             <ScrollView
-              contentContainerStyle={{
-                flex: 1,
-                justifyContent: 'flex-end',
-                paddingBottom: 10,
-              }}>
-              {routeCheck && messageArray.map((item, index) => {
-                let today = moment().format('YYYY-MM-DD')
-                let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD')
-                const time = moment(item.date).format('ddd, MMMM DD')
-                return (
-                  <View key={index}>
-                    <View style={[styles.centerJustify, { marginVertical: 5 }]}>
-                      <Text style={styles.dateLabelText}>
-                        {item.date == today
-                          ? 'Today'
-                          : item.date == yesterday
-                            ? 'Yesterday'
-                            : time}
-                      </Text>
-                    </View>
-                    {/* {item.unRead == true && (
+              contentContainerStyle={styles.scrollViewMain}>
+              {isRequestRoute && (
+                <RequestHangout
+                  headline={postObject.headline}
+                  description={postObject.description}
+                  name={connectedUser && connectedUser.givenName}
+                  source={{ uri: connectedUser && connectedUser.photoUrl }}
+                />
+              )}
+              {!isRequestRoute &&
+                messageArray.map((item, index) => {
+                  let today = moment().format('YYYY-MM-DD')
+                  let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD')
+                  const time = moment(item.date).format('ddd, MMMM DD')
+                  return (
+                    <View key={index}>
+                      <View
+                        style={[styles.centerJustify, { marginVertical: 5 }]}>
+                        <Text style={styles.dateLabelText}>
+                          {item.date == today
+                            ? 'Today'
+                            : item.date == yesterday
+                              ? 'Yesterday'
+                              : time}
+                        </Text>
+                      </View>
+                      {/* {item.unRead == true && (
                       <View style={styles.unReadMessagesIndication}>
                         <View style={styles.border} />
                         <Text style={styles.dateLabelText}>Unread messages</Text>
                         <View style={styles.border} />
                       </View>
                     )} */}
-                    {item.messages.map((subItem, index) => {
-                      const msgTime = getTimeFromMilliseconds(
-                        subItem.sent_at.seconds
-                      )
-                      return (
-                        <View key={index}>
-                          {subItem.sender.id === user.userId ? (
-                            <View style={styles.rightMessageView}>
-                              <View style={styles.rightMessageText}>
-                                <Text
-                                  style={[
-                                    styles.dateLabelText,
-                                    { marginRight: 10 },
-                                  ]}
-                                >
-                                  {msgTime}
-                                </Text>
-                                <Text style={styles.messagesText}>
-                                  {subItem.message}
-                                </Text>
+                      {item.messages.map((subItem, index) => {
+                        const msgTime = getTimeFromMilliseconds(
+                          subItem.sent_at.seconds
+                        )
+                        return (
+                          <View key={index}>
+                            {subItem.sender.id === user.userId ? (
+                              <View style={styles.rightMessageView}>
+                                <View style={styles.rightMessageText}>
+                                  <Text
+                                    style={[
+                                      styles.dateLabelText,
+                                      { marginRight: 10 },
+                                    ]}>
+                                    {msgTime}
+                                  </Text>
+                                  <Text style={styles.messagesText}>
+                                    {subItem.message}
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
-                          ) : (
-                            <View style={styles.leftMessageView}>
-                              <View style={styles.leftMessageText}>
-                                <Text style={styles.messagesText}>
-                                  {subItem.message}
-                                </Text>
-                                <Text
-                                  style={[
-                                    styles.dateLabelText,
-                                    { marginLeft: 10 },
-                                  ]}
-                                >
-                                  {msgTime}
-                                </Text>
+                            ) : (
+                              <View style={styles.leftMessageView}>
+                                <View style={styles.leftMessageText}>
+                                  <Text style={styles.messagesText}>
+                                    {subItem.message}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.dateLabelText,
+                                      { marginLeft: 10 },
+                                    ]}>
+                                    {msgTime}
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
-                          )}
-                        </View>
-                      )
-                    })}
-                  </View>
-                )
-              })}
+                            )}
+                          </View>
+                        )
+                      })}
+                    </View>
+                  )
+                })}
             </ScrollView>
           </View>
-
-          <View style={styles.bottomBar}>
-            <View style={styles.inputView}>
-              <TouchableOpacity style={styles.flexEnd}>
-                <Image style={[styles.icon]} source={ImageSet.plus} />
-              </TouchableOpacity>
-              <TextInput
-                value={message}
-                multiline={true}
-                onChangeText={(text) => setMessage(text)}
-                onContentSizeChange={(event) => {
-                  setInputHeight(event.nativeEvent.contentSize.height)
-                }}
-                placeholder={'Start typing'}
-                placeholderTextColor={ColorSet.gray}
-                style={[
-                  styles.textInput,
-                  {
-                    height: Math.max(25, inputHeight),
-                    width:
-                      (message == '' && screenWidth.width60) ||
-                      screenWidth.width70,
-                  },
-                ]}
-              />
-              {(message == '' && (
-                <View style={styles.sendIconView}>
-                  <TouchableOpacity style={styles.flexEnd}>
-                    <Image style={[styles.icon]} source={ImageSet.mic} />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.flexEnd}>
-                    <Image style={[styles.icon]} source={ImageSet.send} />
-                  </TouchableOpacity>
-                </View>
-              )) || (
-                  <TouchableOpacity
-                    onPress={() => onClickSend()}
-                    style={styles.flexEnd}>
-                    <Image style={[styles.icon]} source={ImageSet.send} />
-                  </TouchableOpacity>
-                )}
-            </View>
-          </View>
+          <ChatBox
+            onChangeText={(text) => setMessage(text)}
+            isSendMsgEnabled={isSendMsgEnabled}
+            isMessage={message}
+            onClickSend={() => onClickSend()}
+          />
         </View>
       </KeyboardAvoidingView>
       <Loader isVisible={loading} />
@@ -307,6 +271,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ColorSet.lightGray,
+  },
+  scrollViewMain: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingBottom: 10,
   },
   topBar: {
     paddingVertical: 10,
@@ -333,7 +302,6 @@ const styles = StyleSheet.create({
   leftIcons: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     width: screenWidth.width30,
   },
   regularText: {
@@ -345,25 +313,11 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
     marginLeft: 10,
   },
-  backButton: {
-    width: 45,
-    height: 45,
-    resizeMode: 'contain',
-  },
-  icon: {
-    width: 25,
-    height: 25,
-    resizeMode: 'contain',
-  },
   chatSection: {
     flex: 1,
     backgroundColor: ColorSet.white,
   },
-  textInput: {
-    maxHeight: 100,
-    paddingHorizontal: 10,
-    // paddingVertical: 5,
-  },
+
   dateLabelText: {
     color: ColorSet.gray,
     fontSize: 10,
@@ -426,28 +380,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginVertical: 5,
   },
-  bottomBar: {
-    marginVertical: 20,
-    alignItems: 'center',
-  },
-  inputView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderRadius: 8,
-    backgroundColor: ColorSet.white,
-    width: screenWidth.width95 - 10,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-  },
-  sendIconView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: screenWidth.width25,
-    paddingHorizontal: 15,
-    alignSelf: 'flex-end',
-  },
+
 })
 
 export default Chat

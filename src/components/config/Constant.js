@@ -65,6 +65,9 @@ export const ColorSet = {
 }
 
 export const ImageSet = {
+
+  defaultProfileImage: 'https://firebasestorage.googleapis.com/v0/b/approachablebackend.appspot.com/o/images%2Fdefault_profile_image.png?alt=media&token=2e6a9e79-a6bf-4580-986b-dc8d30aab4df',
+
   // --------- Icons ---------
   back: require('../../assets/images/icons/back_icon.png'),
   phone: require('../../assets/images/icons/phone_icon.png'),
@@ -79,8 +82,9 @@ export const ImageSet = {
   profile: require('../../assets/images/icons/profile.jpg'),
   noMessage: require('../../assets/images/icons/no-message.png'),
   filter: require('../../assets/images/icons/filter-icon.png'),
-  defaultProfileImage:
-    'https://firebasestorage.googleapis.com/v0/b/approachablebackend.appspot.com/o/images%2Fdefault_profile_image.png?alt=media&token=2e6a9e79-a6bf-4580-986b-dc8d30aab4df',
+  accepted: require('../../assets/images/icons/accepted.png'),
+  rejected: require('../../assets/images/icons/rejected.png'),
+  ArrowRight: require('../../assets/images/icons/ArrowRight.png'),
 }
 
 export const TabType = {
@@ -93,5 +97,5 @@ export const RequestStatus = {
   opened: 'opened',
   accepted: 'accepted',
   rejected: 'rejected',
-  completed: 'completed'
+  completed: 'completed',
 }
