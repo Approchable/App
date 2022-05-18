@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Profile from '../screens/Profile/Profile'
 import CreatePost1 from '../screens/Create/CreatePost1'
 import Explore from '../screens/Explore/Explore'
+import Map from '../screens/Map/Map'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import { Icons, Icon } from '../components/Utility/Icons'
 import React, { useEffect, useRef } from 'react'
@@ -20,6 +21,14 @@ const TabArr = [
     activeIcon: 'home',
     inActiveIcon: 'home',
     component: Explore,
+  },
+  {
+    route: 'Map',
+    label: 'Map',
+    type: Icons.FontAwesome,
+    activeIcon: 'map-pin',
+    inActiveIcon: 'map-pin',
+    component: Map,
   },
   {
     route: 'Create',
@@ -68,8 +77,7 @@ export default function BottomTabNavigator() {
       }}
       screenOptions={{
         headerShown: false,
-      }}
-    >
+      }}>
       {TabArr.map((item, index, route) => {
         return (
           <Tab.Screen
@@ -110,8 +118,7 @@ const TabButton = (props) => {
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={1}
-      style={styles.container}
-    >
+      style={styles.container}>
       <Animatable.View ref={viewRef} duration={1000} style={styles.container}>
         <Icon
           type={item.type}
