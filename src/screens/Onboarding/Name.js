@@ -20,17 +20,17 @@ export default function Name({ route, navigation }) {
 
   let { result, familyName, givenName } = route.params
 
-  if (type === 'apple') {
-    familyName = familyName || ''
-    givenName = givenName || ''
-  }
   const [firstname, setFirstName] = useState(givenName)
   const [lastName, setLastName] = useState(familyName)
   const [buttonActive, setButtonActive] = useState(false)
+
   // tells me how many renders i am having.. fix this later with useMemo
 
-  console.log(result)
+  //console.log(result)
   function checkTextInputs() {
+    if (firstname == null || lastName == null) {
+      return
+    }
     console.log('firstname lenght', firstname.length)
     if (firstname.length <= 1) {
       setButtonActive(false)
@@ -38,10 +38,30 @@ export default function Name({ route, navigation }) {
       setButtonActive(true)
     }
   }
+
+  const getFirstNameFromApple = async (id) => {
+    console.log('id', id)
+
+    if (type === 'apple') {
+      AsyncStorage.getItem(result.id).then((value) => {
+        value = JSON.parse(value)
+        const names = value.fullName
+        const firstName = names.givenName
+        const lastName = names.familyName
+
+        setFirstName(firstName)
+        setLastName(lastName)
+      })
+      familyName = familyName || ''
+      givenName = givenName || ''
+    }
+  }
   useEffect(() => {
+    getFirstNameFromApple(result.id)
     updateFirstNameandCheckTextInputs(givenName)
     updateLastNameandCheckTextInputs(familyName)
   }, [])
+
   function updateFirstNameandCheckTextInputs(name) {
     givenName = name
     setFirstName((prev) => {
@@ -71,8 +91,7 @@ export default function Name({ route, navigation }) {
               fontWeight: '700',
               textAlign: 'left',
               marginVertical: 24,
-            }}
-          >
+            }}>
             What's your name?
           </Text>
           <NormalTextField
@@ -93,8 +112,7 @@ export default function Name({ route, navigation }) {
             ...styles.mainView,
             justifyContent: 'flex-end',
             marginVertical: 20,
-          }}
-        >
+          }}>
           <NormalButton
             text="Next"
             onPress={() =>

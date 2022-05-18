@@ -1,21 +1,19 @@
 import { View, Pressable, Text, StyleSheet, SafeAreaView } from 'react-native'
 import {
-  NormalButton,
   GoogleButtonWithIcon,
   AppleButtonWithIcon,
 } from '../../components/Buttons'
 import { Dimensions } from 'react-native'
 import { useState, useEffect } from 'react'
 import Center from '../../components/Utility/Center'
-import HeadingStyle from '../../components/Utility/Styles/TextStyles'
+
 import { Platform } from 'react-native'
 import LandingPageImage from '../../assets/images/assets/LandingPageImage.svg'
 import * as Google from 'expo-google-app-auth'
 import * as GoogleSignIn from 'expo-google-sign-in'
-import { HeaderText } from '../../components/Texts'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as AppleAuthentication from 'expo-apple-authentication'
 import MyStatusBar from '../../components/MyStatusBar'
-import AppHeader from '../../components/Utility/AppHeader'
 
 export default function LandingPage({ navigation }) {
   const windowWidth = Dimensions.get('window').width
@@ -40,7 +38,12 @@ export default function LandingPage({ navigation }) {
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
       }).then((credential) => {
-        console.log(credential, "===credential====")
+        //console.log(credential, '===credential====')
+        // use async storgae to save user information
+        if (credential.fullName.familyName !== null) {
+          AsyncStorage.setItem(credential.user, JSON.stringify(credential))
+        }
+
         const { email, familyName, givenName } = credential
         const result = { email: email, id: credential.user }
         const type = 'apple'
@@ -68,24 +71,6 @@ export default function LandingPage({ navigation }) {
     }
   }
 
-  const signOutApple = async () => {
-    const ebukaId = '001364.1a655f1ef31342e59f99743f70d156a6.1735'
-    try {
-      AppleAuthentication.refreshAsync({
-        user: ebukaId,
-      }).then((credential) => {})
-
-      console.log(' referesh', credential)
-    } catch (e) {
-      if (e.code === 'ERR_CANCELED') {
-        // handle that the user canceled the sign-in flow
-        console.log('Error occured tyring to sign out')
-      } else {
-        // handle other errors
-      }
-    }
-  }
-
   const handleGoogleSignIn = async () => {
     setGoogleSubmitting(true)
     console.log('test sign in')
@@ -100,8 +85,6 @@ export default function LandingPage({ navigation }) {
 
       // scopes: ['profile', 'email'],
     }
-
-    // console.log('config google  =====>>> ', config);
 
     Google.logInAsync(config)
       .then(async (result) => {
@@ -132,20 +115,17 @@ export default function LandingPage({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
-     
+
       <View style={styles.container}>
         <View style={styles.container}>
           <Center />
-
-        
         </View>
 
         <View
           style={{
             height: 430,
-            alignItems: 'center',   // marginRight: 18,
-          }}
-        >
+            alignItems: 'center', // marginRight: 18,
+          }}>
           <LandingPageImage witdth="100%" />
         </View>
         <View
@@ -156,10 +136,9 @@ export default function LandingPage({ navigation }) {
             width: windowWidth * 0.9,
             alignItems: 'center',
             justifyContent: 'flex-end',
-          
+
             marginBottom: 20,
-          }}
-        >
+          }}>
           <View style={{ width: windowWidth * 0.9, marginVertical: 8 }}>
             <GoogleButtonWithIcon
               onPress={() => handleGoogleSignIn(navigation)}

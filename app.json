@@ -37,7 +37,7 @@
         }
       },
         "infoPlist": {
-          "NSLocationWhenInUseUsageDescription": "ApproachableNative uses your location to show you nearby places."
+          "NSLocationWhenInUseUsageDescription": "ApproachableNative uses your location to show you nearby places and events."
         }
     },
     "android": {
