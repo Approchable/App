@@ -8,13 +8,11 @@ export const LOGOUT = 'LOGOUT'
 export const LOGIN_LOADING = 'LOGIN_LOADING'
 
 //actions
-
 export const Init = () => {
   console.log('Initing user....')
   return async (dispatch) => {
     try {
       var data = await AsyncStorage.getItem('user')
-
       data = JSON.parse(data)
       console.log('user found', data)
       if (data === null || data === undefined) {
@@ -63,7 +61,6 @@ export const logout = () => {
   return async (dispatch) => {
     try {
       var user = await AsyncStorage.getItem('user')
-
       user = JSON.parse(user)
       await AsyncStorage.removeItem('user')
       await AsyncStorage.removeItem('WaitlistToken')
