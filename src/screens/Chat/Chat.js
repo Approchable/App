@@ -24,6 +24,7 @@ import {
   ColorSet,
   ImageSet,
   Routes,
+  screenHeight,
   screenWidth,
 } from '../../components/config/Constant'
 import MyStatusBar from '../../components/MyStatusBar'
@@ -39,6 +40,9 @@ import {
 } from '../../components/Utility/Helper'
 import moment from 'moment'
 import { Button } from 'react-native-elements'
+import ChatHeader from '../../components/Chat/ChatHeader'
+import RequestHangout from '../../components/Chat/RequestHangout'
+import ChatBox from '../../components/Chat/ChatBox'
 
 const width = (Dimensions.get('window').width - 36) / 3.5
 
@@ -64,17 +68,19 @@ const Chat = ({ route, navigation }) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    getUserData()
-    getChat()
-    console.log('isRequestRoute =====>>>> ', isRequestRoute)
-
-    if (isRequestRoute) {
-      setIsSendMsgEnabled(false)
-    } else {
-      setIsSendMsgEnabled(true)
-    }
-    console.log('isSendMsgEnable =>', isSendMsgEnabled)
+    const unsubscribe = navigation.addListener('focus', () => {
+      getUserData()
+      getChat()
+      console.log('isRequestRoute =====>>>> ', isRequestRoute)
+      if (isRequestRoute) {
+        setIsSendMsgEnabled(true)
+      } else {
+        setIsSendMsgEnabled(false)
+      }
+    })
+    return unsubscribe
   }, [])
+
 
   const getUserData = async () => {
     if (!isRequestRoute) {
@@ -91,12 +97,13 @@ const Chat = ({ route, navigation }) => {
       }
       setLoading(false)
     } else {
-      // is from the request route
-      console.log('connection request screen 1234 ===>>> ', request)
-      const userSendingReq = request.userSendingRequest
-      console.log('connection sending req screen ===>>> ', userSendingReq)
 
-      const givenName = userSendingReq.givenName
+      // is from the request route
+      // console.log('connection request screen 1234 ===>>> ', request)
+      const userSendingReq = request.userSendingRequest
+      // console.log('connection sending req screen ===>>> ', userSendingReq)
+      const postObject = request.postObject
+      console.log('postObject ===>>> ', request.postObject)
       setConnectedUser(userSendingReq)
     }
   }
@@ -152,7 +159,8 @@ const Chat = ({ route, navigation }) => {
   const onBackButton = async () => {
     navigation.goBack()
   }
-
+  // console.log('isSendMsgEnabledddddd =>', isSendMsgEnabled)
+  const postObject = request.postObject
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -160,67 +168,21 @@ const Chat = ({ route, navigation }) => {
         style={styles.container}>
         <MyStatusBar backgroundColor="white" />
         <View style={{ flex: 1 }}>
-          <View style={[styles.topBar]}>
-            <View style={[styles.center]}>
-              <TouchableOpacity onPress={onBackButton}>
-                <Image style={[styles.backButton]} source={ImageSet.back} />
-              </TouchableOpacity>
-              <Text style={[styles.regularText]}>
-                {connectedUser && connectedUser.givenName}
-              </Text>
-            </View>
-            <View style={[styles.leftIcons]}>
-              <TouchableOpacity //onPress={onBackButton}
-              >
-                <Image style={[styles.icon]} source={ImageSet.phone} />
-              </TouchableOpacity>
-              <TouchableOpacity //onPress={onBackButton}
-              >
-                <Image style={[styles.icon]} source={ImageSet.camera} />
-              </TouchableOpacity>
-              <TouchableOpacity //onPress={onBackButton}
-              >
-                <Image style={[styles.icon]} source={ImageSet.warning} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
+          <ChatHeader
+            isSendMsgEnabled={isSendMsgEnabled}
+            onBackButton={onBackButton}
+            name={connectedUser && connectedUser.name}
+          />
           <View style={[styles.chatSection]}>
             <ScrollView
-              contentContainerStyle={{
-                flex: 1,
-                justifyContent: 'flex-end',
-                paddingBottom: 10,
-              }}>
+              contentContainerStyle={styles.scrollViewMain}>
               {isRequestRoute && (
-                <React.Fragment>
-                  <View style={styles.requestTopContainer}></View>
-                  <View style={styles.requestMainContainer}>
-                    <Image
-                      style={styles.userImage}
-                      source={{ uri: connectedUser && connectedUser.photoUrl }}
-                    />
-                    <View>
-                      <Text style={styles.userNameApproachableText}>
-                        {connectedUser && connectedUser.givenName} is
-                        Approachable!
-                      </Text>
-                      <Text style={styles.approachableConnectText}>
-                        Do you want to connect?
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.acceptRejectBtnContainer}>
-                    <Image
-                      style={[styles.iconButton]}
-                      source={ImageSet.rejected}
-                    />
-                    <Image
-                      style={[styles.iconButton]}
-                      source={ImageSet.accepted}
-                    />
-                  </View>
-                </React.Fragment>
+                <RequestHangout
+                  headline={postObject.headline}
+                  description={postObject.description}
+                  name={connectedUser && connectedUser.givenName}
+                  source={{ uri: connectedUser && connectedUser.photoUrl }}
+                />
               )}
               {!isRequestRoute &&
                 messageArray.map((item, index) => {
@@ -235,8 +197,8 @@ const Chat = ({ route, navigation }) => {
                           {item.date == today
                             ? 'Today'
                             : item.date == yesterday
-                            ? 'Yesterday'
-                            : time}
+                              ? 'Yesterday'
+                              : time}
                         </Text>
                       </View>
                       {/* {item.unRead == true && (
@@ -291,86 +253,12 @@ const Chat = ({ route, navigation }) => {
                 })}
             </ScrollView>
           </View>
-
-          <View style={styles.bottomBar}>
-            <View style={styles.inputView}>
-              <TouchableOpacity
-                disable={!isSendMsgEnabled}
-                style={styles.flexEnd}>
-                <Image
-                  style={
-                    isSendMsgEnabled
-                      ? [styles.icon, styles.enableElement]
-                      : [styles.icon, styles.disabledElement]
-                  }
-                  source={ImageSet.plus}
-                />
-              </TouchableOpacity>
-              <TextInput
-                value={message}
-                multiline={true}
-                onChangeText={(text) => setMessage(text)}
-                onContentSizeChange={(event) => {
-                  setInputHeight(event.nativeEvent.contentSize.height)
-                }}
-                placeholder={'Start typing'}
-                placeholderTextColor={ColorSet.gray}
-                editable={isSendMsgEnabled}
-                style={[
-                  styles.textInput,
-                  {
-                    height: Math.max(25, inputHeight),
-                    width:
-                      (message == '' && screenWidth.width60) ||
-                      screenWidth.width70,
-                  },
-                ]}
-              />
-              {(message == '' && (
-                <View style={styles.sendIconView}>
-                  <TouchableOpacity
-                    activeOpacity={isSendMsgEnabled ? 1.0 : 0.2}
-                    disabled={!isSendMsgEnabled}
-                    style={styles.flexEnd}>
-                    <Image
-                      style={
-                        isSendMsgEnabled
-                          ? [styles.icon, styles.enableElement]
-                          : [styles.icon, styles.disabledElement]
-                      }
-                      source={ImageSet.mic}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    disabled={!isSendMsgEnabled}
-                    style={styles.flexEnd}>
-                    <Image
-                      style={
-                        isSendMsgEnabled
-                          ? [styles.icon, styles.enableElement]
-                          : [styles.icon, styles.disabledElement]
-                      }
-                      source={ImageSet.send}
-                    />
-                  </TouchableOpacity>
-                </View>
-              )) || (
-                <TouchableOpacity
-                  disabled={!isSendMsgEnabled}
-                  onPress={() => onClickSend()}
-                  style={styles.flexEnd}>
-                  <Image
-                    style={
-                      isSendMsgEnabled
-                        ? [styles.icon, styles.enableElement]
-                        : [styles.icon, styles.disabledElement]
-                    }
-                    source={ImageSet.send}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
+          <ChatBox
+            onChangeText={(text) => setMessage(text)}
+            isSendMsgEnabled={isSendMsgEnabled}
+            isMessage={message}
+            onClickSend={() => onClickSend()}
+          />
         </View>
       </KeyboardAvoidingView>
       <Loader isVisible={loading} />
@@ -382,6 +270,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ColorSet.lightGray,
+  },
+  scrollViewMain: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingBottom: 10,
   },
   topBar: {
     paddingVertical: 10,
@@ -408,7 +301,6 @@ const styles = StyleSheet.create({
   leftIcons: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     width: screenWidth.width30,
   },
   regularText: {
@@ -420,84 +312,11 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
     marginLeft: 10,
   },
-  backButton: {
-    width: 45,
-    height: 45,
-    resizeMode: 'contain',
-  },
-  icon: {
-    width: 25,
-    height: 25,
-    resizeMode: 'contain',
-  },
-  requestTopContainer: {
-    height: 120,
-    borderColor: '#ECEEF2',
-    borderWidth: 2,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 10,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    marginLeft: 16,
-    marginRight: 16,
-    marginBottom: 7,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: 10,
-    paddingRight: 10,
-  },
-  requestMainContainer: {
-    height: 80,
-    backgroundColor: '#44BFBA33',
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 10,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    marginLeft: 16,
-    marginRight: 16,
-    marginBottom: 7,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: 10,
-    paddingRight: 10,
-  },
-  userImage: {
-    width: 45,
-    height: 45,
-    resizeMode: 'contain',
-    borderRadius: 150,
-    marginRight: 10,
-  },
-  acceptRejectBtnContainer: {
-    height: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingLeft: 16,
-    paddingRight: 16,
-  },
-  approachableConnectText: {
-    color: ColorSet.textBlack,
-    fontWeight: 'bold',
-    fontSize: 18,
-    lineHeight: 24,
-    fontFamily: 'Poppins_700Bold',
-    fontStyle: 'normal',
-  },
-  iconButton: {
-    width: 44,
-    height: 44,
-    resizeMode: 'contain',
-  },
   chatSection: {
     flex: 1,
     backgroundColor: ColorSet.white,
   },
-  textInput: {
-    maxHeight: 100,
-    paddingHorizontal: 10,
-    // paddingVertical: 5,
-  },
+
   dateLabelText: {
     color: ColorSet.gray,
     fontSize: 10,
@@ -560,34 +379,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginVertical: 5,
   },
-  bottomBar: {
-    marginVertical: 20,
-    alignItems: 'center',
-  },
-  inputView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderRadius: 8,
-    backgroundColor: ColorSet.white,
-    width: screenWidth.width95 - 10,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-  },
-  sendIconView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: screenWidth.width25,
-    paddingHorizontal: 15,
-    alignSelf: 'flex-end',
-  },
-  disabledElement: {
-    opacity: 0.5,
-  },
-  enableElement: {
-    opacity: 1.0,
-  },
+
 })
 
 export default Chat

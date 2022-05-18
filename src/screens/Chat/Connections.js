@@ -119,6 +119,7 @@ export default function Connections({ navigation }) {
   }
 
   const _getRequests = async () => {
+    setIsFetchedRequest(true)
     const user = await AsyncStorage.getItem('user')
     const userId = JSON.parse(user).id
     if (userId) {
@@ -127,7 +128,7 @@ export default function Connections({ navigation }) {
       )
       dispatch(getRequests(userId))
       const requestsData = await getUserRequests(userId)
-      setRequestsArray(requestArray)
+      setRequestsArray(requestsData)
       setTimeout(() => {
         let checker = requestsData.every(
           (i) => i.requestStatus === RequestStatus.opened
@@ -135,6 +136,7 @@ export default function Connections({ navigation }) {
         console.log('requestsData checker ===>>> ', checker)
         setRequestStatus(checker ? false : true)
       }, 500)
+      setIsFetchedRequest(false)
     } else {
       console.log(`unable to fetch current logged in user ID.`)
     }
@@ -215,7 +217,7 @@ export default function Connections({ navigation }) {
           // value={value}
           style={styles.textInput}
           placeholder={'Search'}
-          // onChangeText={onChangeText}
+        // onChangeText={onChangeText}
         />
         <Image style={styles.filterIcon} source={ImageSet.filter} />
       </View>
@@ -374,15 +376,15 @@ export default function Connections({ navigation }) {
                                   time == 'just now'
                                     ? screenWidth.width55
                                     : status == RequestStatus.pending
-                                    ? screenWidth.width60
-                                    : screenWidth.width65,
+                                      ? screenWidth.width60
+                                      : screenWidth.width65,
                               },
                             ]}>
                             {item.comments
                               ? item.comments
                               : data.givenName +
-                                ' ' +
-                                'is Approachable! start the chat.'}
+                              ' ' +
+                              'is Approachable! start the chat.'}
                           </Text>
                         </View>
                       </View>
