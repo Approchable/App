@@ -36,9 +36,11 @@
           "reservedClientId": "com.googleusercontent.apps.724006010963-er1i8nf3hsoeibm6vg8m01au6gqq8bhb"
         }
       },
-        "infoPlist": {
-          "NSLocationWhenInUseUsageDescription": "ApproachableNative uses your location to show you nearby places and events."
-        }
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "ApproachableNative uses your location to show you nearby places and events.",
+        "NSCameraUsageDescription": "ApproachableNative uses your camera to take photos for your posts.",
+        "NSPhotoLibraryUsageDescription": "ApproachableNative acesses your photos to let you share them with your friends."
+      }
     },
     "android": {
       "adaptiveIcon": {
