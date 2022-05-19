@@ -11,11 +11,13 @@ import {
   query,
   Timestamp,
   updateDoc,
-  doc
+  doc,
+  setDoc
 } from 'firebase/firestore';
 import { getDatabase, ref, set, get, child } from 'firebase/database';
 import { getStorage, ref as storageRef } from 'firebase/storage';
-import { setDataByDate } from './src/components/Utility/Helper';
+import { getCurrentDate, setDataByDate } from './src/components/Utility/Helper';
+import { RequestStatus } from './src/components/config/Constant';
 
 
 const firebaseConfig = {
@@ -175,12 +177,13 @@ export async function getConnectionById(connectionId) {
   }
 }
 
-// get user Requests by id
-export async function getUserRequests(userId) {
+// get active user requests (with status pending or opened) by user id
+export async function getActiveUserRequests(userId) {
   // console.log("sdsds");
   const requestsRef = collection(fireStore, 'users', userId, 'usersWhoRequested');
   try {
-    const querySnapshot = await getDocs(requestsRef);
+    const q = query(requestsRef, where('requestStatus', 'in', [RequestStatus.pending, RequestStatus.opened]))
+    const querySnapshot = await getDocs(q);
     const data = querySnapshot.docs.map(doc => doc.data());
     // console.log('data requests ===>>> ', data);
     return data
@@ -260,6 +263,42 @@ export async function sendChatMessage(messageObject) {
     const docRef = await addDoc(messagesRef, newMessage)
     console.log('sendChatMessage message sent successfully ==> ', docRef)
     return docRef
+  } catch (error) {
+    console.log('sendChatMessage message ==> ', error)
+    return null
+  }
+}
+
+export async function createNewConnectionWithSystemMessage(obj) {
+  const randomId = Date.now()
+  const today = getCurrentDate()
+  const sentAtTimeStamp = Timestamp.fromDate(today)
+  const newConnection = {
+    id: obj.id,
+    isDeleted: false,
+    createdAt: sentAtTimeStamp,
+    updatedAt: sentAtTimeStamp,
+    requestId: obj.requestId,
+    participantIds: [obj.myId, obj.otherId],
+  }
+
+  const systemMessage = {
+    id: `msgId_${randomId + 2}`,
+    isDeleted: false,
+    isRead: true,
+    mediaFiles: obj.mediaFiles,
+    message: 'Start the chat with <otherUserName>',
+    sentAt: sentAtTimeStamp,
+    type: "system",
+  }
+
+  // console.log('newConnection ==> ', newConnection)
+
+  try {
+    await setDoc(doc(fireStore, 'connections', obj.id), newConnection)
+    console.log('new Connection created successfully ==> ')
+    await setDoc(doc(fireStore, 'connections', obj.id, 'messages', systemMessage.id), systemMessage)
+    console.log('====>> system message created successfully <<=====')
   } catch (error) {
     console.log('sendChatMessage message ==> ', error)
     return null

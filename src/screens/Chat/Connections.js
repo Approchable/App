@@ -20,7 +20,7 @@ import {
 import MyStatusBar from '../../components/MyStatusBar'
 import {
   getConnectionById,
-  getUserRequests,
+  getActiveUserRequests,
   updateRequestStatus,
 } from '../../../firebase'
 import { SafeAreaView } from 'react-native'
@@ -31,30 +31,30 @@ import { dateDifference } from '../../components/Utility/Helper'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const DataArray = [
-  {
-    name: 'Jane',
-    lastMassage: 'hi!',
-    time: '2h',
-    count: 8,
-  },
-  {
-    name: 'Leslie',
-    lastMassage: 'In general, everything is fine, but..',
-    time: '14h',
-    count: 1,
-  },
-  {
-    name: 'Kristin',
-    lastMassage: 'Amet minim mollit non desseermo..',
-    time: '14h',
-    count: 0,
-  },
-  {
-    name: 'Dianne',
-    lastMassage: 'Amet minim mollit non desseermo..',
-    time: '12h',
-    count: 0,
-  },
+  //   {
+  //     name: 'Jane',
+  //     lastMassage: 'hi!',
+  //     time: '2h',
+  //     count: 8,
+  //   },
+  //   {
+  //     name: 'Leslie',
+  //     lastMassage: 'In general, everything is fine, but..',
+  //     time: '14h',
+  //     count: 1,
+  //   },
+  //   {
+  //     name: 'Kristin',
+  //     lastMassage: 'Amet minim mollit non desseermo..',
+  //     time: '14h',
+  //     count: 0,
+  //   },
+  //   {
+  //     name: 'Dianne',
+  //     lastMassage: 'Amet minim mollit non desseermo..',
+  //     time: '12h',
+  //     count: 0,
+  //   },
 ]
 const RequestsDataArray = [
   {
@@ -123,16 +123,12 @@ export default function Connections({ navigation }) {
     const user = await AsyncStorage.getItem('user')
     const userId = JSON.parse(user).id
     if (userId) {
-      console.log(
-        `trying to fetch the current logged in user(${userId}) requests`
-      )
+      console.log(`trying to fetch the current logged in user(${userId}) requests`)
       dispatch(getRequests(userId))
-      const requestsData = await getUserRequests(userId)
+      const requestsData = await getActiveUserRequests(userId)
       setRequestsArray(requestsData)
       setTimeout(() => {
-        let checker = requestsData.every(
-          (i) => i.requestStatus === RequestStatus.opened
-        )
+        let checker = requestsData.every((i) => i.requestStatus === RequestStatus.opened)
         console.log('requestsData checker ===>>> ', checker)
         setRequestStatus(checker ? false : true)
       }, 500)

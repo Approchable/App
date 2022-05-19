@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderBottomLeftRadius: 0,
         minWidth: screenWidth.width10,
-        maxWidth: screenWidth.width90,
+        maxWidth: screenWidth.width60,
     },
     dateLabelText: {
         color: ColorSet.gray,
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins_400Regular',
         fontStyle: 'normal',
         minWidth: screenWidth.width5,
-        maxWidth: screenWidth.width75,
+        maxWidth: screenWidth.width65,
     },
 })
 

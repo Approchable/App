@@ -1,21 +1,21 @@
 import moment from 'moment'
 
 export function getTimeFromMilliseconds(timestamp) {
-  const date = new Date(timestamp * 1000)
-  const dateTime2 = moment(date).format('h:mm a')
-  return dateTime2
+    const date = new Date(timestamp * 1000)
+    const dateTime2 = moment(date).format('h:mm a')
+    return dateTime2
 }
 
 export function getDateFromDateTime(timestamp) {
-  const time = timestamp
-  const dateTime2 = moment(time).format('YYYY-MM-DD')
-  return dateTime2
+    const time = timestamp
+    const dateTime2 = moment(time).format('YYYY-MM-DD')
+    return dateTime2
 }
 
 export function getCurrentDate() {
-  const currentDate = new Date()
-  console.log('currentDate ===>>> ', currentDate)
-  return currentDate
+    const currentDate = new Date()
+    console.log('currentDate ===>>> ', currentDate)
+    return currentDate
 }
 
 export function setDataByDate(array) {

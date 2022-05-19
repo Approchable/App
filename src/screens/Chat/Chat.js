@@ -29,6 +29,7 @@ import {
 } from '../../components/config/Constant'
 import MyStatusBar from '../../components/MyStatusBar'
 import {
+  createNewConnectionWithSystemMessage,
   getAllMessagesForConnectionId,
   getUserDataById,
   sendChatMessage,
@@ -127,7 +128,7 @@ const Chat = ({ route, navigation }) => {
     // let currentTime = getCurrentTime();
     const today = getCurrentDate()
     const connectionId = connection.id
-    const msgId = `msgid_${today.getMilliseconds()}`
+    const msgId = `msgid_${today}`
     const isRead = false
     const isDeleted = false
     const mediaFiles = []
@@ -161,6 +162,18 @@ const Chat = ({ route, navigation }) => {
   const onBackButton = async () => {
     navigation.goBack()
   }
+
+  const onRequestAccepted = async () => {
+    const today = Date.now()
+    const data = {
+      id: `conId_${today}`,
+      myId: request.userReciving.id,
+      otherId: request.userSendingRequest.id,
+      requestId: request.requestID,
+      mediaFiles: [],
+    }
+    await createNewConnectionWithSystemMessage(data)
+  }
   // console.log('isSendMsgEnabledddddd =>', isSendMsgEnabled)
   const postObject = request.postObject
   return (
@@ -189,7 +202,7 @@ const Chat = ({ route, navigation }) => {
                     comment={request.comment}
                     accepted={accepted}
                     rejected={rejected}
-                    onAccepted={() => setAccepted(true)}
+                    onAccepted={onRequestAccepted}
                   // onRejected={() => setRejected(true)}
                   />
                   {accepted &&
