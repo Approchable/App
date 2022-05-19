@@ -55,7 +55,9 @@ function ReportModal({ visible, onCancel }) {
           }}>
           <ModalBarTop />
 
-          {currentStep == 'STEP_ONE' && <StepOne goToStepTwo={goToStepTwo} />}
+          {currentStep == 'STEP_ONE' && (
+            <StepOne goToStepTwo={goToStepTwo} onCancel={onCancel} />
+          )}
           {currentStep == 'STEP_TWO' && (
             <StepTwo goToStepThree={goToStepThree} />
           )}
@@ -75,19 +77,42 @@ function ReportModal({ visible, onCancel }) {
     </SafeAreaView>
   )
 }
-const StepOne = ({ goToStepTwo }) => {
+const StepOne = ({ goToStepTwo, onCancel }) => {
+  const handleBlock = () => {
+    Alert.alert(
+      'Are you sure you want to block this user?',
+      'This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => onCancel(),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: onCancel() },
+      ],
+      { cancelable: false }
+    )
+  }
   return (
-    <TouchableOpacity onPress={goToStepTwo} style={styles.reportButton}>
-      <Image
-        style={{ width: 25, height: 25, marginRight: 10 }}
-        source={ImageSet.warning}
-      />
-      <Text style={styles.options}>Report</Text>
-    </TouchableOpacity>
+    <>
+      <TouchableOpacity onPress={goToStepTwo} style={styles.reportButton}>
+        <Image
+          style={{ width: 25, height: 25, marginRight: 10 }}
+          source={ImageSet.warning}
+        />
+        <Text style={styles.options}>Report</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleBlock} style={styles.reportButton}>
+        <Image
+          style={{ width: 25, height: 25, marginRight: 10 }}
+          source={ImageSet.eyeSlash}
+        />
+        <Text style={styles.options}>Block</Text>
+      </TouchableOpacity>
+    </>
   )
 }
 const StepTwo = ({ goToStepThree }) => {
-  
   // check if reason was block and then re-word copy
   return (
     <>
@@ -114,7 +139,7 @@ const StepTwo = ({ goToStepThree }) => {
   )
 }
 const StepThree = ({ onSubmit, setReason, reason }) => {
-  console.log(reason, "reason")
+  console.log(reason, 'reason')
   return (
     <KeyboardAwareScrollView extraHeight={60}>
       <View style={{ ...styles.titleDesc, marginTop: 20, flex: 1 }}>

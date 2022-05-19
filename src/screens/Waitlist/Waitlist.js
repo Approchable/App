@@ -33,6 +33,7 @@ export default function Waitlist({ navigation, route }) {
   const [code, setCode] = useState('0123456789')
 
   const approachableUrl = 'https://www.approachable.ai/'
+  const termsAndSerivicesUrl = 'https://www.approachable.ai/license-agreement'
   const dispatch = useDispatch()
 
   const openUrl = async (url) => {
@@ -90,6 +91,9 @@ export default function Waitlist({ navigation, route }) {
 
               <View style={{ marginTop: -20 }}>
                 <SmallerText content="Looks like you are a first time Approachable user! My name is Matt Williams and my co-founder's name is Ebuka Egbunam. We both will personally like to say thank you and welcome to a community that aims to bring the world closer together" />
+              
+               
+              
               </View>
               {/* <View style={{marginTop: -20}}>
                 <SmallerText content="Thanks for joining Approachable!  We're adding people gradually to make sure nothing breaks, so we're placing you on the waitlist. Make sure you keep your notifications on, and when its your turn we'll send you a code to enter that will let you in." />
@@ -118,7 +122,7 @@ export default function Waitlist({ navigation, route }) {
               /> */}
 
               <NormalButton
-                text="Welcome !! "
+                text="Welcome !!"
                 onPress={() => _verifyCode(code)} //clode app
                 inActive={true}
                 hollow
@@ -127,7 +131,14 @@ export default function Waitlist({ navigation, route }) {
               <TouchableOpacity onPress={() => openUrl(approachableUrl)}>
                 <RegularText
                   content="Click here to learn more about us!"
-                  moreStyles={{ color: '#1183ca', fontSize: 12 }}
+                  moreStyles={{ color: '#1183ca', fontSize: 12 , marginBottom: 0}}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => openUrl(termsAndSerivicesUrl)}>
+                <RegularText
+                  content="By clicking on WELCOME you agree to all terms and services. Click here to read!"
+                  moreStyles={{ color: '#1183ca', fontSize: 8 , marginTop:0}}
                 />
               </TouchableOpacity>
             </View>

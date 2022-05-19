@@ -11,7 +11,7 @@
         }
       ]
     ],
-    "version": "1.0.7",
+    "version": "1.0.8",
     "orientation": "portrait",
     "packagerOpts": {
       "config": "metro.config.js"
@@ -30,7 +30,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.approachable.approachablenative",
-      "buildNumber": "1.0.7",
+      "buildNumber": "1.0.8",
       "config": {
         "googleSignIn": {
           "reservedClientId": "com.googleusercontent.apps.724006010963-er1i8nf3hsoeibm6vg8m01au6gqq8bhb"
