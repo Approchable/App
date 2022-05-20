@@ -269,8 +269,8 @@ export async function sendChatMessage(messageObject) {
   }
 }
 
-export async function createNewConnectionWithSystemMessage(obj) {
-  const randomId = Date.now()
+export async function createNewConnectionWithSystemMessage(obj, systemMessage) {
+
   const today = getCurrentDate()
   const sentAtTimeStamp = Timestamp.fromDate(today)
   const newConnection = {
@@ -282,15 +282,15 @@ export async function createNewConnectionWithSystemMessage(obj) {
     participantIds: [obj.myId, obj.otherId],
   }
 
-  const systemMessage = {
-    id: `msgId_${randomId + 2}`,
-    isDeleted: false,
-    isRead: true,
-    mediaFiles: obj.mediaFiles,
-    message: 'Start the chat with <otherUserName>',
-    sentAt: sentAtTimeStamp,
-    type: "system",
-  }
+  // const systemMessage = {
+  //   id: `msgId_${randomId + 2}`,
+  //   isDeleted: false,
+  //   isRead: true,
+  //   mediaFiles: obj.mediaFiles,
+  //   message: 'Start the chat with <otherUserName>',
+  //   sentAt: sentAtTimeStamp,
+  //   type: "system",
+  // }
 
   // console.log('newConnection ==> ', newConnection)
 

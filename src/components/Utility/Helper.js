@@ -1,6 +1,8 @@
 import moment from 'moment'
 
 export function getTimeFromMilliseconds(timestamp) {
+
+    console.log("getTimeFromMilliseconds ==> ", timestamp);
     const date = new Date(timestamp * 1000)
     const dateTime2 = moment(date).format('h:mm a')
     return dateTime2

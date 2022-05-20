@@ -100,3 +100,9 @@ export const RequestStatus = {
   rejected: 'rejected',
   completed: 'completed',
 }
+
+export const MessageTypeStatus = {
+  system: 'system',
+  user: 'user',
+  requestAcceptance: 'request_acceptance'
+}

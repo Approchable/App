@@ -173,7 +173,13 @@ export default function Connections({ navigation }) {
       isRequestRoute: true,
       connection: connections,
       request: request,
+      onGoBack: () => onRefresh()
     })
+  }
+
+  const onRefresh = () => {
+    tabsChangingHandler(TabType.connections)
+    console.log('=============================> on go back function called successfully <=============================');
   }
 
   const tabsChangingHandler = (tabType) => {

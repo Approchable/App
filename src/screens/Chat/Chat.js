@@ -23,6 +23,7 @@ import { NormalTextField } from '../../components/TextField'
 import {
   ColorSet,
   ImageSet,
+  RequestStatus,
   Routes,
   screenHeight,
   screenWidth,
@@ -33,6 +34,7 @@ import {
   getAllMessagesForConnectionId,
   getUserDataById,
   sendChatMessage,
+  updateRequestStatus,
 } from '../../../firebase'
 import Loader from '../../components/Loader'
 import {
@@ -51,6 +53,7 @@ const Chat = ({ route, navigation }) => {
   const connection = route.params.connection
   const request = route.params.request
   const isRequestRoute = route.params.isRequestRoute
+
   // const connectedUser = useSelector(state => state.getConnectionUserReducer.connectedUser);
   // const connections = useSelector(state => state.GetConnectionsReducer.connections);
   //TODO: Need to fetch the current user from secure items or aysnc storage
@@ -68,6 +71,8 @@ const Chat = ({ route, navigation }) => {
   const [isSendMsgEnabled, setIsSendMsgEnabled] = useState(false)
   const [accepted, setAccepted] = useState(false)
   const [rejected, setRejected] = useState(false)
+  const [systemMsg, setSystemMsg] = useState(undefined)
+
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -160,10 +165,18 @@ const Chat = ({ route, navigation }) => {
   }
 
   const onBackButton = async () => {
-    navigation.goBack()
+    route.params.onGoBack();
+    const goback = navigation.goBack()
+    // console.log('goback ===========>>> ', goback);
   }
 
-  const onRequestAccepted = async () => {
+  const onRequestAcceptBtnAction = async () => {
+
+    // 1. Update the request status to `accepted
+
+    await updateRequestStatus(request.userReciving.id, request.requestID, RequestStatus.accepted)
+
+    // 2. create new connection with system message
     const today = Date.now()
     const data = {
       id: `conId_${today}`,
@@ -172,10 +185,30 @@ const Chat = ({ route, navigation }) => {
       requestId: request.requestID,
       mediaFiles: [],
     }
-    await createNewConnectionWithSystemMessage(data)
+
+    // system message
+    const sentAtTimeStamp = getCurrentDate()
+    const systemMessage = {
+      id: `msgId_${today}`,
+      isDeleted: false,
+      isRead: false,
+      mediaFiles: [],
+      message: 'Start the chat with <otherUserName>',
+      sentAt: sentAtTimeStamp,
+      type: "system",
+    }
+    setSystemMsg(systemMessage)
+
+    await createNewConnectionWithSystemMessage(data, systemMessage)
+
+    // 3. Update UI
+    setAccepted(true)
+    setIsSendMsgEnabled(false)
+
   }
   // console.log('isSendMsgEnabledddddd =>', isSendMsgEnabled)
   const postObject = request.postObject
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -200,9 +233,11 @@ const Chat = ({ route, navigation }) => {
                     name={connectedUser && connectedUser.givenName}
                     source={{ uri: connectedUser && connectedUser.photoUrl }}
                     comment={request.comment}
+                    screeningQuestion={postObject.screeningQuestion}
+                    screeningAnswer={request.screeningAnswer}
                     accepted={accepted}
                     rejected={rejected}
-                    onAccepted={onRequestAccepted}
+                    onAccepted={onRequestAcceptBtnAction}
                   // onRejected={() => setRejected(true)}
                   />
                   {accepted &&
@@ -214,7 +249,9 @@ const Chat = ({ route, navigation }) => {
                               styles.dateLabelText,
                               { marginRight: 10 },
                             ]}>
-                            {'12m'}
+                            {systemMsg && getTimeFromMilliseconds(
+                              systemMsg.sentAt
+                            )}
                           </Text>
                           <Text style={styles.messagesText}>
                             {`Start the chat with ${connectedUser.givenName}`}

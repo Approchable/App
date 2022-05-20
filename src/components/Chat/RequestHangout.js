@@ -15,7 +15,7 @@ import {
 import { ColorSet, ImageSet, screenHeight, screenWidth } from "../config/Constant"
 
 const RequestHangout = (props) => {
-    const { headline, description, source, name, comment, accepted, rejected, onAccepted, onRejected } = props
+    const { headline, description, source, name, comment, screeningQuestion, screeningAnswer, accepted, rejected, onAccepted, onRejected } = props
     return (
         <View>
             <View style={styles.requestTopContainer}>
@@ -29,7 +29,7 @@ const RequestHangout = (props) => {
                     {description}
                 </Text>
             </View>
-            {!comment ?
+            {!comment && !screeningAnswer ?
                 <View style={styles.requestMainContainer}>
                     {accepted &&
                         <View style={styles.tick}>
@@ -58,10 +58,11 @@ const RequestHangout = (props) => {
                     }
                     <View>
                         <Text style={styles.userNameApproachableText}>
-                            {name} is Approachable!
+                            {screeningQuestion ?
+                                `${name} answered your question, and is approachable!` : `${name} is Approachable!`}
                         </Text>
                         <Text style={styles.approachableConnectText}>
-                            Do you want to connect?
+                            {screeningQuestion ? screeningQuestion : 'Do you want to connect'}
                         </Text>
                     </View>
                     <View style={styles.rightMessageView}>
@@ -71,7 +72,7 @@ const RequestHangout = (props) => {
                         />
                         <View style={styles.rightMessageText}>
                             <Text style={styles.messagesText}>
-                                {comment}
+                                {comment ? comment : screeningAnswer}
                             </Text>
                             <Text
                                 style={styles.dateLabelText}>
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
     },
     userNameApproachableText: {
         fontSize: 14,
-        lineHeight: 24,
+        lineHeight: 22,
         fontWeight: '400',
         color: ColorSet.dimGray
     },
