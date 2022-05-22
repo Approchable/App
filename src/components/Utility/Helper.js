@@ -16,13 +16,20 @@ export function getDateFromDateTime(timestamp) {
 
 export function getCurrentDate() {
     const currentDate = new Date()
-    console.log('currentDate ===>>> ', currentDate)
+    // console.log('currentDate ===>>> ', currentDate)
     return currentDate
+}
+
+export function generateRandomId() {
+    var randomId;
+    randomId = Date.now()
+    console.log('randomId ===>>> ', randomId);
+    return randomId
 }
 
 export function setDataByDate(array) {
     const groups = array.reduce((groups, message) => {
-        const date = getDateFromDateTime(message.sent_at.toDate())
+        const date = getDateFromDateTime(message.sentAt.toDate())
         if (!groups[date]) {
             groups[date] = [];
         }

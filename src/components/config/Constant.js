@@ -102,7 +102,7 @@ export const RequestStatus = {
 }
 
 export const MessageTypeStatus = {
-  system: 'system',
+  systemStartChat: 'system_start_chat',
+  systemRequestAccept: 'system_request_accept',
   user: 'user',
-  requestAcceptance: 'request_acceptance'
 }

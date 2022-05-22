@@ -111,7 +111,7 @@ export default function Connections({ navigation }) {
   }, [])
 
   useEffect(() => {
-    console.log('requestArray.length ===>>> ', requestArray.length)
+    // console.log('requestArray.length ===>>> ', requestArray.length)
   }, [])
 
   const _getConnections = async () => {
@@ -123,18 +123,18 @@ export default function Connections({ navigation }) {
     const user = await AsyncStorage.getItem('user')
     const userId = JSON.parse(user).id
     if (userId) {
-      console.log(`trying to fetch the current logged in user(${userId}) requests`)
+      // console.log(`trying to fetch the current logged in user(${userId}) requests`)
       dispatch(getRequests(userId))
       const requestsData = await getActiveUserRequests(userId)
       setRequestsArray(requestsData)
       setTimeout(() => {
         let checker = requestsData.every((i) => i.requestStatus === RequestStatus.opened)
-        console.log('requestsData checker ===>>> ', checker)
+        // console.log('requestsData checker ===>>> ', checker)
         setRequestStatus(checker ? false : true)
       }, 500)
       setIsFetchedRequest(false)
     } else {
-      console.log(`unable to fetch current logged in user ID.`)
+      // console.log(`unable to fetch current logged in user ID.`)
     }
   }
 
@@ -179,7 +179,7 @@ export default function Connections({ navigation }) {
 
   const onRefresh = () => {
     tabsChangingHandler(TabType.connections)
-    console.log('=============================> on go back function called successfully <=============================');
+    // console.log('=============================> on go back function called successfully <=============================');
   }
 
   const tabsChangingHandler = (tabType) => {
@@ -206,7 +206,7 @@ export default function Connections({ navigation }) {
     let checker = requestArray.every(
       (i) => i.requestStatus === RequestStatus.opened
     )
-    console.log(' checker ========>>>> ', checker)
+    // console.log(' checker ========>>>> ', checker)
     setRequestStatus(checker ? false : true)
   }
 
