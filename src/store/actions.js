@@ -16,14 +16,17 @@ import {
   CONNECTIONS_USER_ERROR,
   GET_ALL_REQUESTS,
   GET_ALL_REQUESTS_ERROR,
+  GET_USER_CONNECTIONS_BY_ID,
+  USER_CONNECTIONS_LOADING,
+  GET_USER_CONNECTIONS_BY_ID_ERROR,
 } from './actionTypes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   deleteUserData,
   getUserDataById,
   getConnectionById,
+  getUserConnectionsById,
   getPostsFromFireStore,
-
   writeUserData,
 
 } from '../../firebase';
@@ -179,6 +182,38 @@ export const getConnections = connectionId => {
       console.log(err);
       dispatch({
         type: GET_CONNECTIONS_BY_ID_ERROR,
+        payload: {
+          error: err,
+          loading: false,
+        },
+      });
+    }
+  };
+};
+
+export const getUserConnections = userId => {
+  return async dispatch => {
+    dispatch({
+      type: USER_CONNECTIONS_LOADING,
+      payload: {
+        loading: true,
+      },
+    });
+    try {
+      const connections = await getUserConnectionsById(userId);
+      if (connections) {
+        dispatch({
+          type: GET_USER_CONNECTIONS_BY_ID,
+          payload: {
+            connections: connections,
+            loading: false,
+          },
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      dispatch({
+        type: GET_USER_CONNECTIONS_BY_ID_ERROR,
         payload: {
           error: err,
           loading: false,

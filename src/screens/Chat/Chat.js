@@ -57,7 +57,7 @@ const Chat = ({ route, navigation }) => {
   const isRequestRoute = route.params.isRequestRoute
 
   //TODO: Need to fetch the current user from secure items or aysnc storage
-  const [user, setUser] = useState(undefined)
+  const [user, setUser] = useState('')
   const [connectedUser, setConnectedUser] = useState()
   const [messageArray, setMessageArray] = useState([])
   // const [participentId, setParticipentId] = useState(connections.participent_id[0]);
@@ -67,7 +67,7 @@ const Chat = ({ route, navigation }) => {
   const [isSendMsgEnabled, setIsSendMsgEnabled] = useState(false)
   const [accepted, setAccepted] = useState(false)
   const [rejected, setRejected] = useState(false)
-  const [connectionId, setConnectionId] = useState(undefined)
+  const [connectionId, setConnectionId] = useState()
 
   const dispatch = useDispatch()
 
@@ -87,13 +87,11 @@ const Chat = ({ route, navigation }) => {
 
 
   const getCurrentUserData = async () => {
-
     var user = await AsyncStorage.getItem('user')
     console.log("Current User Info --> ", user)
     const u = JSON.parse(user)
     console.log('user id is', u.id)
     setUser(u)
-
   }
 
   const getUserData = async () => {
@@ -135,6 +133,14 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
+  const updateChat = async (messageObj) => {
+    var newChat = []
+    newChat = messageArray
+    console.log('newChat ======================>>>> ', newChat);
+    // newChat.push(messageObj)
+    // setMessageArray(newChat)
+  }
+
   const onClickSend = () => {
     // let currentTime = getCurrentTime();
     const today = getCurrentDate()
@@ -162,8 +168,8 @@ const Chat = ({ route, navigation }) => {
         senderId: senderId,
         type: MessageTypeStatus.user,
       }
-      sendChatMessage(newMessage)
-      getChat() // TODO: Might need to get updated messages from firestorer
+      // sendChatMessage(newMessage)
+      updateChat(newMessage) // TODO: Might need to get updated messages from firestorer
       setMessage('')
     }
   }
@@ -176,6 +182,7 @@ const Chat = ({ route, navigation }) => {
 
 
   const onRequestAcceptBtnAction = async () => {
+    setLoading(true)
     const randomConnectionId = `${uuid.v4()}`
 
     // 1. Update the request status to `accepted
@@ -186,13 +193,11 @@ const Chat = ({ route, navigation }) => {
     setTimeout(async () => {
 
       // set connection ID for futurre chat messages
-
-
-      // console.log('randomConnectionId =====>>> ', randomConnectionId);
       const chat = await getAllMessagesForConnectionId(randomConnectionId)
       if (chat) {
         // console.log('chat ============== : ', chat);
         setMessageArray(chat)
+        setLoading(false)
       }
     }, 2000);
 

@@ -178,6 +178,19 @@ export async function getConnectionById(connectionId) {
   }
 }
 
+export async function getUserConnectionsById(userId) {
+  const connectionsRef = collection(fireStore, 'connections')
+  try {
+    const q = query(connectionsRef, where('participantIds', 'array-contains', userId))
+    const querySnapshot = await getDocs(q)
+    const data = querySnapshot.docs.map((doc) => doc.data())
+    return data
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error)
+    return null
+  }
+}
+
 // get active user requests (with status pending or opened etc.) by user id
 export async function getActiveUserRequests(userId) {
   const requestsRef = collection(fireStore, 'users', userId, 'usersWhoRequested');
@@ -248,14 +261,6 @@ export async function createNewConnectionWithSystemMessage(requestObj, conId) {
   const today = getCurrentDate()
   const sentAtTimeStamp = Timestamp.fromDate(today)
 
-  const newConnection = {
-    id: conId,
-    isDeleted: false,
-    createdAt: sentAtTimeStamp,
-    updatedAt: sentAtTimeStamp,
-    participantIds: [requestObj.userReciving.id, requestObj.userSendingRequest.id],
-  }
-
   const systemRequestAcceptMessage = {
     id: `${uuid.v4()}`,
     connectionId: conId,
@@ -277,6 +282,17 @@ export async function createNewConnectionWithSystemMessage(requestObj, conId) {
     message: 'Start the chat with <otherUserName>',
     sentAt: sentAtTimeStamp,
     type: MessageTypeStatus.systemStartChat,
+  }
+
+  const newConnection = {
+    id: conId,
+    isDeleted: false,
+    createdAt: sentAtTimeStamp,
+    updatedAt: sentAtTimeStamp,
+    userReceiving: requestObj.userReciving,
+    userSendingRequest: requestObj.userSendingRequest,
+    participantIds: [requestObj.userReciving.id, requestObj.userSendingRequest.id],
+    lastMessage: systemStartChatMessage
   }
 
   try {

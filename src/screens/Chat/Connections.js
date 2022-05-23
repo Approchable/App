@@ -21,6 +21,7 @@ import MyStatusBar from '../../components/MyStatusBar'
 import {
   getConnectionById,
   getActiveUserRequests,
+  getUserConnectionsById,
   updateRequestStatus,
 } from '../../../firebase'
 import { SafeAreaView } from 'react-native'
@@ -86,13 +87,12 @@ export default function Connections({ navigation }) {
   )
   // const loading = useSelector((state) => state.GetConnectionsReducer.loading)
   const [conId, setConId] = useState('conid_12345680')
-  const [conId2, setConId2] = useState('101432345899135768743')
   const [connectionTab, setConnectionTab] = useState(true)
   const [requestTab, setRequestTab] = useState(false)
   const [isFetched, setIsFetched] = useState(true)
   const [isFetchedRequest, setIsFetchedRequest] = useState(false)
   const [requestStatus, setRequestStatus] = useState(false)
-  const [connectionsArray, setConnectionsArray] = useState(DataArray)
+  const [connectionsArray, setConnectionsArray] = useState([])
   const [requestArray, setRequestsArray] = useState([])
   const [currentUserId, setCurrentUserId] = useState(undefined)
 
@@ -102,10 +102,10 @@ export default function Connections({ navigation }) {
     const unsubscribe = navigation.addListener('focus', () => {
       _getRequests()
       _getConnections()
-      setTimeout(() => {
-        // checkStatus()
-        setIsFetched(false)
-      }, 2000)
+      // setTimeout(() => {
+      //   // checkStatus()
+      //   setIsFetched(false)
+      // }, 2000)
     })
     return unsubscribe
   }, [])
@@ -115,7 +115,18 @@ export default function Connections({ navigation }) {
   }, [])
 
   const _getConnections = async () => {
-    dispatch(getConnections(conId))
+
+    setIsFetched(true)
+    const user = await AsyncStorage.getItem('user')
+    const userId = JSON.parse(user).id
+    if (userId) {
+
+      const connectionsData = await getUserConnectionsById(userId)
+      setConnectionsArray(connectionsData)
+      setIsFetched(false)
+    } else {
+      // console.log(`unable to fetch current logged in user ID.`)
+    }
   }
 
   const _getRequests = async () => {
@@ -278,6 +289,33 @@ export default function Connections({ navigation }) {
         connectionsArray.length > 0 ? (
           <View style={styles.mainView}>
             {connectionsArray.map((item, index) => {
+              console.log(item)
+              const time = dateDifference(item.createdAt.seconds)
+              const userReceiving = item.userReceiving
+              console.log("User Receiver --> ", userReceiving)
+              const userSending = item.userSendingRequest
+              console.log("User Sender --> ", userSending)
+              const currentId = '113582845232411943502'
+
+              const lastMessage = item.lastMessage
+              //get other user participant ID
+
+              // detect current user from userReceiving and userSending
+              let currentUser;
+              let otherUser;
+              if (userReceiving != undefined && userReceiving.id == currentId) {
+                currentUser = userReceiving
+                otherUser = userSending
+              } else {
+                otherUser = userReceiving
+                currentUser = userSending
+              }
+
+              console.log("User Current --> ", currentUser)
+              console.log("User Other --> ", otherUser)
+
+              let message = lastMessage.message.replace("<otherUserName>", otherUser.givenName)
+
               return (
                 <SkeletonContent
                   key={index}
@@ -297,19 +335,19 @@ export default function Connections({ navigation }) {
                     <View style={styles.centerRowAlign}>
                       <Image
                         style={styles.userImage}
-                        source={ImageSet.profile}
+                        source={{ uri: otherUser && otherUser.photoUrl }}
                       />
                       <View>
-                        <Text style={styles.userName}>{item.name}</Text>
+                        <Text style={styles.userName}>{otherUser && otherUser.name}</Text>
                         <View style={styles.lastMessageView}>
                           <Text
                             numberOfLines={1}
                             style={styles.lastMessageText}>
-                            {item.lastMassage}
+                            {message}
                           </Text>
                         </View>
                       </View>
-                      <Text style={styles.time}>{'  ' + item.time}</Text>
+                      <Text style={styles.time}>{'  ' + time}</Text>
                     </View>
                     {(item.count && (
                       <View style={styles.messageCountView}>
