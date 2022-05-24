@@ -92,9 +92,10 @@ export default function Connections({ navigation }) {
   const [isFetched, setIsFetched] = useState(true)
   const [isFetchedRequest, setIsFetchedRequest] = useState(false)
   const [requestStatus, setRequestStatus] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState(false)
   const [connectionsArray, setConnectionsArray] = useState([])
   const [requestArray, setRequestsArray] = useState([])
-  const [currentUserId, setCurrentUserId] = useState(undefined)
+  const [user, setUser] = useState('')
 
   const dispatch = useDispatch()
 
@@ -102,27 +103,37 @@ export default function Connections({ navigation }) {
     const unsubscribe = navigation.addListener('focus', () => {
       _getRequests()
       _getConnections()
-      // setTimeout(() => {
-      //   // checkStatus()
-      //   setIsFetched(false)
-      // }, 2000)
+      getCurrentUserData()
     })
     return unsubscribe
   }, [])
 
-  useEffect(() => {
-    // console.log('requestArray.length ===>>> ', requestArray.length)
-  }, [])
+
+  const getCurrentUserData = async () => {
+    var user = await AsyncStorage.getItem('user')
+    const u = JSON.parse(user)
+    console.log('user id is', u.id)
+    setUser(u)
+  }
+
 
   const _getConnections = async () => {
-
     setIsFetched(true)
+    setConnectionStatus(false)
     const user = await AsyncStorage.getItem('user')
     const userId = JSON.parse(user).id
     if (userId) {
 
       const connectionsData = await getUserConnectionsById(userId)
       setConnectionsArray(connectionsData)
+      setTimeout(async () => {
+        const user = await AsyncStorage.getItem('user')
+        const currentUserId = JSON.parse(user).id
+        connectionsData.map((item, index) => {
+          checkConnectionsUnreadMessage(item)
+        }
+        )
+      }, 500);
       setIsFetched(false)
     } else {
       // console.log(`unable to fetch current logged in user ID.`)
@@ -149,16 +160,12 @@ export default function Connections({ navigation }) {
     }
   }
 
-  const onClickChatButton = async () => {
-    _getConnections()
-    // console.log('conId ===>>>  ', conId)
-    const connections = await getConnectionById(conId)
-    if (connections) {
-      // console.log('connections new 1 ====>> ', connections)
-      navigation.navigate(Routes.Chat, { data: connections })
-    } else {
-      // console.log('connections new 2 ====>> ', connections)
-    }
+  const onClickConnection = async (item) => {
+    checkConnectionsUnreadMessage(item)
+    navigation.navigate(Routes.Chat, {
+      connection: item,
+      isRequestRoute: false,
+    })
   }
 
   const onClickRequestButton = async (request, index) => {
@@ -182,7 +189,6 @@ export default function Connections({ navigation }) {
 
     navigation.navigate(Routes.Chat, {
       isRequestRoute: true,
-      connection: connections,
       request: request,
       onGoBack: () => onRefresh()
     })
@@ -221,6 +227,21 @@ export default function Connections({ navigation }) {
     setRequestStatus(checker ? false : true)
   }
 
+  const checkConnectionsUnreadMessage = async (item) => {
+    const user = await AsyncStorage.getItem('user')
+    const currentUserId = JSON.parse(user).id
+
+    if (item.userReceiving != undefined && item.userReceiving.id == currentUserId) {
+      if (item.userSenderUnreadCount > 0) {
+        setConnectionStatus(true)
+      }
+    } else {
+      if (item.userReceiveUnreadCount > 0) {
+        setConnectionStatus(true)
+      }
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
@@ -257,7 +278,10 @@ export default function Connections({ navigation }) {
             ]}>
             Connections
           </Text>
-          <Image style={styles.dotIcon} source={ImageSet.dot} />
+          {connectionStatus && (
+            <Image style={styles.dotIcon} source={ImageSet.dot} />
+          )
+          }
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.5}
@@ -289,13 +313,14 @@ export default function Connections({ navigation }) {
         connectionsArray.length > 0 ? (
           <View style={styles.mainView}>
             {connectionsArray.map((item, index) => {
-              console.log(item)
-              const time = dateDifference(item.createdAt.seconds)
+              // console.log(item)
+              const time = dateDifference(item.updatedAt.seconds)
               const userReceiving = item.userReceiving
-              console.log("User Receiver --> ", userReceiving)
+              // console.log("User Receiver --> ", userReceiving)
               const userSending = item.userSendingRequest
-              console.log("User Sender --> ", userSending)
-              const currentId = '113582845232411943502'
+              // console.log("User Sender --> ", userSending)
+
+              const currentUserId = user.id
 
               const lastMessage = item.lastMessage
               //get other user participant ID
@@ -303,16 +328,20 @@ export default function Connections({ navigation }) {
               // detect current user from userReceiving and userSending
               let currentUser;
               let otherUser;
-              if (userReceiving != undefined && userReceiving.id == currentId) {
+              let unReadMsgCount = 0;
+              if (userReceiving != undefined && userReceiving.id == currentUserId) {
                 currentUser = userReceiving
                 otherUser = userSending
+                unReadMsgCount = item.userSenderUnreadCount
+
               } else {
                 otherUser = userReceiving
                 currentUser = userSending
+                unReadMsgCount = item.userReceiveUnreadCount
               }
 
-              console.log("User Current --> ", currentUser)
-              console.log("User Other --> ", otherUser)
+              // console.log("User Current --> ", currentUser)
+              // console.log("User Other --> ", otherUser)
 
               let message = lastMessage.message.replace("<otherUserName>", otherUser.givenName)
 
@@ -330,6 +359,7 @@ export default function Connections({ navigation }) {
                     styles.countShimmer,
                   ]}>
                   <TouchableOpacity
+                    onPress={() => onClickConnection(item)}
                     activeOpacity={0.5}
                     style={styles.connectionsView}>
                     <View style={styles.centerRowAlign}>
@@ -349,10 +379,10 @@ export default function Connections({ navigation }) {
                       </View>
                       <Text style={styles.time}>{'  ' + time}</Text>
                     </View>
-                    {(item.count && (
+                    {(unReadMsgCount && (
                       <View style={styles.messageCountView}>
                         <Text style={styles.messageCount}>
-                          {item.count && item.count}
+                          {unReadMsgCount}
                         </Text>
                       </View>
                     )) || <View style={{ width: screenWidth.width5 }} />}

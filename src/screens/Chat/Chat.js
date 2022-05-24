@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native'
 import { NormalButton } from '../../components/Buttons'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, createRef } from 'react'
 import { HeaderText, RegularBoldText } from '../../components/Texts'
 import CategoryItem from '../../components/CategoryItem'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -35,19 +35,26 @@ import {
   getAllMessagesForConnectionId,
   getUserDataById,
   sendChatMessage,
+  updateIsReadStatus,
+  updateLastMessage,
   updateRequestStatus,
+  updateUnreadMessageCount,
 } from '../../../firebase'
+
+import { Button } from 'react-native-elements'
+import { AutoScrollFlatList } from "react-native-autoscroll-flatlist";
 import Loader from '../../components/Loader'
 import {
   getCurrentDate,
   getTimeFromMilliseconds,
 } from '../../components/Utility/Helper'
 import moment from 'moment'
-import { Button } from 'react-native-elements'
 import ChatHeader from '../../components/Chat/ChatHeader'
 import RequestHangout from '../../components/Chat/RequestHangout'
 import ChatBox from '../../components/Chat/ChatBox'
 import uuid from 'react-native-uuid'
+
+const myRef = createRef();
 
 const width = (Dimensions.get('window').width - 36) / 3.5
 
@@ -68,17 +75,24 @@ const Chat = ({ route, navigation }) => {
   const [accepted, setAccepted] = useState(false)
   const [rejected, setRejected] = useState(false)
   const [connectionId, setConnectionId] = useState()
+  const [postObject, setPostObject] = useState()
+
+
 
   const dispatch = useDispatch()
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      getUserData()
-      getChat()
-      console.log('isRequestRoute =====>>>> ', isRequestRoute)
+      getCurrentUserData()
+      console.log('isRequestRoute ====>>>> ', isRequestRoute);
       if (isRequestRoute) {
         setIsSendMsgEnabled(true)
+        setConnectedUser(request.userSendingRequest)
+        setPostObject(request.postObject)
       } else {
+        getChat()
+        setConnectedUser(connection.userSendingRequest)
+        updateUnreadMessageCountHandler()
         setIsSendMsgEnabled(false)
       }
     })
@@ -88,44 +102,18 @@ const Chat = ({ route, navigation }) => {
 
   const getCurrentUserData = async () => {
     var user = await AsyncStorage.getItem('user')
-    console.log("Current User Info --> ", user)
     const u = JSON.parse(user)
     console.log('user id is', u.id)
     setUser(u)
   }
 
-  const getUserData = async () => {
-    if (!isRequestRoute) {
-      setLoading(true)
-      // console.log('connection chat screen 1234 ===>>> ', connection)
-      const participentId = connection.participants_id.find(
-        (i) => i != user && user.id
-      )
-      // console.log('get other user Id ===>>> ', participentId)
-      const userData = await getUserDataById(participentId)
-      // console.log('userData ===>>> ', userData)
-      if (userData) {
-        setConnectedUser(userData)
-      }
-      setLoading(false)
-    } else {
 
-      // is from the request route
-      // console.log('connection request screen 1234 ===>>> ', request)
-      const userSendingReq = request.userSendingRequest
-      // console.log('connection sending req screen ===>>> ', userSendingReq)
-      const postObject = request.postObject
-      // console.log('postObject ===>>> ', request.postObject)
-      setConnectedUser(userSendingReq)
-    }
-  }
 
   const getChat = async () => {
     if (!isRequestRoute) {
-      const connectionId = connection.id
-      const chat = await getAllMessagesForConnectionId(connectionId)
+      const conId = connection.id
+      const chat = await getAllMessagesForConnectionId(conId)
       if (chat) {
-        // console.log('chat ============== : ', chat);
         setMessageArray(chat)
       }
     } else {
@@ -133,16 +121,24 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
-  const updateChat = async (messageObj) => {
-    var newChat = []
-    newChat = messageArray
-    console.log('newChat ======================>>>> ', newChat);
-    // newChat.push(messageObj)
-    // setMessageArray(newChat)
+  const updateUnreadMessageCountHandler = async () => {
+    const conId = isRequestRoute ? connectionId : connection.id
+    await updateUnreadMessageCount(connection, user.id)
+  }
+
+  const updateChat = async () => {
+    const conId = isRequestRoute ? connectionId : connection.id
+    const chat = await getAllMessagesForConnectionId(conId)
+    if (chat) {
+      setMessageArray(chat)
+    }
+  }
+
+  const updateLastMessageOfConnection = async (connection, messageObj) => {
+    await updateLastMessage(connection, messageObj, user.id)
   }
 
   const onClickSend = () => {
-    // let currentTime = getCurrentTime();
     const today = getCurrentDate()
     const conId = isRequestRoute ? connectionId : connection.id
     const msgId = `${uuid.v4()}`
@@ -150,9 +146,8 @@ const Chat = ({ route, navigation }) => {
     const isDeleted = false
     const mediaFiles = []
     const sentAt = today
-    const msgText = message
-    console.log("Current UserInfo on Click Send  ---> ", user.id)
-    const senderId = user.id //TODO: Get current user ID
+    const msgText = message.trim()
+    const senderId = user.id
 
     //checking if message text is not empty
     if (msgText != '') {
@@ -168,18 +163,21 @@ const Chat = ({ route, navigation }) => {
         senderId: senderId,
         type: MessageTypeStatus.user,
       }
-      // sendChatMessage(newMessage)
-      updateChat(newMessage) // TODO: Might need to get updated messages from firestorer
+      sendChatMessage(newMessage)
+      updateChat()
+      updateLastMessageOfConnection(connection, newMessage)
       setMessage('')
     }
   }
 
   const onBackButton = async () => {
-    route.params.onGoBack();
-    const goback = navigation.goBack()
-    // console.log('goback ===========>>> ', goback);
+    if (isRequestRoute) {
+      route.params.onGoBack();
+      const goback = navigation.goBack()
+    } else {
+      navigation.goBack()
+    }
   }
-
 
   const onRequestAcceptBtnAction = async () => {
     setLoading(true)
@@ -190,12 +188,11 @@ const Chat = ({ route, navigation }) => {
 
     // 2. create new connection with system message
     await createNewConnectionWithSystemMessage(request, randomConnectionId)
-    setTimeout(async () => {
 
+    setTimeout(async () => {
       // set connection ID for futurre chat messages
       const chat = await getAllMessagesForConnectionId(randomConnectionId)
       if (chat) {
-        // console.log('chat ============== : ', chat);
         setMessageArray(chat)
         setLoading(false)
       }
@@ -207,10 +204,6 @@ const Chat = ({ route, navigation }) => {
     setIsSendMsgEnabled(false)
     getCurrentUserData()
   }
-
-
-  // console.log('isSendMsgEnabledddddd =>', isSendMsgEnabled)
-  const postObject = request.postObject
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -226,122 +219,147 @@ const Chat = ({ route, navigation }) => {
             name={connectedUser && connectedUser.name}
           />
           <View style={[styles.chatSection]}>
-            <ScrollView
-              contentContainerStyle={styles.scrollViewMain}>
-              {isSendMsgEnabled && (
-                <>
-                  <RequestHangout
-                    headline={postObject.headline}
-                    description={postObject.description}
-                    name={connectedUser && connectedUser.givenName}
-                    source={{ uri: connectedUser && connectedUser.photoUrl }}
-                    comment={request.comment}
-                    screeningQuestion={postObject.screeningQuestion}
-                    screeningAnswer={request.screeningAnswer}
-                    accepted={accepted}
-                    rejected={rejected}
-                    onAccepted={onRequestAcceptBtnAction}
-                  // onRejected={() => setRejected(true)}
-                  />
-                </>)}
-              {!isSendMsgEnabled &&
-                messageArray.map((item, index) => {
-                  let today = moment().format('YYYY-MM-DD')
-                  let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD')
-                  const time = moment(item.date).format('ddd, MMMM DD')
-                  return (
-                    <View key={index}>
-                      <View
-                        style={[styles.centerJustify, { marginVertical: 5 }]}>
-                        <Text style={styles.dateLabelText}>
-                          {item.date == today
-                            ? 'Today'
-                            : item.date == yesterday
-                              ? 'Yesterday'
-                              : time}
-                        </Text>
-                      </View>
-                      {/* {item.unRead == true && (
-                      <View style={styles.unReadMessagesIndication}>
-                        <View style={styles.border} />
-                        <Text style={styles.dateLabelText}>Unread messages</Text>
-                        <View style={styles.border} />
-                      </View>
-                    )} */}
-                      {item.messages.map((subItem, index) => {
-                        const msgTime = getTimeFromMilliseconds(subItem.sentAt.seconds)
+            <AutoScrollFlatList
+              ref={myRef}
+              threshold={20}
+              data={messageArray}
+              renderItem={({ item, index }) => {
+                return (
+                  <>
+                    {!isSendMsgEnabled &&
+                      messageArray.map((item, index) => {
+                        let today = moment().format('YYYY-MM-DD')
+                        let yesterday = moment().add(-1, 'days').format('YYYY-MM-DD')
+                        const time = moment(item.date).format('ddd, MMMM DD')
                         return (
                           <View key={index}>
-                            {subItem.type === MessageTypeStatus.systemRequestAccept && (
-                              subItem.requestData.postObject &&
-                              <RequestHangout
-                                headline={subItem.requestData.postObject.headline}
-                                description={subItem.requestData.postObject.description}
-                                name={connectedUser && connectedUser.givenName}
-                                source={{ uri: connectedUser && connectedUser.photoUrl }}
-                                comment={subItem.requestData.comment}
-                                screeningQuestion={subItem.requestData.postObject.screeningQuestion}
-                                screeningAnswer={subItem.requestData.screeningAnswer}
-                                accepted={true}
-                                rejected={false}
-                                onAccepted={onRequestAcceptBtnAction}
-                              // onRejected={() => setRejected(true)}
-                              />
-                            )}
-                            {subItem.type === MessageTypeStatus.systemRequestAccept && (
-                              <View style={{ alignItems: 'center' }}>
-                                <View style={styles.rightMessageView}>
-                                  <View style={[styles.rightMessageText, { backgroundColor: ColorSet.chatLeftPopupGray, paddingHorizontal: 20 }]}>
-                                    <Text
-                                      style={[
-                                        styles.dateLabelText,
-                                        { marginRight: 10 },
-                                      ]}>
-                                      {subItem.sentAt && getTimeFromMilliseconds(subItem.sentAt)}
-                                    </Text>
-                                    <Text style={styles.messagesText}>
-                                      {`Start the chat with ${connectedUser.givenName}`}
-                                    </Text>
-                                  </View>
-                                </View>
-                              </View>
-                            )}
-                            {subItem.type === MessageTypeStatus.user && (
-                              subItem.sender && subItem.sender.id === user.id ? (
-                                <View style={styles.rightMessageView}>
-                                  <View style={styles.rightMessageText}>
-                                    <Text
-                                      style={[
-                                        styles.dateLabelText,
-                                        { marginRight: 10 },
-                                      ]}>
-                                      {msgTime}
-                                    </Text>
-                                    <Text style={styles.messagesText}>
-                                      {subItem.message}
-                                    </Text>
-                                  </View>
-                                </View>
-                              ) : (
-                                <View style={styles.leftMessageView}>
-                                  <View style={styles.leftMessageText}>
-                                    <Text style={styles.messagesText}>
-                                      {subItem.message}
-                                    </Text>
-                                    <Text style={[styles.dateLabelText, { marginLeft: 10 },]}>
-                                      {msgTime}
-                                    </Text>
-                                  </View>
+                            <View
+                              style={[styles.centerJustify, { marginVertical: 5 }]}>
+                              <Text style={styles.dateLabelText}>
+                                {item.date == today
+                                  ? 'Today'
+                                  : item.date == yesterday
+                                    ? 'Yesterday'
+                                    : time}
+                              </Text>
+                            </View>
+                            {item.messages.map((subItem, index) => {
+                              const msgTime = getTimeFromMilliseconds(subItem.sentAt.seconds)
+                              var firstUnread = item.messages.find(({ isRead, senderId, type }) => type === MessageTypeStatus.user && senderId !== user.id && isRead == false);
+                              var conId = isRequestRoute ? connectionId : connection.id
+                              if (subItem.type === MessageTypeStatus.user && subItem.senderId !== user.id) {
+                                updateIsReadStatus(subItem.id, conId)
+                              }
+                              return (
+                                <View key={index}>
+                                  {subItem.type === MessageTypeStatus.systemRequestAccept && (
+                                    subItem.requestData.postObject &&
+                                    <RequestHangout
+                                      headline={subItem.requestData.postObject.headline}
+                                      description={subItem.requestData.postObject.description}
+                                      name={connectedUser && connectedUser.givenName}
+                                      source={{ uri: connectedUser && connectedUser.photoUrl }}
+                                      comment={subItem.requestData.comment}
+                                      screeningQuestion={subItem.requestData.postObject.screeningQuestion}
+                                      screeningAnswer={subItem.requestData.screeningAnswer}
+                                      accepted={true}
+                                      rejected={false}
+                                      onAccepted={onRequestAcceptBtnAction}
+                                    // onRejected={() => setRejected(true)}
+                                    />
+                                  )}
+                                  {subItem.type === MessageTypeStatus.systemRequestAccept && (
+                                    <>
+                                      <View style={{ alignItems: 'center' }}>
+                                        <View style={styles.rightMessageView}>
+                                          <View style={[styles.rightMessageText, { backgroundColor: ColorSet.chatLeftPopupGray, paddingHorizontal: 20 }]}>
+                                            <Text
+                                              style={[
+                                                styles.dateLabelText,
+                                                { marginRight: 10 },
+                                              ]}>
+                                              {subItem.sentAt && getTimeFromMilliseconds(subItem.sentAt)}
+                                            </Text>
+                                            <Text style={styles.messagesText}>
+                                              {`Start the chat with ${connectedUser.givenName}`}
+                                            </Text>
+                                          </View>
+                                        </View>
+                                      </View>
+
+                                      <View style={styles.unReadMessagesIndication}>
+                                        <View style={styles.border} />
+                                        <Text style={styles.dateLabelText}>Start of your conversation</Text>
+                                        <View style={styles.border} />
+                                      </View>
+                                    </>
+                                  )}
+                                  {subItem.type === MessageTypeStatus.user && (
+                                    subItem.senderId === user.id ? (
+                                      <View style={styles.rightMessageView}>
+                                        <View style={styles.rightMessageText}>
+                                          <Text
+                                            style={[
+                                              styles.dateLabelText,
+                                              { marginRight: 10 },
+                                            ]}>
+                                            {msgTime}
+                                          </Text>
+                                          <Text style={styles.messagesText}>
+                                            {subItem.message}
+                                          </Text>
+                                        </View>
+                                      </View>
+                                    ) : (
+                                      <>
+                                        {subItem.isRead == false && firstUnread.id === subItem.id && (
+                                          <View style={styles.unReadMessagesIndication}>
+                                            <View style={styles.border} />
+                                            <Text style={styles.dateLabelText}>Unread messages</Text>
+                                            <View style={styles.border} />
+                                          </View>
+                                        )}
+                                        <View style={styles.leftMessageView}>
+                                          <View style={styles.leftMessageText}>
+                                            <Text style={styles.messagesText}>
+                                              {subItem.message}
+                                            </Text>
+                                            <Text style={[styles.dateLabelText, { marginLeft: 10 },]}>
+                                              {msgTime}
+                                            </Text>
+                                          </View>
+                                        </View>
+                                      </>
+                                    )
+                                  )}
                                 </View>
                               )
-                            )}
+                            })}
                           </View>
                         )
                       })}
-                    </View>
-                  )
-                })}
-            </ScrollView>
+                  </>
+                )
+              }}
+              keyExtractor={index => index}
+            />
+            {isSendMsgEnabled && (
+              <>
+                <RequestHangout
+                  headline={postObject.headline}
+                  description={postObject.description}
+                  name={connectedUser && connectedUser.givenName}
+                  source={{ uri: connectedUser && connectedUser.photoUrl }}
+                  comment={request.comment}
+                  screeningQuestion={postObject.screeningQuestion}
+                  screeningAnswer={request.screeningAnswer}
+                  accepted={accepted}
+                  rejected={rejected}
+                  onAccepted={onRequestAcceptBtnAction}
+                // onRejected={() => setRejected(true)}
+                />
+              </>)}
+
           </View>
           <ChatBox
             onChangeText={(text) => setMessage(text)}
