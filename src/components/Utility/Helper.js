@@ -1,26 +1,35 @@
 import moment from 'moment'
 
 export function getTimeFromMilliseconds(timestamp) {
-  const date = new Date(timestamp * 1000)
-  const dateTime2 = moment(date).format('h:mm a')
-  return dateTime2
+
+    console.log("getTimeFromMilliseconds ==> ", timestamp);
+    const date = new Date(timestamp * 1000)
+    const dateTime2 = moment(date).format('h:mm a')
+    return dateTime2
 }
 
 export function getDateFromDateTime(timestamp) {
-  const time = timestamp
-  const dateTime2 = moment(time).format('YYYY-MM-DD')
-  return dateTime2
+    const time = timestamp
+    const dateTime2 = moment(time).format('YYYY-MM-DD')
+    return dateTime2
 }
 
 export function getCurrentDate() {
-  const currentDate = new Date()
-  console.log('currentDate ===>>> ', currentDate)
-  return currentDate
+    const currentDate = new Date()
+    // console.log('currentDate ===>>> ', currentDate)
+    return currentDate
+}
+
+export function generateRandomId() {
+    var randomId;
+    randomId = Date.now()
+    console.log('randomId ===>>> ', randomId);
+    return randomId
 }
 
 export function setDataByDate(array) {
     const groups = array.reduce((groups, message) => {
-        const date = getDateFromDateTime(message.sent_at.toDate())
+        const date = getDateFromDateTime(message.sentAt.toDate())
         if (!groups[date]) {
             groups[date] = [];
         }
