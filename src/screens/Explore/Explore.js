@@ -101,6 +101,7 @@ function Explore({ navigation }) {
             }
             renderItem={({ item }) => (
               <Post
+                post={item}
                 userName={item.user.name}
                 title={item.headline}
                 description={item.description}
@@ -182,10 +183,14 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
   const dispatch = useDispatch()
   const [comment, setComment] = useState('')
   const handleSendRequest = (post , comment="") => {
-    console.log('add join dispacth function here')
     dispatch(sendJoinRequest(post , comment))
-    onCancel()
+     onCancel()
   }
+  const getUserId = async () => {
+    const user = await AsyncStorage.getItem('user')
+    return JSON.parse(user).id
+  }
+
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -199,7 +204,7 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
         <PostModal
           setComment={setComment}
           post={postObject}
-          onPressSend={() => {
+          onPressSend={(post) => {
             handleSendRequest(postObject , comment)
           }}
         />

@@ -316,7 +316,7 @@ export default function CreatePost2({ navigation, route }) {
             <NormalTextField
               placeholder="Add a question"
               moreStyles={{ marginTop: -28 }}
-              onChangeText={(text) => setDescription(text)}
+              onChangeText={(text) => setScreeningQuestion(text)}
             />
           </View>
 
