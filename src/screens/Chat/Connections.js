@@ -108,7 +108,6 @@ export default function Connections({ navigation }) {
     return unsubscribe
   }, [])
 
-
   const getCurrentUserData = async () => {
     var user = await AsyncStorage.getItem('user')
     const u = JSON.parse(user)
@@ -116,14 +115,12 @@ export default function Connections({ navigation }) {
     setUser(u)
   }
 
-
   const _getConnections = async () => {
     setIsFetched(true)
     setConnectionStatus(false)
     const user = await AsyncStorage.getItem('user')
     const userId = JSON.parse(user).id
     if (userId) {
-
       const connectionsData = await getUserConnectionsById(userId)
       setConnectionsArray(connectionsData)
       setTimeout(async () => {
@@ -131,9 +128,8 @@ export default function Connections({ navigation }) {
         const currentUserId = JSON.parse(user).id
         connectionsData.map((item, index) => {
           checkConnectionsUnreadMessage(item)
-        }
-        )
-      }, 500);
+        })
+      }, 500)
       setIsFetched(false)
     } else {
       // console.log(`unable to fetch current logged in user ID.`)
@@ -150,7 +146,9 @@ export default function Connections({ navigation }) {
       const requestsData = await getActiveUserRequests(userId)
       setRequestsArray(requestsData)
       setTimeout(() => {
-        let checker = requestsData.every((i) => i.requestStatus === RequestStatus.opened)
+        let checker = requestsData.every(
+          (i) => i.requestStatus === RequestStatus.opened
+        )
         // console.log('requestsData checker ===>>> ', checker)
         setRequestStatus(checker ? false : true)
       }, 500)
@@ -190,7 +188,7 @@ export default function Connections({ navigation }) {
     navigation.navigate(Routes.Chat, {
       isRequestRoute: true,
       request: request,
-      onGoBack: () => onRefresh()
+      onGoBack: () => onRefresh(),
     })
   }
 
@@ -231,7 +229,10 @@ export default function Connections({ navigation }) {
     const user = await AsyncStorage.getItem('user')
     const currentUserId = JSON.parse(user).id
 
-    if (item.userReceiving != undefined && item.userReceiving.id == currentUserId) {
+    if (
+      item.userReceiving != undefined &&
+      item.userReceiving.id == currentUserId
+    ) {
       if (item.userSenderUnreadCount > 0) {
         setConnectionStatus(true)
       }
@@ -251,7 +252,7 @@ export default function Connections({ navigation }) {
           // value={value}
           style={styles.textInput}
           placeholder={'Search'}
-        // onChangeText={onChangeText}
+          // onChangeText={onChangeText}
         />
         <Image style={styles.filterIcon} source={ImageSet.filter} />
       </View>
@@ -267,8 +268,7 @@ export default function Connections({ navigation }) {
               borderBottomWidth: connectionTab ? 1.5 : 0,
             },
           ]}
-          onPress={() => tabsChangingHandler(TabType.connections)}
-        >
+          onPress={() => tabsChangingHandler(TabType.connections)}>
           <Text
             style={[
               styles.tabsText,
@@ -280,8 +280,7 @@ export default function Connections({ navigation }) {
           </Text>
           {connectionStatus && (
             <Image style={styles.dotIcon} source={ImageSet.dot} />
-          )
-          }
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.5}
@@ -294,8 +293,7 @@ export default function Connections({ navigation }) {
               borderBottomWidth: requestTab ? 1.5 : 0,
             },
           ]}
-          onPress={() => tabsChangingHandler(TabType.requests)}
-        >
+          onPress={() => tabsChangingHandler(TabType.requests)}>
           <Text
             style={[
               styles.tabsText,
@@ -326,14 +324,16 @@ export default function Connections({ navigation }) {
               //get other user participant ID
 
               // detect current user from userReceiving and userSending
-              let currentUser;
-              let otherUser;
-              let unReadMsgCount = 0;
-              if (userReceiving != undefined && userReceiving.id == currentUserId) {
+              let currentUser
+              let otherUser
+              let unReadMsgCount = 0
+              if (
+                userReceiving != undefined &&
+                userReceiving.id == currentUserId
+              ) {
                 currentUser = userReceiving
                 otherUser = userSending
                 unReadMsgCount = item.userSenderUnreadCount
-
               } else {
                 otherUser = userReceiving
                 currentUser = userSending
@@ -343,7 +343,12 @@ export default function Connections({ navigation }) {
               // console.log("User Current --> ", currentUser)
               // console.log("User Other --> ", otherUser)
 
-              let message = lastMessage.message.replace("<otherUserName>", otherUser.givenName)
+              let message =
+                lastMessage &&
+                lastMessage.message.replace(
+                  '<otherUserName>',
+                  otherUser.givenName
+                )
 
               return (
                 <SkeletonContent
@@ -368,7 +373,9 @@ export default function Connections({ navigation }) {
                         source={{ uri: otherUser && otherUser.photoUrl }}
                       />
                       <View>
-                        <Text style={styles.userName}>{otherUser && otherUser.name}</Text>
+                        <Text style={styles.userName}>
+                          {otherUser && otherUser.name}
+                        </Text>
                         <View style={styles.lastMessageView}>
                           <Text
                             numberOfLines={1}
@@ -448,15 +455,15 @@ export default function Connections({ navigation }) {
                                   time == 'just now'
                                     ? screenWidth.width55
                                     : status == RequestStatus.pending
-                                      ? screenWidth.width60
-                                      : screenWidth.width65,
+                                    ? screenWidth.width60
+                                    : screenWidth.width65,
                               },
                             ]}>
                             {item.comments
                               ? item.comments
                               : data.givenName +
-                              ' ' +
-                              'is Approachable! start the chat.'}
+                                ' ' +
+                                'is Approachable! start the chat.'}
                           </Text>
                         </View>
                       </View>
