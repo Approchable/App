@@ -85,6 +85,7 @@ export const ImageSet = {
   accepted: require('../../assets/images/icons/accepted.png'),
   rejected: require('../../assets/images/icons/rejected.png'),
   ArrowRight: require('../../assets/images/icons/ArrowRight.png'),
+  tick: require('../../assets/images/icons/tick.png'),
 }
 
 export const TabType = {
@@ -98,4 +99,10 @@ export const RequestStatus = {
   accepted: 'accepted',
   rejected: 'rejected',
   completed: 'completed',
+}
+
+export const MessageTypeStatus = {
+  systemStartChat: 'system_start_chat',
+  systemRequestAccept: 'system_request_accept',
+  user: 'user',
 }
