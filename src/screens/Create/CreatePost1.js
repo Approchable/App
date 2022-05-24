@@ -107,10 +107,14 @@ export default function CreatePost1({ navigation }) {
             />
 
             <View
-              style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: -5 }}
-            >
+              style={{
+                flexWrap: 'wrap',
+                flexDirection: 'row',
+                marginLeft: -5,
+              }}>
               {interests.map((item, index) => (
                 <CategoryItem
+                  key={index}
                   content={item}
                   width={width}
                   onPress={() => handleSelectingItems(item)}
@@ -136,8 +140,7 @@ export default function CreatePost1({ navigation }) {
             justifyContent: 'flex-end',
             marginBottom: 20,
             marginTop: 40,
-          }}
-        >
+          }}>
           <NormalButton
             text="Next"
             onPress={() => (buttonActive ? finishCreatePost1() : null)}
