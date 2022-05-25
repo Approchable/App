@@ -18,6 +18,7 @@ import FastImage from 'react-native-fast-image'
 import { getusersWhoRequested } from '../store/Requests/Requests'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ExploreReport } from './Report'
+import { ImageSet } from '..//components//config//Constant'
 var dayjs = require('dayjs')
 
 export default function Post({
@@ -37,7 +38,7 @@ export default function Post({
   setCurrentReportPost,
   post,
 }) {
-  console.log(post)
+  
   return (
     <View style={styles.PostView}>
       <PostHeader
@@ -88,6 +89,7 @@ export function PostModal({ post, onPressSend, setComment }) {
   useEffect(() => {
     handleButtonActive()
   }, [description])
+  
   return (
     <KeyboardAwareScrollView extraHeight={60}>
       <View style={styles.PostView}>
@@ -108,6 +110,7 @@ export function PostModal({ post, onPressSend, setComment }) {
           startDateTime={post.startDateTime}
           endDateTime={post.endDateTime}
           showJoinButton={false}
+          post={post}
         />
         <View
           style={{
@@ -194,7 +197,7 @@ function PostLocation({ location, addressResult }) {
       return
     }
     let addressResult = await Location.reverseGeocodeAsync(location.coords)
-    // console.log('addressResult', addressResult);
+   
     setAddress(String(addressResult[0].name))
     setLoading(false)
   }, [location.coords])
@@ -237,10 +240,11 @@ function PostProfileImage({ imageUrl }) {
 
   return (
     <View style={styles.PostProfileImageView}>
-      <LoadingScreen visible={loading} />
+     
       <Image
         style={styles.postProfileImage}
         source={{ uri: imageUrl }}
+        defaultSource={ImageSet.profile}
         onLoadStart={() => setLoading(true)}
         onLoadEnd={() => setLoading(false)}
       />
@@ -344,9 +348,6 @@ function PostTime({ startDateTime, endDateTime }) {
     return true
   }
   useEffect(() => {
-    // console.log(startDateTime , endDateTime , "end date time in posts");
-    // startDateTime = new Date(startDateTime)
-    // endDateTime = new Date(endDateTime)
     getStartTime()
     setStartTimeGreaterThanEndTime(isStartTimegreaterThanCurrentTime())
     formatAllTimes()
@@ -394,6 +395,7 @@ function PostJoinButton({ onPress, postId, usersWhoRequested }) {
   const [isUserRequested, setisUserRequested] = useState(false)
   const [message, setMessage] = useState('')
 
+  
   const getUserId = async () => {
     const user = await AsyncStorage.getItem('user')
     return JSON.parse(user).id
@@ -406,7 +408,7 @@ function PostJoinButton({ onPress, postId, usersWhoRequested }) {
   const checkIfUserRequested = async () => {
     const user = await AsyncStorage.getItem('user')
     const userId = JSON.parse(user).id
-    console.log('user id is', userId)
+   
 
     if (usersWhoRequested.includes(userId)) {
       setisUserRequested(true)
@@ -417,15 +419,15 @@ function PostJoinButton({ onPress, postId, usersWhoRequested }) {
     }
   }
 
-  useEffect(() => {
-    checkIfUserRequested()
+  useEffect(async() => {
+    await checkIfUserRequested()
   }, [])
   if (isUserRequested == true) {
     return (
       <View style={styles.PostJoinButtonView}>
         <NormalButton
           text={message}
-          onPress={() => onclickJoin(getUserId())}
+          onPress={() => null}
           moreStyles={{
             height: 36,
             paddingLeft: 25,
@@ -489,7 +491,7 @@ function PostFooter({
   }
   const shouldShowJoinButton =  () => {
     if (currUser == null) {
-      return false
+      return true
     }
     const sameUser = () => {
       return currUser == post.user.id

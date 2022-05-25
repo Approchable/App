@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   View,
   StyleSheet,
@@ -30,6 +30,12 @@ import {
 } from '../../components/config/Constant'
 //GetPostsReducer
 function Explore({ navigation }) {
+
+  // var posts = useMemo(() => {
+  //   return useSelector((state) => state.GetPostsReducer.posts)
+  // }, [posts])
+   //var posts = useSelector((state) => state.GetPostsReducer.posts)
+
   var posts = useSelector((state) => state.GetPostsReducer.posts)
   var loading = useSelector((state) => state.GetPostsReducer.loading)
   var error = useSelector((state) => state.GetPostsReducer.error)
@@ -99,6 +105,7 @@ function Explore({ navigation }) {
             refreshControl={
               <RefreshControl refreshing={loading} onRefresh={onRefresh} />
             }
+            refreshing={loading}
             renderItem={({ item }) => (
               <Post
                 post={item}
@@ -191,7 +198,6 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
     return JSON.parse(user).id
   }
 
-
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View
@@ -204,7 +210,7 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
         <PostModal
           setComment={setComment}
           post={postObject}
-          onPressSend={(post) => {
+          onPressSend={() => {
             handleSendRequest(postObject , comment)
           }}
         />
