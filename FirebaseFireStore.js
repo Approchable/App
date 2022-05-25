@@ -10,7 +10,7 @@ import {
   where,
   query,
 } from 'firebase/firestore';
-
+//
 import { sendImageToFireStorageAndGetUrl } from './FirebaseStorage';
 
 export async function sendPostToFireStore(postObject) {
