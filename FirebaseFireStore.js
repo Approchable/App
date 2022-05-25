@@ -10,16 +10,16 @@ import {
   where,
   query,
 } from 'firebase/firestore';
-
+//
 import { sendImageToFireStorageAndGetUrl } from './FirebaseStorage';
 
 export async function sendPostToFireStore(postObject) {
   console.log('sendPostToFireStore');
-  // if ('localImageUrl' in postObject) {
-  //   postObject['imageUrl'] = await sendImageToFireStorageAndGetUrl(
-  //     postObject.localImageUrl,
-  //   );
-  // }
+  if ('localImageUrl' in postObject) {
+    postObject['imageUrl'] = await sendImageToFireStorageAndGetUrl(
+      postObject.localImageUrl,
+    );
+  }
   console.log('postObject after image url', postObject);
   const collectionRef = collection(fireStore, 'posts');
   try {
