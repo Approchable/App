@@ -1,4 +1,4 @@
-import {fireStore} from './firebase.js';
+import { fireStore } from './firebase.js';
 import {
   getFirestore,
   collection,
@@ -11,15 +11,15 @@ import {
   query,
 } from 'firebase/firestore';
 
-import {sendImageToFireStorageAndGetUrl} from './FirebaseStorage';
+import { sendImageToFireStorageAndGetUrl } from './FirebaseStorage';
 
 export async function sendPostToFireStore(postObject) {
   console.log('sendPostToFireStore');
-  // if ('localImageUrl' in postObject) {
-  //   postObject['imageUrl'] = await sendImageToFireStorageAndGetUrl(
-  //     postObject.localImageUrl,
-  //   );
-  // }
+  if ('localImageUrl' in postObject) {
+    postObject['imageUrl'] = await sendImageToFireStorageAndGetUrl(
+      postObject.localImageUrl,
+    );
+  }
   console.log('postObject after image url', postObject);
   const collectionRef = collection(fireStore, 'posts');
   try {
@@ -35,11 +35,17 @@ export async function sendPostToFireStore(postObject) {
 }
 
 export async function sendRequestToFireStore(request) {
+  if (request.userSendingRequest.id === request.userReciving.id) {
+    return null;
+  }
   const userRef = await collection(fireStore, 'users');
   const userDocRef = await doc(userRef, request.userReciving.id);
   const requestRef = await collection(userDocRef, 'usersWhoRequested');
   try {
-    const docRef = await addDoc(requestRef, request);
+    const docRef = await setDoc(
+      doc(requestRef, request.requestID),
+      request
+    );
     return docRef;
   } catch (error) {
     console.log('Error sending requests to firebase ', error);
@@ -113,7 +119,7 @@ export async function joinPostRequest(postId, userId) {
     requestIds = [...new Set(requestIds)];
     const postCollectionRef = collection(fireStore, 'posts');
     const postDoc = await doc(postCollectionRef, postId);
-    await updateDoc(postDoc, {usersWhoRequested: requestIds});
+    await updateDoc(postDoc, { usersWhoRequested: requestIds });
     return requestIds;
   } catch (error) {
     console.log('Error joining post ', error);

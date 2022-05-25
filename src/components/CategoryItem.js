@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   View,
   Text,
@@ -7,39 +7,40 @@ import {
   Dimensions,
   Image,
   Animated,
-} from 'react-native';
+} from 'react-native'
 
-import {useCallback, useState, useContext, useEffect} from 'react';
-import {CategorieContext} from '../..//src/context/CategorieContext';
-function CategoryItem({content, position, onPress, width, moreStyles}) {
-  const [categories, setCategories] = useContext(CategorieContext);
-  const [enabled, setEnabled] = useState(false);
-  const [size, onLayout] = useComponentSize();
+import { useCallback, useState, useContext, useEffect } from 'react'
+import { CategorieContext } from '../..//src/context/CategorieContext'
+function CategoryItem({ content, position, onPress, width, moreStyles }) {
+  const [categories, setCategories] = useContext(CategorieContext)
+  const [enabled, setEnabled] = useState(false)
+  const [size, onLayout] = useComponentSize()
 
   // hollow ? '#44BFBA' : 'white',
   const onPressHandler = () => {
-    onPress() 
-    setEnabled(!enabled);
-  };
+    onPress()
+    setEnabled(!enabled)
+  }
 
   const handleCategories = () => {
     if (enabled) {
       if (!categories.includes(content)) {
-        setCategories([...categories, content]);
+        setCategories([...categories, content])
       }
     } else {
-      setCategories(categories.filter(item => item !== content));
+      setCategories(categories.filter((item) => item !== content))
     }
-  };
+  }
 
   useEffect(() => {
-    handleCategories();
-  }, [enabled]);
+    handleCategories()
+  }, [enabled])
   return (
     <TouchableOpacity
       onPress={() => {
-        onPressHandler();
-      }}>
+        onPressHandler()
+      }}
+    >
       <View
         style={
           enabled
@@ -56,23 +57,24 @@ function CategoryItem({content, position, onPress, width, moreStyles}) {
                 ...moreStyles,
               }
         }
-        onLayout={onLayout}>
+        onLayout={onLayout}
+      >
         <Text style={styles.unselectedText}> {content} </Text>
       </View>
     </TouchableOpacity>
-  );
+  )
 }
 
 const useComponentSize = () => {
-  const [size, setSize] = useState(null);
+  const [size, setSize] = useState(null)
 
-  const onLayout = useCallback(event => {
-    const {width, height} = event.nativeEvent.layout;
-    setSize({width, height});
-  }, []);
+  const onLayout = useCallback((event) => {
+    const { width, height } = event.nativeEvent.layout
+    setSize({ width, height })
+  }, [])
 
-  return [size, onLayout];
-};
+  return [size, onLayout]
+}
 
 const styles = StyleSheet.create({
   selectedContainer: {
@@ -111,5 +113,5 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontFamily: 'Poppins_400Regular',
   },
-});
-export default CategoryItem;
+})
+export default CategoryItem

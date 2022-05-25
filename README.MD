@@ -1,7 +1,11 @@
 # Approachbale App Instructions
 
+## Setup Guide
 
-
+1. run `npm install` on project root directory to install the node modules.
+2. run `npm run ios` to run the application on iOS simulator or device.
+3. run `npm run android` to run the application on emulator or device.
+   
 ## Important Objects 
 
 #### User Objects

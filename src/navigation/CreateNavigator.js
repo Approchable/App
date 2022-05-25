@@ -1,9 +1,9 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import CreatePost1 from '../screens/Create/CreatePost1';
-import CreatePost2 from '../screens/Create/CreatePost2';
-import CreatePost3 from '../screens/Create/CreatePost3';
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import CreatePost1 from '../screens/Create/CreatePost1'
+import CreatePost2 from '../screens/Create/CreatePost2'
+import CreatePost3 from '../screens/Create/CreatePost3'
 
-const CreateStackNavigator = createNativeStackNavigator();
+const CreateStackNavigator = createNativeStackNavigator()
 
 export default function CreateStack() {
   return (
@@ -23,7 +23,7 @@ export default function CreateStack() {
           headerShown: false,
         }}
       />
-        <CreateStackNavigator.Screen
+      <CreateStackNavigator.Screen
         name="CreatePost3"
         component={CreatePost3}
         options={{
@@ -31,5 +31,5 @@ export default function CreateStack() {
         }}
       />
     </CreateStackNavigator.Navigator>
-  );
+  )
 }

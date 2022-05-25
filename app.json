@@ -25,7 +25,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
@@ -35,9 +37,13 @@
         "googleSignIn": {
           "reservedClientId": "com.googleusercontent.apps.724006010963-er1i8nf3hsoeibm6vg8m01au6gqq8bhb"
         }
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "ApproachableNative uses your location to show you nearby places."
       }
     },
     "android": {
+      "package": "com.approachable.approachablenative",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"

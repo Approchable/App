@@ -1,108 +1,114 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
-  TextInput,
-  ScrollView,
-  ActivityIndicator,
   FlatList,
   RefreshControl,
   Modal,
   TouchableWithoutFeedback,
-} from 'react-native';
-import {RegularBoldText} from '../../components/Texts';
-import {NormalButton} from '../../components/Buttons';
-import EmptyCreatePost from '../../assets/images/assets/EmptyCreatePost.svg';
-import {useDispatch} from 'react-redux';
-import SucessLogo from '../../assets/images/assets/SucessLogo.svg';
-import {NavigateToCreate} from '../../store/actions';
-import Post, {PostModal} from '../../components/Utility/Post';
-import AppHeader from '../../components/Utility/AppHeader';
-import {useSelector} from 'react-redux';
-import {getPosts} from '../../store/actions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import MyStatusBar from '../../components/MyStatusBar';
-import {sendJoinRequest} from '../../store/Requests/Requests';
-import * as Random from 'expo-random';
-import uuid from 'react-native-uuid';
+  ScrollView,
+} from 'react-native'
+import { RegularBoldText } from '../../components/Texts'
+import { NormalButton } from '../../components/Buttons'
+import EmptyCreatePost from '../../assets/images/assets/EmptyCreatePost.svg'
+import { useDispatch } from 'react-redux'
+import SucessLogo from '../../assets/images/assets/SucessLogo.svg'
+import { NavigateToCreate } from '../../store/actions'
+import Post, { PostModal } from '../../components/Post'
+import AppHeader from '../../components/Utility/AppHeader'
+import { useSelector } from 'react-redux'
+import { getPosts } from '../../store/posts/posts'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import MyStatusBar from '../../components/MyStatusBar'
+import { sendJoinRequest } from '../../store/Requests/Requests'
+import * as Random from 'expo-random'
+import uuid from 'react-native-uuid'
+import ReportModal from '../../components/ReportModal'
+import SkeletonContent from 'react-native-skeleton-content'
+import {
+  screenWidth,
+} from '../../components/config/Constant'
 //GetPostsReducer
-function Explore({navigation}) {
-  var posts = useSelector(state => state.GetPostsReducer.posts);
-  var loading = useSelector(state => state.GetPostsReducer.loading);
-  var error = useSelector(state => state.GetPostsReducer.error);
+function Explore({ navigation }) {
 
-  const [refreshing, setRefreshing] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalPost, setModalPost] = useState(null);
+  // var posts = useMemo(() => {
+  //   return useSelector((state) => state.GetPostsReducer.posts)
+  // }, [posts])
+   //var posts = useSelector((state) => state.GetPostsReducer.posts)
 
+  var posts = useSelector((state) => state.GetPostsReducer.posts)
+  var loading = useSelector((state) => state.GetPostsReducer.loading)
+  var error = useSelector((state) => state.GetPostsReducer.error)
+
+  const [refreshing, setRefreshing] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [reportModalVisible, setReportModalVisible] = useState(false)
+  const [modalPost, setModalPost] = useState(null)
+  const [currentReportPost, setCurrentReportPost] = useState(null)
   const onRefresh = () => {
-    setRefreshing(true);
-    _getPosts();
+    setRefreshing(true)
+    _getPosts()
 
     setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  };
-  const dispatch = useDispatch();
+      setRefreshing(false)
+    }, 1000)
+  }
+  const dispatch = useDispatch()
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null)
 
+  const handleModalOpen = () => {
+    setReportModalVisible(true)
+  }
+  const onCancelReportModal = () => {
+    setReportModalVisible(false)
+  }
   const _getPosts = async () => {
     // dispatch fetch new post to properly update old posts
-    dispatch(getPosts());
-  };
+    dispatch(getPosts())
+  }
 
-  const handleJoin = postObject => {
-    setModalVisible(true);
-    setModalPost(postObject);
-  };
+  const handleJoin = (postObject) => {
+    setModalVisible(true)
+    setModalPost(postObject)
+  }
 
   const handleCancel = () => {
-    _getPosts();
-    setModalVisible(false);
-
+    _getPosts()
+    setModalVisible(false)
   }
 
   useEffect(() => {
-    _getPosts();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('focsed on explore ')
+      // _getPosts()
+    })
+    _getPosts()
+  }, [navigation])
 
-  const postCount = 0;
-  const Postdata = {
-    userName: 'Linda',
-    title: "Linda's Hangout",
-    description:
-      'I’m at Nick’s Pub for happy hour, and would love to make some new friends while i’m here. Open to going anywhere nearby.',
-  };
-  if (loading == true) {
-    return (
-      <View
-        style={{flex: 1, justifyContent: 'center', backgroundColor: 'white'}}>
-        <ActivityIndicator size="large" color="#44BFBA" />
-      </View>
-    );
-  } else if (posts.length > 0 && loading == false) {
-    return (
-      <View style={styles.container}>
-        {/* <MyStatusBar backgroundColor="white" />
-        <AppHeader moreStyles={{flex: 0.1}} /> */}
-        <MyStatusBar backgroundColor="#F6F6F6" />
-        <AppHeader moreStyles={{flex: 0.1}} />
-        <View style={{flex: 1, borderRadius: 16}}>
+  return (
+    <View style={styles.container}>
+      <MyStatusBar backgroundColor="#F6F6F6" />
+      <AppHeader moreStyles={{ flex: 0.1 }} />
+      <View style={{ flex: 1, borderRadius: 16 }}>
+        {loading ? (
+          <ExploreLoader loading={loading} />
+        ) : (
           <FlatList
             style={{
-              marginTop: 0,
+              marginTop: 20,
               backgroundColor: 'white',
               borderRadius: 16,
             }}
             data={posts}
-            keyExtractor={item => item.id}
+            keyExtractor={(item) => item.id}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              <RefreshControl refreshing={loading} onRefresh={onRefresh} />
             }
-            renderItem={({item}) => (
+            refreshing={loading}
+            renderItem={({ item }) => (
               <Post
+                post={item}
                 userName={item.user.name}
                 title={item.headline}
                 description={item.description}
@@ -113,36 +119,38 @@ function Explore({navigation}) {
                 endDateTime={item.endDateTime}
                 addressResult={item.addressResult}
                 profileImage={item.user.photoUrl}
+                handleModalOpen={handleModalOpen}
+                setCurrentReportPost={setCurrentReportPost}
                 postId={item.postId}
                 onPress={() => {
-                  handleJoin(item);
+                  handleJoin(item)
                 }}
                 usersWhoRequested={item.usersWhoRequested}
               />
             )}
           />
+        )}
 
           <JoinModal
             visible={modalVisible}
             onCancel={() => handleCancel()}
             postObject={modalPost}
           />
+          <ReportModal
+            currentReportPost={currentReportPost}
+            visible={reportModalVisible}
+            onCancel={onCancelReportModal}
+          />
         </View>
       </View>
-    );
-  } else {
-    return <NoPost navigation={navigation} />;
-  }
+    )
 }
 
-function NoPost({navigation}) {
-  const dispatch = useDispatch();
-
-  const postCount = 0;
+function NoPost({ navigation }) {
 
   const NavigateToCreateInExplore = () => {
-    navigation.navigate('Create');
-  };
+    navigation.navigate('Create')
+  }
 
   return (
     <View style={styles.container}>
@@ -155,16 +163,17 @@ function NoPost({navigation}) {
 
           flex: 1,
           alignItems: 'center',
-        }}>
+        }}
+      >
         <EmptyCreatePost witdth="100%" />
       </View>
-      <View style={{flex: 0.8}}>
+      <View style={{ flex: 0.8 }}>
         <RegularBoldText
           content="No hangouts yet? Be the first to post!"
-          moreStyles={{textAlign: 'center'}}
+          moreStyles={{ textAlign: 'center' }}
         />
 
-        <View style={{flex: 0.3, marginHorizontal: 60, marginTop: -15}}>
+        <View style={{ flex: 0.3, marginHorizontal: 60, marginTop: -15 }}>
           <NormalButton
             hollow={false}
             text="Create Hangout"
@@ -174,29 +183,35 @@ function NoPost({navigation}) {
         </View>
       </View>
     </View>
-  );
+  )
 }
 
-const JoinModal = ({visible, postObject, onCancel}) => {
-  const dispatch = useDispatch();
-  const handleSendRequest = post => {
-    console.log('add join dispacth function here');
-    dispatch(sendJoinRequest(post));
-    onCancel();
-  };
+const JoinModal = ({ visible, postObject, onCancel }) => {
+  const dispatch = useDispatch()
+  const [comment, setComment] = useState('')
+  const handleSendRequest = (post , comment="") => {
+    dispatch(sendJoinRequest(post , comment))
+     onCancel()
+  }
+  const getUserId = async () => {
+    const user = await AsyncStorage.getItem('user')
+    return JSON.parse(user).id
+  }
 
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View
         style={{
           ...styles.modal,
-        }}>
+        }}
+      >
         <ModalBarTop post={postObject} />
 
         <PostModal
+          setComment={setComment}
           post={postObject}
           onPressSend={() => {
-            handleSendRequest(postObject);
+            handleSendRequest(postObject , comment)
           }}
         />
       </View>
@@ -204,8 +219,72 @@ const JoinModal = ({visible, postObject, onCancel}) => {
         <View style={styles.modalBG} />
       </TouchableWithoutFeedback>
     </Modal>
-  );
-};
+  )
+}
+
+const ExploreLoader = (props) => {
+  const { loading } = props
+
+  const itemArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+  if (loading) {
+    return (
+      <ScrollView>
+        {itemArr.map((item) => {
+          return (
+            <SkeletonContent
+              key={item.id}
+              containerStyle={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 300,
+                width: screenWidth.width85,
+                margin: 10,
+              }}
+              layout={[
+                // long line
+                {
+                  width: 44,
+                  height: 44,
+                  resizeMode: 'contain',
+                  borderRadius: 22,
+                  alignItems: 'center',
+                  // marginBottom: 10,
+                  marginLeft: 15,
+                },
+                {
+                  children: [
+                    {
+                      width: screenWidth.width80,
+                      height: 40,
+                      marginBottom: 6,
+                      marginLeft: 10,
+                      marginTop: 10,
+                    },
+                    {
+                      width: screenWidth.width80,
+                      height: 200,
+                      marginLeft: 10,
+                      marginTop: 10,
+                      marginBottom: 10,
+                    },
+                  ],
+                },
+              ]}
+              isVisible={true}
+              isLoading={true}
+              animationType="pulse"
+              animationDirection="horizontalRight"
+            />
+          )
+        })}
+      </ScrollView>
+    )
+  } else {
+    return <></>
+  }
+}
 
 const ModalBarTop = () => {
   return (
@@ -217,9 +296,10 @@ const ModalBarTop = () => {
         borderRadius: 13,
         alignSelf: 'center',
         marginTop: 10,
-      }}></View>
-  );
-};
+      }}
+    ></View>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -244,5 +324,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.2)',
     height: 900, // change this to height of screen later
   },
-});
-export default Explore;
+})
+export default Explore

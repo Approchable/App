@@ -14,19 +14,24 @@ import {
   GET_CONNECTIONS_BY_ID_ERROR,
   CONNECTIONS_USER_DETAILS,
   CONNECTIONS_USER_ERROR,
+  GET_ALL_REQUESTS,
+  GET_ALL_REQUESTS_ERROR,
+  GET_USER_CONNECTIONS_BY_ID,
+  USER_CONNECTIONS_LOADING,
+  GET_USER_CONNECTIONS_BY_ID_ERROR,
 } from './actionTypes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   deleteUserData,
   getUserDataById,
   getConnectionById,
+  getUserConnectionsById,
   getPostsFromFireStore,
-
   writeUserData,
 
 } from '../../firebase';
 
-import { sendPostToFireStore } from '../../FirebaseFireStore';
+import { getAllRequest, sendPostToFireStore } from '../../FirebaseFireStore';
 
 export const Init = () => {
   //console.log('Initing user....');
@@ -120,39 +125,6 @@ export const NaviagteOutOfCreate = () => {
   };
 };
 
-export const getPosts = () => {
-  return async dispatch => {
-    dispatch({
-      type: GET_POSTS_LOADING,
-      payload: {
-        loading: true,
-      },
-    });
-    try {
-      const posts = await getPostsFromFireStore();
-      if (posts !== null) {
-        dispatch({
-          type: GET_POSTS,
-
-          payload: {
-            posts: posts,
-            loading: false,
-          },
-        });
-      }
-    } catch (err) {
-      console.log(err);
-      dispatch({
-        type: GET_POSTS_ERROR,
-        payload: {
-          error: err,
-          loading: false,
-        },
-      });
-    }
-  };
-};
-
 export const createPosts = postObject => {
   return async dispatch => {
     dispatch({
@@ -219,6 +191,38 @@ export const getConnections = connectionId => {
   };
 };
 
+export const getUserConnections = userId => {
+  return async dispatch => {
+    dispatch({
+      type: USER_CONNECTIONS_LOADING,
+      payload: {
+        loading: true,
+      },
+    });
+    try {
+      const connections = await getUserConnectionsById(userId);
+      if (connections) {
+        dispatch({
+          type: GET_USER_CONNECTIONS_BY_ID,
+          payload: {
+            connections: connections,
+            loading: false,
+          },
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      dispatch({
+        type: GET_USER_CONNECTIONS_BY_ID_ERROR,
+        payload: {
+          error: err,
+          loading: false,
+        },
+      });
+    }
+  };
+};
+
 
 export const getConnectionUser = userId => {
   return async dispatch => {
@@ -244,3 +248,5 @@ export const getConnectionUser = userId => {
     }
   };
 };
+
+
