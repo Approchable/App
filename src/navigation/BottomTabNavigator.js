@@ -47,13 +47,14 @@ const TabArr = [
     component: Connections,
   },
   {
-    route: 'Profile',
-    label: 'Profile',
+    route: 'Account',
+    label: 'Account',
     type: Icons.Octicons,
     activeIcon: 'person',
     inActiveIcon: 'person',
     component: Profile,
   },
+
 ]
 const Tab = createMaterialBottomTabNavigator()
 
