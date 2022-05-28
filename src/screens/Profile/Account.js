@@ -3,15 +3,16 @@ import {
     View,
     Text,
     StyleSheet,
-    Dimensions,
     SafeAreaView,
     TouchableOpacity,
     Image,
     ScrollView} from 'react-native'
-import { ColorSet, ImageSet, screenHeight, screenWidth } from "../../components/config/Constant"
+import {  ImageSet } from "../../components/config/Constant"
 import { ActivityIndicator } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native';
+import MyStatusBar from '../../components/MyStatusBar'
+import AppHeader from '../../components/Utility/AppHeader'
 
 export default function Account() {
   const [user, setUser] = useState(null)
@@ -32,30 +33,46 @@ export default function Account() {
       {name:'Community Guidelines',icon:'redirect'},
       {name:'Privacy Policy',icon:'redirect'},
       {name:'Settings',icon:'arrow'},
-    
   ]
-  const MenuOptions=(name,icon)=>{
+  const MenuOptions=({name,icon})=>{
       return(
       <TouchableOpacity style={styles.options}>
-         <Text>{name}</Text>
-         <Image style={styles.icon} source={ImageSet.ArrowRight} />
+         <Text style={styles.menuText}>{name}</Text>
+         <Image
+            source={icon=='arrow'?ImageSet.rightCaret:ImageSet.redirect}
+          />
       </TouchableOpacity>
       )
   }
   const UserExists =()=>{
     return (
-        <View>
-          <TouchableOpacity style={styles.profileSection} onPress={goToProfile}>
-            <Image style={styles.profileImage} source={{uri:user?.photoUrl}} />
-             <View style={styles.profileIdentity}>
-                <View>
-                    <Text style={styles.name}>{user?.name}, 21</Text>
-                    <Text style={styles.address}>Wells St, Chicago</Text>
-                </View>
-                <Image style={styles.icon} source={ImageSet.ArrowRight} />
+
+     <SafeAreaView style={styles.container}>
+     
+        <MyStatusBar backgroundColor="white" />
+        <AppHeader moreStyles={{ height: 50 }} />
+        <View style={{ flex: '1', marginHorizontal: 16, marginTop: 10 }}>
+  
+           <TouchableOpacity style={styles.profileSection} onPress={goToProfile}>
+             <Image style={styles.profileImage} source={{uri:user?.photoUrl}} />
+              <View style={styles.profileIdentity}>
+              <View style={{marginRight:10}}>
+                     <Text style={styles.name}>{user?.name}, 21</Text>
+                     <Text style={styles.address}>Wells St, Chicago</Text>
+                 </View>
+                 <Image
+                    style={{width:10,height:18}}
+                    source={ImageSet.rightCaret}
+                    />
               </View>
-          </TouchableOpacity>
+           </TouchableOpacity>
+           <ScrollView showsVerticalScrollIndicator={false}>
+          <View>
+            {menu.map(({name,icon})=><MenuOptions name={name} icon={icon}/>)}
+          </View>
+       </ScrollView>
         </View>
+      </SafeAreaView>
       )
   }
 const NoUser=()=>{
@@ -71,13 +88,17 @@ const NoUser=()=>{
   return user ? (
     <UserExists />
   ) : (
-    <NoUser />
+     <NoUser />
   )
 
 
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'white',
+      },
     profileSection:{
         backgroundColor: '#F6F6F6',
         display:'flex',
@@ -85,23 +106,55 @@ const styles = StyleSheet.create({
         alignItems:'center',
         padding:20,
         borderRadius:8,
-        marginBottom:10
+        marginVertical:40
     },
     profileIdentity:{
         display:'flex',
         flexDirection:'row',
         alignItems:'center',
+        justifyContent:'space-between',
+        marginHorizontal:20,
+        width:'60%',
+
     },
 
     profileImage:{
-     width:50,
-     height:50,
+     width:110,
+     height:110,
      borderRadius:8
     },
     options:{
         display:'flex',
         flexDirection:'row',
         alignItems:'center',
-        borderRadius:8
-    }
+        justifyContent:'space-between',
+        borderRadius:8,
+        padding:20,
+        backgroundColor: '#F6F6F6',
+        marginBottom:8
+    },
+    name:{
+        fontFamily: 'Poppins',
+        fontStyle: 'normal',
+        fontWeight: '600',
+        fontSize: 20,
+        lineHeight: 32,
+        color: '#030E01'
+      },
+      address:{
+        fontFamily: 'Poppins',
+        fontStyle: 'normal',
+        fontWeight: '400',
+        fontSize: 14,
+        lineHeight: 24,
+        color: '#989898'
+      },
+      menuText:{
+        fontFamily: 'Poppins',
+        fontStyle: 'normal',
+        fontWeight: '400',
+        fontSize: 14,
+        lineHeight: 22,
+        color: '#696969'
+      }
 })

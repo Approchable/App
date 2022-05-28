@@ -86,6 +86,8 @@ export const ImageSet = {
   rejected: require('../../assets/images/icons/rejected.png'),
   ArrowRight: require('../../assets/images/icons/ArrowRight.png'),
   tick: require('../../assets/images/icons/tick.png'),
+  rightCaret: require('../../assets/images/icons/CaretRight.png'),
+  redirect: require('../../assets/images/icons/redirect.png'),
 }
 
 export const TabType = {
