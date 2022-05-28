@@ -11,12 +11,14 @@ import {
   query,
   Timestamp,
   updateDoc,
-  doc
+  doc,
+  setDoc
 } from 'firebase/firestore';
 import { getDatabase, ref, set, get, child } from 'firebase/database';
 import { getStorage, ref as storageRef } from 'firebase/storage';
-import { setDataByDate } from './src/components/Utility/Helper';
-
+import { generateRandomId, getCurrentDate, setDataByDate } from './src/components/Utility/Helper';
+import { MessageTypeStatus, RequestStatus } from './src/components/config/Constant';
+import uuid from 'react-native-uuid'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDdTfUFd_lcoQOKjwLV4mCSczLypegMPAs',
@@ -156,7 +158,8 @@ export async function getAllConnections() {
     return null
   }
 }
-//
+
+
 // get connection by id
 export async function getConnectionById(connectionId) {
   const connectionsRef = collection(fireStore, 'connections')
@@ -175,20 +178,27 @@ export async function getConnectionById(connectionId) {
   }
 }
 
-// get user Requests by id
-export async function getUserRequests(userId) {
-  // console.log("sdsds");
+export async function getUserConnectionsById(userId) {
+  const connectionsRef = collection(fireStore, 'connections')
+  try {
+    const q = query(connectionsRef, where('participantIds', 'array-contains', userId))
+    const querySnapshot = await getDocs(q)
+    const data = querySnapshot.docs.map((doc) => doc.data())
+    return data
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error)
+    return null
+  }
+}
+
+// get active user requests (with status pending or opened etc.) by user id
+export async function getActiveUserRequests(userId) {
   const requestsRef = collection(fireStore, 'users', userId, 'usersWhoRequested');
   try {
-    const querySnapshot = await getDocs(requestsRef);
+    const q = query(requestsRef, where('requestStatus', 'in', [RequestStatus.pending, RequestStatus.opened]))
+    const querySnapshot = await getDocs(q);
     const data = querySnapshot.docs.map(doc => doc.data());
-    // console.log('data requests ===>>> ', data);
     return data
-    // if (data.length > 0) {
-    //   return data[0]
-    // } else {
-    //   return null
-    // }
   } catch (error) {
     console.log('Error getting connections from firebase ', error);
     return null;
@@ -196,8 +206,6 @@ export async function getUserRequests(userId) {
 }
 
 export async function updateRequestStatus(userId, requestId, requestStatus) {
-  // console.log("sdsds");
-
   try {
     const requestsCollectionRef = collection(fireStore, 'users', userId, 'usersWhoRequested');
     const requestDoc = await doc(requestsCollectionRef, requestId);
@@ -209,21 +217,89 @@ export async function updateRequestStatus(userId, requestId, requestStatus) {
   }
 }
 
+export async function updateLastMessage(connection, messageObj, userId) {
+  const conId = connection.id
+  const today = getCurrentDate()
+  try {
+    const connectionsCollectionRef = collection(fireStore, 'connections');
+    const connectionsDoc = await doc(connectionsCollectionRef, conId);
+    const currentId = userId
+
+    const userReceiving = connection.userReceiving
+
+    if (userReceiving != undefined && userReceiving.id == currentId) {
+      // updating receiver unread message count
+      const unReadMsgCount = connection.userReceiveUnreadCount + 1
+      console.log("receiver message Count --> ", unReadMsgCount)
+      await updateDoc(connectionsDoc, { "lastMessage": messageObj, "userReceiveUnreadCount": unReadMsgCount, "updateAt": today });
+    } else {
+      // updating sender unread message count
+      const unReadMsgCount = connection.userSenderUnreadCount + 1
+      console.log("sender message Count --> ", unReadMsgCount)
+      await updateDoc(connectionsDoc, { "lastMessage": messageObj, "userSenderUnreadCount": unReadMsgCount, "updateAt": today });
+    }
+    // console.log(' <<============== lastMessage update sucessfully  =====>>> ');
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error);
+    return null;
+  }
+}
+
+export async function updateUnreadMessageCount(connection, userId) {
+  const conId = connection.id
+
+  try {
+    const connectionsCollectionRef = collection(fireStore, 'connections');
+    const connectionsDoc = await doc(connectionsCollectionRef, conId);
+    //TODO: this user ID should coming in params / async storage
+    const currentId = userId
+
+    const userReceiving = connection.userReceiving
+
+    if (userReceiving != undefined && userReceiving.id !== currentId) {
+      // updating receiver unread message count
+      const unReadMsgCount = 0
+      console.log("receiver message Count --> ", unReadMsgCount)
+      await updateDoc(connectionsDoc, { "userReceiveUnreadCount": unReadMsgCount, });
+    } else {
+      // updating sender unread message count
+      const unReadMsgCount = 0
+      console.log("sender message Count --> ", unReadMsgCount)
+      await updateDoc(connectionsDoc, { "userSenderUnreadCount": unReadMsgCount, });
+    }
+    // console.log(' <<============== lastMessage update sucessfully  =====>>> ');
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error);
+    return null;
+  }
+}
+
+export async function updateIsReadStatus(msgId, conId) {
+  try {
+    const messageCollectionRef = collection(fireStore, 'connections', conId, 'messages');
+
+    const messageDoc = await doc(messageCollectionRef, msgId);
+    await updateDoc(messageDoc, { "isRead": true });
+    console.log(' <<============ isRead updated sucessfully  =====>>> ');
+  } catch (error) {
+    console.log('Error getting connections from firebase ', error);
+    return null;
+  }
+}
+
 
 
 export async function getAllMessagesForConnectionId(conId) {
-  const messagesRef = collection(
-    fireStore,
-    'connections/' + conId + '/' + 'messages'
-  )
+  const messagesRef = collection(fireStore, 'connections', conId, 'messages')
   try {
     const q = query(
       messagesRef,
-      where('connection_id', '==', conId),
-      orderBy('sent_at')
+      where('connectionId', '==', conId),
+      orderBy('sentAt')
     )
     const querySnapshot = await getDocs(q)
     const data = querySnapshot.docs.map((doc) => doc.data())
+    // console.log('conId==== : ', conId);
     // console.log('data chating ==== : ', data);
     const groupedData = setDataByDate(data)
     return groupedData
@@ -234,32 +310,60 @@ export async function getAllMessagesForConnectionId(conId) {
 }
 
 export async function sendChatMessage(messageObject) {
-  const msg = messageObject
-  const conId = msg.connection_id
-  console.log('sendChatMessage message ==> ', msg)
-  const sentAtTimeStamp = Timestamp.fromDate(msg.sent_at)
-  const messagesRef = collection(
-    fireStore,
-    'connections/' + conId + '/' + 'messages'
-  )
+  try {
+    await setDoc(doc(fireStore, 'connections', messageObject.connectionId, 'messages', messageObject.id), messageObject)
+    return docRef
+  } catch (error) {
+    console.log('sendChatMessage message ==> ', error)
+    return null
+  }
+}
 
-  const newMessage = {
-    connection_id: conId,
-    id: msg.id,
-    is_deleted: msg.is_deleted,
-    is_read: msg.is_read,
-    sent_at: sentAtTimeStamp,
-    message: msg.message,
-    media_files: msg.media_files,
-    sender: msg.sender,
+export async function createNewConnectionWithSystemMessage(requestObj, conId) {
+
+  const today = getCurrentDate()
+  const sentAtTimeStamp = Timestamp.fromDate(today)
+
+  const systemRequestAcceptMessage = {
+    id: `${uuid.v4()}`,
+    connectionId: conId,
+    isDeleted: false,
+    isRead: false,
+    mediaFiles: [],
+    message: 'request accepted',
+    requestData: requestObj,
+    sentAt: sentAtTimeStamp,
+    type: MessageTypeStatus.systemRequestAccept,
   }
 
-  console.log('sendChatMessage message updated ==> ', newMessage)
+  const systemStartChatMessage = {
+    id: `${uuid.v4()}`,
+    connectionId: conId,
+    isDeleted: false,
+    isRead: false,
+    mediaFiles: [],
+    message: 'Start the chat with <otherUserName>',
+    sentAt: sentAtTimeStamp,
+    type: MessageTypeStatus.systemStartChat,
+  }
+
+  const newConnection = {
+    id: conId,
+    isDeleted: false,
+    createdAt: sentAtTimeStamp,
+    updatedAt: sentAtTimeStamp,
+    userReceiving: requestObj.userReciving,
+    userSendingRequest: requestObj.userSendingRequest,
+    participantIds: [requestObj.userReciving.id, requestObj.userSendingRequest.id],
+    lastMessage: systemStartChatMessage
+  }
 
   try {
-    const docRef = await addDoc(messagesRef, newMessage)
-    console.log('sendChatMessage message sent successfully ==> ', docRef)
-    return docRef
+    await setDoc(doc(fireStore, 'connections', conId), newConnection)
+    await setDoc(doc(fireStore, 'connections', conId, 'messages', systemRequestAcceptMessage.id), systemRequestAcceptMessage)
+    console.log('====>> system request accept message created successfully <<=====')
+    await setDoc(doc(fireStore, 'connections', conId, 'messages', systemStartChatMessage.id), systemStartChatMessage)
+    console.log('====>> system start chat message created successfully <<=====')
   } catch (error) {
     console.log('sendChatMessage message ==> ', error)
     return null

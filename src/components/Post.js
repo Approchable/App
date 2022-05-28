@@ -5,20 +5,21 @@ import {
   Image,
   ActivityIndicator,
   KeyboardAvoidingView,
-} from 'react-native';
-import React, {useState, useEffect, useMemo} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import * as Location from 'expo-location';
-import {SmallerText} from './Texts';
-import {Icon, Icons} from './Utility/Icons';
-import {NormalButton} from './Buttons';
-import {NormalTextField} from './TextField.js';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import FastImage from 'react-native-fast-image';
-import {getusersWhoRequested} from '../store/Requests/Requests';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ExploreReport} from './Report';
-var dayjs = require('dayjs');
+} from 'react-native'
+import React, { useState, useEffect, useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import * as Location from 'expo-location'
+import { SmallerText } from './Texts'
+import { Icon, Icons } from './Utility/Icons'
+import { NormalButton } from './Buttons'
+import { NormalTextField } from './TextField.js'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import FastImage from 'react-native-fast-image'
+import { getusersWhoRequested } from '../store/Requests/Requests'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { ExploreReport } from './Report'
+import { ImageSet } from '..//components//config//Constant'
+var dayjs = require('dayjs')
 
 export default function Post({
   userName,
@@ -33,7 +34,14 @@ export default function Post({
   onPress,
   postId,
   usersWhoRequested,
+<<<<<<< HEAD
+=======
+  handleModalOpen,
+  setCurrentReportPost,
+  post,
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
 }) {
+  
   return (
     <View style={styles.PostView}>
       <PostHeader
@@ -57,13 +65,14 @@ export default function Post({
         showJoinButton={true}
         postId={postId}
         usersWhoRequested={usersWhoRequested}
+        post={post}
       />
     </View>
   );
 }
 
-export function PostModal({post, onPressSend , setComment}) {
-  const dispatch = useDispatch();
+export function PostModal({ post, onPressSend, setComment }) {
+  const dispatch = useDispatch()
   if (post === null || post === undefined) {
     return null;
   }
@@ -71,17 +80,21 @@ export function PostModal({post, onPressSend , setComment}) {
   const [buttonActive, setButtonActive] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
 
+  const handleSendingRequest = () => {
+    onPressSend(post)
+  }
   const handleButtonActive = () => {
-    // if (description === null || description === '') {
-    //   setButtonActive(false);
-    // } else {
-    //   setButtonActive(true);
-    // }
     setButtonActive(true)
-  };
+  }
   useEffect(() => {
+<<<<<<< HEAD
     handleButtonActive();
   }, [description]);
+=======
+    handleButtonActive()
+  }, [description])
+  
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
   return (
     <KeyboardAwareScrollView extraHeight={60}>
       <View style={styles.PostView}>
@@ -104,22 +117,26 @@ export function PostModal({post, onPressSend , setComment}) {
           startDateTime={post.startDateTime}
           endDateTime={post.endDateTime}
           showJoinButton={false}
+          post={post}
         />
         <View
           style={{
             marginTop: 20,
             marginBottom: 10,
           }}>
+<<<<<<< HEAD
           { post.screeningQuestion ? <Text style={{marginBottom:10,fontWeight:'500',fontSize:15}}>{post.screeningQuestion}</Text> : null}
+=======
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
           <NormalTextField
             placeholder="Break the ice with a comment"
-            moreStyles={{marginBottom: 60}}
-            onChangeText={text => setComment(text)}
+            moreStyles={{ marginBottom: 60 }}
+            onChangeText={(text) => setComment(text)}
             autoFocus={false}
           />
           <NormalButton
             text={'Send Request'}
-            onPress={onPressSend}
+            onPress={handleSendingRequest}
             inActive={buttonActive}
             hollow={true}
             moreStyles={{
@@ -140,6 +157,7 @@ function PostHeader({
   moreStyles,
 }) {
   return (
+<<<<<<< HEAD
     <View
       style={{
         ...styles.PostHeaderView,
@@ -157,6 +175,27 @@ function PostHeader({
             addressResult={addressResult}
             showJoinButton
           />
+=======
+    <KeyboardAwareScrollView extraHeight={100}>
+      <View
+        style={{
+          ...styles.PostHeaderView,
+          flexDirection: 'row',
+          ...moreStyles,
+
+          justifyContent: 'space-between',
+        }}>
+        <View style={{ flexDirection: 'row' }}>
+          <PostProfileImage imageUrl={profileImage} />
+          <View style={{ marginLeft: 10 }}>
+            <PostUserName userName={userName} />
+            <PostLocation
+              location={location}
+              addressResult={addressResult}
+              showJoinButton
+            />
+          </View>
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
         </View>
       </View>
 
@@ -169,11 +208,8 @@ function PostLocation({location, addressResult}) {
   const [loading, setLoading] = useState(true);
   const [address, setAddress] = useState(addressResult);
 
-
-
-
   // perfom expensive calculation once
-  useMemo(async () =>   {
+  useMemo(async () => {
     if (location === null || location === '' || location === undefined) {
       setAddress('No Location!');
       return;
@@ -184,12 +220,20 @@ function PostLocation({location, addressResult}) {
       Alert.alert('Error', 'Permission to access location was denied');
       return;
     }
+<<<<<<< HEAD
     let addressResult = await Location.reverseGeocodeAsync(location.coords);
     // console.log('addressResult', addressResult);
     setAddress(String(addressResult[0].name));
     setLoading(false);
   },[location.coords])
 
+=======
+    let addressResult = await Location.reverseGeocodeAsync(location.coords)
+   
+    setAddress(String(addressResult[0].name))
+    setLoading(false)
+  }, [location.coords])
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
 
   return (
     <View style={styles.PostLocationView}>
@@ -204,7 +248,11 @@ function PostDescription({description}) {
   return (
     <View style={styles.PostDescriptionView}>
       <SmallerText
+<<<<<<< HEAD
         moreStyles={{marginBottom: 8, marginTop: 4}}
+=======
+        moreStyles={{ marginBottom: 8, marginTop: 4 }}
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
         content={description}></SmallerText>
     </View>
   );
@@ -229,10 +277,15 @@ function PostProfileImage({imageUrl}) {
 
   return (
     <View style={styles.PostProfileImageView}>
-      <LoadingScreen visible={loading} />
+     
       <Image
         style={styles.postProfileImage}
+<<<<<<< HEAD
         source={{uri: imageUrl}}
+=======
+        source={{ uri: imageUrl }}
+        defaultSource={ImageSet.profile}
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
         onLoadStart={() => setLoading(true)}
         onLoadEnd={() => setLoading(false)}
       />
@@ -288,7 +341,11 @@ function LoadingScreen({visible}) {
   return (
     visible === true && (
       <View
+<<<<<<< HEAD
         style={{flex: 1, justifyContent: 'center', backgroundColor: 'white'}}>
+=======
+        style={{ flex: 1, justifyContent: 'center', backgroundColor: 'white' }}>
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
         <ActivityIndicator size="large" color="#44BFBA" />
       </View>
     )
@@ -359,6 +416,7 @@ function PostTime({startDateTime, endDateTime}) {
     return true;
   };
   useEffect(() => {
+<<<<<<< HEAD
     // console.log(startDateTime , endDateTime , "end date time in posts");
     // startDateTime = new Date(startDateTime)
     // endDateTime = new Date(endDateTime)
@@ -366,6 +424,12 @@ function PostTime({startDateTime, endDateTime}) {
     setStartTimeGreaterThanEndTime(isStartTimegreaterThanCurrentTime());
     formatAllTimes();
   }, []);
+=======
+    getStartTime()
+    setStartTimeGreaterThanEndTime(isStartTimegreaterThanCurrentTime())
+    formatAllTimes()
+  }, [])
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
 
   return (
     <View
@@ -375,7 +439,11 @@ function PostTime({startDateTime, endDateTime}) {
 
         justifyContent: 'center',
       }}>
+<<<<<<< HEAD
       <View style={{flexDirection: 'row'}}>
+=======
+      <View style={{ flexDirection: 'row' }}>
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
         <View>
           <Icon
             type={Icons.Entypo}
@@ -409,10 +477,26 @@ function PostJoinButton({onPress, postId, usersWhoRequested}) {
   const [isUserRequested, setisUserRequested] = useState(false);
   const [message, setMessage] = useState('');
 
+  
+  const getUserId = async () => {
+    const user = await AsyncStorage.getItem('user')
+    return JSON.parse(user).id
+  }
+
+  const onclickJoin = (userWhoWantsToJoin) => {
+    onPress()
+    //usersWhoRequested.push(userWhoWantsToJoin)
+  }
   const checkIfUserRequested = async () => {
+<<<<<<< HEAD
     const user = await AsyncStorage.getItem('user');
     const userId = JSON.parse(user).id;
     console.log('user id is', userId);
+=======
+    const user = await AsyncStorage.getItem('user')
+    const userId = JSON.parse(user).id
+   
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
 
     if (usersWhoRequested.includes(userId)) {
       setisUserRequested(true);
@@ -423,15 +507,21 @@ function PostJoinButton({onPress, postId, usersWhoRequested}) {
     }
   };
 
+<<<<<<< HEAD
   useEffect(() => {
     checkIfUserRequested();
   }, []);
+=======
+  useEffect(async() => {
+    await checkIfUserRequested()
+  }, [])
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
   if (isUserRequested == true) {
     return (
       <View style={styles.PostJoinButtonView}>
         <NormalButton
           text={message}
-          onPress={onPress}
+          onPress={() => null}
           moreStyles={{
             height: 36,
             paddingLeft: 25,
@@ -448,16 +538,20 @@ function PostJoinButton({onPress, postId, usersWhoRequested}) {
           inActive={false}
         />
       </View>
+<<<<<<< HEAD
     );
     // ngoId : 113992437978529065350
     // ebuka egbunam : 101432345899135768743
     //ebuka egb:107841417840884772453
+=======
+    )
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
   } else {
     return (
       <View style={styles.PostJoinButtonView}>
         <NormalButton
           text={message}
-          onPress={onPress}
+          onPress={() => onclickJoin(getUserId())}
           moreStyles={{
             height: 36,
             paddingLeft: 25,
@@ -484,7 +578,38 @@ function PostFooter({
   showJoinButton,
   postId,
   usersWhoRequested,
+  post,
 }) {
+  const [currUser, setCurrUser] = useState(null)
+  const getUserId = async () => {
+    const user = await AsyncStorage.getItem('user')
+    return JSON.parse(user).id
+  }
+  const userCreatedPost = async () => {
+    const userId = await getUserId()
+    setCurrUser(userId)
+    return userId == post.user.id
+  }
+  const shouldShowJoinButton =  () => {
+    if (currUser == null) {
+      return true
+    }
+    const sameUser = () => {
+      return currUser == post.user.id
+    }
+   
+
+    if (sameUser()) {
+      return false
+    }
+    if(showJoinButton){
+      return true
+    }
+    return false 
+  }
+  useEffect(async () => {
+    await userCreatedPost()
+  }, [])
   return (
     <View style={{...styles.PostFooterView, flexDirection: 'row'}}>
    
@@ -492,8 +617,13 @@ function PostFooter({
         time="time test"
         startDateTime={startDateTime}
         endDateTime={endDateTime}
+<<<<<<< HEAD
       /> */}
       {showJoinButton && (
+=======
+      />
+      {shouldShowJoinButton() && (
+>>>>>>> 5c0ae06a85588fb24aabebfa8422ddaf75e98fb0
         <PostJoinButton
           onPress={onPress}
           postId={postId}

@@ -9,7 +9,7 @@ import {
 
 import uuid from 'react-native-uuid'
 import { GET_ALL_REQUESTS, GET_ALL_REQUESTS_ERROR } from '../actionTypes'
-import { getUserRequests } from '../../../firebase'
+import { getActiveUserRequests } from '../../../firebase'
 import { RequestStatus } from '../../components/config/Constant'
 
 //TODO: these below actions types should be move to ../actionTypes
@@ -133,9 +133,8 @@ export const getusersWhoRequested = (postId) => {
 export const getRequests = (userId) => {
   return async (dispatch) => {
     try {
-      const requests = await getUserRequests(userId)
-      console.log('api response of requests ===>>> ', requests[0].requestStatus);
-      console.log('api response of requests ===>>> ', requests[1].requestStatus);
+      const requests = await getActiveUserRequests(userId)
+
       if (requests.length > 0) {
         dispatch({
           type: GET_ALL_REQUESTS,

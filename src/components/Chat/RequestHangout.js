@@ -15,66 +15,91 @@ import {
 import { ColorSet, ImageSet, screenHeight, screenWidth } from "../config/Constant"
 
 const RequestHangout = (props) => {
-    const { headline, description, source, name } = props
+    const { headline, description, source, name, comment, screeningQuestion, screeningAnswer, accepted, rejected, onAccepted, onRejected } = props
     return (
         <View>
             <View style={styles.requestTopContainer}>
-                <View style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: 5,
-                }}>
-                    <Text style={{
-                        fontSize: 18,
-                        lineHeight: 24,
-                        fontWeight: '600',
-                    }}>
+                <View style={styles.topContainerMain}>
+                    <Text style={styles.headline}>
                         {headline}
                     </Text>
-                    <Image style={{
-                        width: 20,
-                        height: 20,
-                        resizeMode: 'contain'
-                    }} source={ImageSet.ArrowRight} />
+                    <Image style={styles.icon} source={ImageSet.ArrowRight} />
                 </View>
-                <Text style={{
-                    fontSize: 16,
-                    lineHeight: 20,
-                    fontWeight: '400',
-                    color: ColorSet.dimGray,
-                }}>
+                <Text style={styles.description}>
                     {description}
                 </Text>
             </View>
-            <View style={styles.requestMainContainer}>
-                <Image
-                    style={styles.userImage}
-                    source={source}
-                />
-                <View>
-                    <Text style={styles.userNameApproachableText}>
-                        {name} is Approachable!
-                    </Text>
-                    <Text style={styles.approachableConnectText}>
-                        Do you want to connect?
-                    </Text>
+            {!comment && !screeningAnswer ?
+                <View style={styles.requestMainContainer}>
+                    {accepted &&
+                        <View style={styles.tick}>
+                            <Image style={styles.icon} source={ImageSet.tick} />
+                        </View>
+                    }
+                    <Image
+                        style={styles.userImage}
+                        source={source}
+                    />
+                    <View>
+                        <Text style={styles.userNameApproachableText}>
+                            {name} is Approachable!
+                        </Text>
+                        <Text style={styles.approachableConnectText}>
+                            Do you want to connect?
+                        </Text>
+                    </View>
                 </View>
-            </View>
-            <View style={styles.acceptRejectBtnContainer}>
-                <TouchableOpacity activeOpacity={0.5}>
-                    <Image
-                        style={[styles.iconButton]}
-                        source={ImageSet.rejected}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.5}>
-                    <Image
-                        style={[styles.iconButton]}
-                        source={ImageSet.accepted}
-                    />
-                </TouchableOpacity>
-            </View>
+                :
+                <View style={styles.requestMainContainerWithComment}>
+                    {accepted &&
+                        <View style={styles.tick}>
+                            <Image style={styles.icon} source={ImageSet.tick} />
+                        </View>
+                    }
+                    <View>
+                        <Text style={styles.userNameApproachableText}>
+                            {screeningQuestion ?
+                                `${name} answered your question, and is approachable!` : `${name} is Approachable!`}
+                        </Text>
+                        <Text style={styles.approachableConnectText}>
+                            {screeningQuestion ? screeningQuestion : 'Do you want to connect'}
+                        </Text>
+                    </View>
+                    <View style={styles.rightMessageView}>
+                        <Image
+                            style={styles.userImage}
+                            source={source}
+                        />
+                        <View style={styles.rightMessageText}>
+                            <Text style={styles.messagesText}>
+                                {comment ? comment : screeningAnswer}
+                            </Text>
+                            <Text
+                                style={styles.dateLabelText}>
+                                {'12m'}
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+            }
+            {!rejected ? !accepted ?
+                <View style={styles.acceptRejectBtnContainer}>
+                    <TouchableOpacity onPress={onRejected} activeOpacity={0.5}>
+                        <Image
+                            style={[styles.iconButton]}
+                            source={ImageSet.rejected}
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={onAccepted} activeOpacity={0.5}>
+                        <Image
+                            style={[styles.iconButton]}
+                            source={ImageSet.accepted}
+                        />
+                    </TouchableOpacity>
+                </View>
+                : null
+                : null
+            }
         </View>
     )
 }
@@ -90,8 +115,35 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         paddingVertical: 20
     },
+    icon: {
+        width: 20,
+        height: 20,
+        resizeMode: 'contain'
+    },
+    tick: {
+        position: 'absolute',
+        top: 20,
+        right: 20
+    },
+    topContainerMain: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 5,
+    },
+    headline: {
+        fontSize: 18,
+        lineHeight: 24,
+        fontWeight: '600',
+    },
+    description: {
+        fontSize: 16,
+        lineHeight: 20,
+        fontWeight: '400',
+        color: ColorSet.dimGray,
+    },
     requestMainContainer: {
-        height: screenHeight.height10,
+        // height: screenHeight.height10,
         backgroundColor: '#44BFBA33',
         borderRadius: 10,
         borderBottomLeftRadius: 0,
@@ -99,8 +151,17 @@ const styles = StyleSheet.create({
         marginBottom: 7,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingLeft: 10,
-        paddingRight: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 20
+    },
+    requestMainContainerWithComment: {
+        backgroundColor: '#44BFBA33',
+        borderRadius: 10,
+        borderBottomLeftRadius: 0,
+        marginHorizontal: 20,
+        marginBottom: 7,
+        paddingHorizontal: 20,
+        paddingVertical: 20
     },
     userImage: {
         width: 45,
@@ -111,7 +172,7 @@ const styles = StyleSheet.create({
     },
     userNameApproachableText: {
         fontSize: 14,
-        lineHeight: 24,
+        lineHeight: 22,
         fontWeight: '400',
         color: ColorSet.dimGray
     },
@@ -134,6 +195,40 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         resizeMode: 'contain',
+    },
+    rightMessageView: {
+        flexDirection: 'row',
+        // justifyContent: 'flex-end',
+        marginVertical: 5,
+    },
+    rightMessageText: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: ColorSet.white,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        borderRadius: 8,
+        borderBottomLeftRadius: 0,
+        minWidth: screenWidth.width10,
+        maxWidth: screenWidth.width60,
+    },
+    dateLabelText: {
+        color: ColorSet.gray,
+        fontSize: 10,
+        lineHeight: 18,
+        fontFamily: 'Poppins_400Regular',
+        fontStyle: 'normal',
+        alignSelf: 'flex-end',
+        marginLeft: 10
+    },
+    messagesText: {
+        color: ColorSet.textBlack,
+        fontSize: 12,
+        lineHeight: 20,
+        fontFamily: 'Poppins_400Regular',
+        fontStyle: 'normal',
+        minWidth: screenWidth.width5,
+        maxWidth: screenWidth.width65,
     },
 })
 

@@ -131,7 +131,6 @@ export default function LandingPage({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
-      <AppHeader moreStyles={{ height: 50 }} />
       <View style={styles.container}>
         <View style={styles.container}>
           <Center />

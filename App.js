@@ -1,13 +1,11 @@
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import RootNavigator from './src/navigation/RootNavigator'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import Sucess from './src/screens/Onboarding/Sucess'
 import { CategoryProvider } from './src/context/CategorieContext'
-import { UserContext, UserProvider } from './src/context/UserContext'
-import { Provider, useSelector } from 'react-redux'
-import AppHeader from './src/components/Utility/AppHeader'
+import { UserProvider } from './src/context/UserContext'
+import { Provider } from 'react-redux'
+
 import { store } from './src/store/index'
 
 export default function App() {
@@ -31,9 +29,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 })
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-// });

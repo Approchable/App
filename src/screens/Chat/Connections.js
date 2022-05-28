@@ -20,7 +20,8 @@ import {
 import MyStatusBar from '../../components/MyStatusBar'
 import {
   getConnectionById,
-  getUserRequests,
+  getActiveUserRequests,
+  getUserConnectionsById,
   updateRequestStatus,
 } from '../../../firebase'
 import { SafeAreaView } from 'react-native'
@@ -31,30 +32,30 @@ import { dateDifference } from '../../components/Utility/Helper'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const DataArray = [
-  {
-    name: 'Jane',
-    lastMassage: 'hi!',
-    time: '2h',
-    count: 8,
-  },
-  {
-    name: 'Leslie',
-    lastMassage: 'In general, everything is fine, but..',
-    time: '14h',
-    count: 1,
-  },
-  {
-    name: 'Kristin',
-    lastMassage: 'Amet minim mollit non desseermo..',
-    time: '14h',
-    count: 0,
-  },
-  {
-    name: 'Dianne',
-    lastMassage: 'Amet minim mollit non desseermo..',
-    time: '12h',
-    count: 0,
-  },
+  //   {
+  //     name: 'Jane',
+  //     lastMassage: 'hi!',
+  //     time: '2h',
+  //     count: 8,
+  //   },
+  //   {
+  //     name: 'Leslie',
+  //     lastMassage: 'In general, everything is fine, but..',
+  //     time: '14h',
+  //     count: 1,
+  //   },
+  //   {
+  //     name: 'Kristin',
+  //     lastMassage: 'Amet minim mollit non desseermo..',
+  //     time: '14h',
+  //     count: 0,
+  //   },
+  //   {
+  //     name: 'Dianne',
+  //     lastMassage: 'Amet minim mollit non desseermo..',
+  //     time: '12h',
+  //     count: 0,
+  //   },
 ]
 const RequestsDataArray = [
   {
@@ -86,15 +87,15 @@ export default function Connections({ navigation }) {
   )
   // const loading = useSelector((state) => state.GetConnectionsReducer.loading)
   const [conId, setConId] = useState('conid_12345680')
-  const [conId2, setConId2] = useState('101432345899135768743')
   const [connectionTab, setConnectionTab] = useState(true)
   const [requestTab, setRequestTab] = useState(false)
   const [isFetched, setIsFetched] = useState(true)
   const [isFetchedRequest, setIsFetchedRequest] = useState(false)
   const [requestStatus, setRequestStatus] = useState(false)
-  const [connectionsArray, setConnectionsArray] = useState(DataArray)
+  const [connectionStatus, setConnectionStatus] = useState(false)
+  const [connectionsArray, setConnectionsArray] = useState([])
   const [requestArray, setRequestsArray] = useState([])
-  const [currentUserId, setCurrentUserId] = useState(undefined)
+  const [user, setUser] = useState('')
 
   const dispatch = useDispatch()
 
@@ -102,20 +103,37 @@ export default function Connections({ navigation }) {
     const unsubscribe = navigation.addListener('focus', () => {
       _getRequests()
       _getConnections()
-      setTimeout(() => {
-        // checkStatus()
-        setIsFetched(false)
-      }, 2000)
+      getCurrentUserData()
     })
     return unsubscribe
   }, [])
 
-  useEffect(() => {
-    console.log('requestArray.length ===>>> ', requestArray.length)
-  }, [])
+  const getCurrentUserData = async () => {
+    var user = await AsyncStorage.getItem('user')
+    const u = JSON.parse(user)
+    console.log('user id is', u.id)
+    setUser(u)
+  }
 
   const _getConnections = async () => {
-    dispatch(getConnections(conId))
+    setIsFetched(true)
+    setConnectionStatus(false)
+    const user = await AsyncStorage.getItem('user')
+    const userId = JSON.parse(user).id
+    if (userId) {
+      const connectionsData = await getUserConnectionsById(userId)
+      setConnectionsArray(connectionsData)
+      setTimeout(async () => {
+        const user = await AsyncStorage.getItem('user')
+        const currentUserId = JSON.parse(user).id
+        connectionsData.map((item, index) => {
+          checkConnectionsUnreadMessage(item)
+        })
+      }, 500)
+      setIsFetched(false)
+    } else {
+      // console.log(`unable to fetch current logged in user ID.`)
+    }
   }
 
   const _getRequests = async () => {
@@ -123,35 +141,29 @@ export default function Connections({ navigation }) {
     const user = await AsyncStorage.getItem('user')
     const userId = JSON.parse(user).id
     if (userId) {
-      console.log(
-        `trying to fetch the current logged in user(${userId}) requests`
-      )
+      // console.log(`trying to fetch the current logged in user(${userId}) requests`)
       dispatch(getRequests(userId))
-      const requestsData = await getUserRequests(userId)
+      const requestsData = await getActiveUserRequests(userId)
       setRequestsArray(requestsData)
       setTimeout(() => {
         let checker = requestsData.every(
           (i) => i.requestStatus === RequestStatus.opened
         )
-        console.log('requestsData checker ===>>> ', checker)
+        // console.log('requestsData checker ===>>> ', checker)
         setRequestStatus(checker ? false : true)
       }, 500)
       setIsFetchedRequest(false)
     } else {
-      console.log(`unable to fetch current logged in user ID.`)
+      // console.log(`unable to fetch current logged in user ID.`)
     }
   }
 
-  const onClickChatButton = async () => {
-    _getConnections()
-    // console.log('conId ===>>>  ', conId)
-    const connections = await getConnectionById(conId)
-    if (connections) {
-      // console.log('connections new 1 ====>> ', connections)
-      navigation.navigate(Routes.Chat, { data: connections })
-    } else {
-      // console.log('connections new 2 ====>> ', connections)
-    }
+  const onClickConnection = async (item) => {
+    checkConnectionsUnreadMessage(item)
+    navigation.navigate(Routes.Chat, {
+      connection: item,
+      isRequestRoute: false,
+    })
   }
 
   const onClickRequestButton = async (request, index) => {
@@ -175,9 +187,14 @@ export default function Connections({ navigation }) {
 
     navigation.navigate(Routes.Chat, {
       isRequestRoute: true,
-      connection: connections,
       request: request,
+      onGoBack: () => onRefresh(),
     })
+  }
+
+  const onRefresh = () => {
+    tabsChangingHandler(TabType.connections)
+    // console.log('=============================> on go back function called successfully <=============================');
   }
 
   const tabsChangingHandler = (tabType) => {
@@ -204,8 +221,26 @@ export default function Connections({ navigation }) {
     let checker = requestArray.every(
       (i) => i.requestStatus === RequestStatus.opened
     )
-    console.log(' checker ========>>>> ', checker)
+    // console.log(' checker ========>>>> ', checker)
     setRequestStatus(checker ? false : true)
+  }
+
+  const checkConnectionsUnreadMessage = async (item) => {
+    const user = await AsyncStorage.getItem('user')
+    const currentUserId = JSON.parse(user).id
+
+    if (
+      item.userReceiving != undefined &&
+      item.userReceiving.id == currentUserId
+    ) {
+      if (item.userSenderUnreadCount > 0) {
+        setConnectionStatus(true)
+      }
+    } else {
+      if (item.userReceiveUnreadCount > 0) {
+        setConnectionStatus(true)
+      }
+    }
   }
 
   return (
@@ -217,7 +252,7 @@ export default function Connections({ navigation }) {
           // value={value}
           style={styles.textInput}
           placeholder={'Search'}
-        // onChangeText={onChangeText}
+          // onChangeText={onChangeText}
         />
         <Image style={styles.filterIcon} source={ImageSet.filter} />
       </View>
@@ -230,11 +265,10 @@ export default function Connections({ navigation }) {
               borderColor: connectionTab
                 ? ColorSet.defaultTheme
                 : ColorSet.dimGray,
-              borderBottomWidth: connectionTab && 1.5,
+              borderBottomWidth: connectionTab ? 1.5 : 0,
             },
           ]}
-          onPress={() => tabsChangingHandler(TabType.connections)}
-        >
+          onPress={() => tabsChangingHandler(TabType.connections)}>
           <Text
             style={[
               styles.tabsText,
@@ -244,7 +278,9 @@ export default function Connections({ navigation }) {
             ]}>
             Connections
           </Text>
-          <Image style={styles.dotIcon} source={ImageSet.dot} />
+          {connectionStatus && (
+            <Image style={styles.dotIcon} source={ImageSet.dot} />
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.5}
@@ -254,11 +290,10 @@ export default function Connections({ navigation }) {
               borderColor: requestTab
                 ? ColorSet.defaultTheme
                 : ColorSet.dimGray,
-              borderBottomWidth: requestTab && 1.5,
+              borderBottomWidth: requestTab ? 1.5 : 0,
             },
           ]}
-          onPress={() => tabsChangingHandler(TabType.requests)}
-        >
+          onPress={() => tabsChangingHandler(TabType.requests)}>
           <Text
             style={[
               styles.tabsText,
@@ -276,6 +311,45 @@ export default function Connections({ navigation }) {
         connectionsArray.length > 0 ? (
           <View style={styles.mainView}>
             {connectionsArray.map((item, index) => {
+              // console.log(item)
+              const time = dateDifference(item.updatedAt.seconds)
+              const userReceiving = item.userReceiving
+              // console.log("User Receiver --> ", userReceiving)
+              const userSending = item.userSendingRequest
+              // console.log("User Sender --> ", userSending)
+
+              const currentUserId = user.id
+
+              const lastMessage = item.lastMessage
+              //get other user participant ID
+
+              // detect current user from userReceiving and userSending
+              let currentUser
+              let otherUser
+              let unReadMsgCount = 0
+              if (
+                userReceiving != undefined &&
+                userReceiving.id == currentUserId
+              ) {
+                currentUser = userReceiving
+                otherUser = userSending
+                unReadMsgCount = item.userSenderUnreadCount
+              } else {
+                otherUser = userReceiving
+                currentUser = userSending
+                unReadMsgCount = item.userReceiveUnreadCount
+              }
+
+              // console.log("User Current --> ", currentUser)
+              // console.log("User Other --> ", otherUser)
+
+              let message =
+                lastMessage &&
+                lastMessage.message.replace(
+                  '<otherUserName>',
+                  otherUser.givenName
+                )
+
               return (
                 <SkeletonContent
                   key={index}
@@ -290,29 +364,32 @@ export default function Connections({ navigation }) {
                     styles.countShimmer,
                   ]}>
                   <TouchableOpacity
+                    onPress={() => onClickConnection(item)}
                     activeOpacity={0.5}
                     style={styles.connectionsView}>
                     <View style={styles.centerRowAlign}>
                       <Image
                         style={styles.userImage}
-                        source={ImageSet.profile}
+                        source={{ uri: otherUser && otherUser.photoUrl }}
                       />
                       <View>
-                        <Text style={styles.userName}>{item.name}</Text>
+                        <Text style={styles.userName}>
+                          {otherUser && otherUser.name}
+                        </Text>
                         <View style={styles.lastMessageView}>
                           <Text
                             numberOfLines={1}
                             style={styles.lastMessageText}>
-                            {item.lastMassage}
+                            {message}
                           </Text>
                         </View>
                       </View>
-                      <Text style={styles.time}>{'  ' + item.time}</Text>
+                      <Text style={styles.time}>{'  ' + time}</Text>
                     </View>
-                    {(item.count && (
+                    {(unReadMsgCount && (
                       <View style={styles.messageCountView}>
                         <Text style={styles.messageCount}>
-                          {item.count && item.count}
+                          {unReadMsgCount}
                         </Text>
                       </View>
                     )) || <View style={{ width: screenWidth.width5 }} />}
@@ -378,15 +455,15 @@ export default function Connections({ navigation }) {
                                   time == 'just now'
                                     ? screenWidth.width55
                                     : status == RequestStatus.pending
-                                      ? screenWidth.width60
-                                      : screenWidth.width65,
+                                    ? screenWidth.width60
+                                    : screenWidth.width65,
                               },
                             ]}>
                             {item.comments
                               ? item.comments
                               : data.givenName +
-                              ' ' +
-                              'is Approachable! start the chat.'}
+                                ' ' +
+                                'is Approachable! start the chat.'}
                           </Text>
                         </View>
                       </View>
