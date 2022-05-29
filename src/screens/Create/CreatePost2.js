@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { NormalButton, TextButton } from '../../components/Buttons'
+import LocationSearch from '../../components/LocationSearch'
 import { NaviagteOutOfCreate, createPosts } from '../../store/actions'
 import { useDispatch } from 'react-redux'
 import {
@@ -27,14 +28,14 @@ import * as Location from 'expo-location'
 import MyStatusBar from '../../components/MyStatusBar'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
+
 export default function CreatePost2({ navigation, route }) {
   const selectedStartTime = 'start'
   const selectedEndTime = 'end'
 
   const dispatch = useDispatch()
-
   const currenTime = new Date()
-
+  const googleApiKey = "AIzaSyDNEZdKGtGmuL6jFRd4w4rK_JN1HeS4FYs"
   const [description, setDescription] = useState(null)
   const [buttonActive, setButtonActive] = useState(false)
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)

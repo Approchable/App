@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, TextInput, SafeAreaView } from 'react-native'
 import { NormalButton } from '../../components/Buttons'
-import AppLoading from 'expo-app-loading'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import {
   useFonts,
   Poppins_400Regular,
@@ -66,13 +65,15 @@ export default function Name({ route, navigation }) {
         <View style={styles.mainView}>
           <Text
             style={{
-              ...HeadingStyle,
+              textAlign: 'center',
+              fontWeight: 'bold',
+              fontSize: 24,
+              lineHeight: 36,
               fontFamily: 'Poppins_700Bold',
               fontWeight: '700',
               textAlign: 'left',
               marginVertical: 24,
-            }}
-          >
+            }}>
             What's your name?
           </Text>
           <NormalTextField
@@ -93,8 +94,7 @@ export default function Name({ route, navigation }) {
             ...styles.mainView,
             justifyContent: 'flex-end',
             marginVertical: 20,
-          }}
-        >
+          }}>
           <NormalButton
             text="Next"
             onPress={() =>

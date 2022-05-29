@@ -7,7 +7,7 @@ import {
 import { Dimensions } from 'react-native';
 import { useState, useEffect } from 'react';
 import Center from '../../components/Utility/Center';
-import HeadingStyle from '../../components/Utility/Styles/TextStyles';
+
 import { Platform } from 'react-native';
 import LandingPageImage from '../../assets/images/assets/LandingPageImage.svg';
 import * as Google from 'expo-google-app-auth';

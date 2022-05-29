@@ -25,6 +25,7 @@ import * as Random from 'expo-random'
 import uuid from 'react-native-uuid'
 import ReportModal from '../../components/ReportModal'
 import SkeletonContent from 'react-native-skeleton-content'
+import LocationSearchBar from '../../components/LocationSearch'
 import {
   screenWidth,
 } from '../../components/config/Constant'
@@ -94,6 +95,8 @@ function Explore({ navigation }) {
         {loading ? (
           <ExploreLoader loading={loading} />
         ) : (
+         <>
+        <LocationSearchBar/>
           <FlatList
             style={{
               marginTop: 20,
@@ -129,6 +132,7 @@ function Explore({ navigation }) {
               />
             )}
           />
+          </>
         )}
 
           <JoinModal
@@ -186,7 +190,7 @@ function NoPost({ navigation }) {
   )
 }
 
-const JoinModal = ({ visible, postObject, onCancel }) => {
+ const JoinModal = ({ visible, postObject, onCancel }) => {
   const dispatch = useDispatch()
   const [comment, setComment] = useState('')
   const handleSendRequest = (post , comment="") => {
