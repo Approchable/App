@@ -29,14 +29,14 @@ const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 const MapScreen = () => {
 
   const initialMapState = {
-    markers,
-    region: {
-      latitude: 51.5051281,
-      longitude: -0.0929633,
-      latitudeDelta: 0.2,
-      longitudeDelta: 0.1, 
-    },
+    markers  
   };
+  const initialRegion = {
+    latitude: null,
+    longitude: null,
+    latitudeDelta: 0.2,
+    longitudeDelta: 0.1, 
+  }
 
   const [state, setState] = React.useState(initialMapState);
   const [location, setLocation] = React.useState(null);
@@ -45,6 +45,8 @@ const MapScreen = () => {
   const [loading, setLoading] = React.useState(false)
   const [showMapCard, setShowMapCard] = React.useState(false)
   const [currentIndex, setCurrentIndex] = React.useState(0)
+  const [userRegion, setUserRegion] = React.useState(initialRegion)
+
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
 
@@ -78,8 +80,8 @@ const MapScreen = () => {
             {
               latitude: state.markers[index].location.coords.latitude,
               longitude: state.markers[index].location.coords.longitude,
-              latitudeDelta: state.region.latitudeDelta,
-              longitudeDelta: state.region.longitudeDelta,
+              latitudeDelta: userRegion.latitudeDelta,
+              longitudeDelta: userRegion.longitudeDelta,
             },
             350
           );
@@ -138,7 +140,7 @@ const MapScreen = () => {
 
       let location = await Location.getLastKnownPositionAsync();
       setLocation(location);
-    
+      setUserRegion({...userRegion,latitude: location.coords.latitude, longitude: location.coords.longitude});
     })();
   }, []);
 
@@ -165,8 +167,9 @@ const MapScreen = () => {
     <View style={styles.container}>
 
       {location === null ? <View style={styles.loader}><Text>Getting Location...</Text></View> : null}
-
-      <MapView ref={_map} style={styles.map} region={{ latitude: location != null ? location.coords.latitude : state.region.latitude, longitude: location != null ? location.coords.longitude : state.region.longitude, latitudeDelta: location != null ? 0.2 : 0.01, longitudeDelta: location != null ? 0.1 : 0.01 }}>
+      {userRegion.latitude === null ? <View style={styles.loader}><Text>Getting Location...</Text></View> :
+      <View>
+       <MapView ref={_map} style={styles.map} region={{ latitude: location != null ? location.coords.latitude : userRegion.latitude, longitude: location != null ? location.coords.longitude : userRegion.longitude, latitudeDelta: location != null ? 0.2 : 0.01, longitudeDelta: location != null ? 0.1 : 0.01 }}>
         {location != null ?
           <Marker coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}>
             <View style={[styles.markerWrap]}>
@@ -265,7 +268,9 @@ const MapScreen = () => {
         postObject={modalPost}
       />
     </View>
-
+}
+      </View>
+     
   );
 }
 
