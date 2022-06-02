@@ -10,7 +10,7 @@ import { useDispatch } from "react-redux"
 import { PostModal } from "./Post"
 import { sendJoinRequest } from '../store/Requests/Requests'
 import ModalBarTop from './ModalBarTop'
-const JoinModal = ({ visible, postObject, onCancel }) => {
+const JoinModal = ({ duration,visible, postObject, onCancel }) => {
     const dispatch = useDispatch()
     const [comment, setComment] = useState('') 
     const handleSendRequest = (post , comment="") => {
@@ -33,6 +33,7 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
             onPressSend={() => {
               handleSendRequest(postObject , comment)
             }}
+            duration={duration}
           />
         </View>
         <TouchableWithoutFeedback onPress={onCancel}>

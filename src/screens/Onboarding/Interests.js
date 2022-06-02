@@ -7,24 +7,24 @@ import {
   Dimensions,
   ScrollView,
   SafeAreaView,
-} from 'react-native';
-import { NormalButton } from '../../components/Buttons';
-import Center from '../../components/Utility/Center';
-import { HeaderText, RegularText, SmallerText } from '../../components/Texts';
-import LandingPage from '../Onboarding/LandingPage';
-import HowItWorks from './HowItWorks';
-import { useState, useEffect, useContext, useRef } from 'react';
-import { writeUserData } from '../../../firebase';
-import CategoryItem from '../../components/CategoryItem';
-import { CategorieContext } from '../..//context/CategorieContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserContext, UserProvider } from '../../context/UserContext';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import { useDispatch } from 'react-redux';
-import { login } from '../../store/actions';
-import MyStatusBar from '../../components/MyStatusBar';
-import { ImageSet } from '../../components/config/Constant';
+} from 'react-native'
+import { NormalButton } from '../../components/Buttons'
+import Center from '../../components/Utility/Center'
+import { HeaderText, RegularText, SmallerText } from '../../components/Texts'
+import LandingPage from '../Onboarding/LandingPage'
+import HowItWorks from './HowItWorks'
+import { useState, useEffect, useContext, useRef } from 'react'
+import { writeUserData } from '../../../firebase'
+import CategoryItem from '../../components/CategoryItem'
+import { CategorieContext } from '../..//context/CategorieContext'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { UserContext, UserProvider } from '../../context/UserContext'
+import * as Device from 'expo-device'
+import * as Notifications from 'expo-notifications'
+import { useDispatch } from 'react-redux'
+import { login } from '../../store/actions'
+import MyStatusBar from '../../components/MyStatusBar'
+import { ImageSet } from '../../components/config/Constant'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -121,9 +121,7 @@ export default function Interests({ navigation, route }) {
       if (finalResult['photoUrl'] == undefined) {
         finalResult['photoUrl'] = ImageSet.defaultProfileImage
       }
-      console.log('finalResult', finalResult);
-
-
+      console.log('finalResult', finalResult)
 
       navigation.navigate('Waitlist', finalResult)
     })
@@ -162,8 +160,7 @@ export default function Interests({ navigation, route }) {
             // flex: 1,
             // backgroundColor: 'red',
             flexWrap: 'wrap',
-          }}
-        >
+          }}>
           <HeaderText content="What do you like?" />
           <SmallerText content="Select below to help us find the people and hangouts for you" />
         </View>
@@ -178,8 +175,7 @@ export default function Interests({ navigation, route }) {
             marginBottom: 50,
             justifyContent: 'flex-end',
             // backgroundColor: 'blue',
-          }}
-        >
+          }}>
           <ScrollView style={{ marginBottom: -15 }}>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
               {CategorieArr.map((item, index) => (
@@ -242,6 +238,7 @@ async function registerForPushNotificationsAsync() {
   if (Device.isDevice) {
     const { status: existingStatus } = await Notifications.getPermissionsAsync()
     let finalStatus = existingStatus
+
     if (existingStatus !== 'granted') {
       const { status } = await Notifications.requestPermissionsAsync()
       finalStatus = status
@@ -250,8 +247,8 @@ async function registerForPushNotificationsAsync() {
       alert('Failed to get push token for push notification!')
       return
     }
+
     token = (await Notifications.getExpoPushTokenAsync()).data
-    console.log(token)
   } else {
     alert('Must use physical device for Push Notifications')
   }

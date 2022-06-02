@@ -19,6 +19,10 @@ import JoinModal from '../../components/JoinModal';
 import SkeletonContent from 'react-native-skeleton-content'
 import MapLoader from '../../components/MapLoader';
 import MapCard from '../../components/MapCard';
+import { useSelector } from 'react-redux'
+import moment from 'moment'
+import MapViewDirections from 'react-native-maps-directions';
+import { Snackbar } from 'react-native-paper';
 
 
 const { width, height } = Dimensions.get("window");
@@ -37,7 +41,7 @@ const MapScreen = () => {
     latitudeDelta: 0.2,
     longitudeDelta: 0.1, 
   }
-
+  var posts = useSelector((state) => state.GetPostsReducer.posts)
   const [state, setState] = React.useState(initialMapState);
   const [location, setLocation] = React.useState(null);
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -46,7 +50,9 @@ const MapScreen = () => {
   const [showMapCard, setShowMapCard] = React.useState(false)
   const [currentIndex, setCurrentIndex] = React.useState(0)
   const [userRegion, setUserRegion] = React.useState(initialRegion)
-
+  const [mdest, setMDest] = React.useState()
+  const [duration, setDuration] = React.useState("0")
+  const [snackbar, setSnackbar] = React.useState(true)
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
 
@@ -54,17 +60,26 @@ const MapScreen = () => {
   const handleJoin = (postObject) => {
     setModalVisible(true)
     setModalPost(postObject)
+    setMDest({
+      latitude: postObject.location.coords.latitude, 
+      longitude: postObject.location.coords.longitude
+    })
   }
 
   const handleCancel = () => {
     setModalVisible(false)
   }
+  const _getPosts = () => {
+    dispatch(getPosts())
+  }
 
   useEffect(() => {
+    if(posts.length > 0){
+
     mapAnimation.addListener(({ value }) => {
       let index = Math.floor(value / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
-      if (index >= state.markers.length) {
-        index = state.markers.length - 1;
+      if (index >= posts.length) {
+        index = posts.length - 1;
       }
       if (index <= 0) {
         index = 0;
@@ -75,11 +90,11 @@ const MapScreen = () => {
       const regionTimeout = setTimeout(() => {
         if (mapIndex !== index) {
           mapIndex = index;
-          // const { coordinate } = state.markers[index];
+          // const { coordinate } = posts[index];
           _map.current.animateToRegion(
             {
-              latitude: state.markers[index].location.coords.latitude,
-              longitude: state.markers[index].location.coords.longitude,
+              latitude: posts[index].location.coords.latitude,
+              longitude: posts[index].location.coords.longitude,
               latitudeDelta: userRegion.latitudeDelta,
               longitudeDelta: userRegion.longitudeDelta,
             },
@@ -87,10 +102,16 @@ const MapScreen = () => {
           );
         }
       }, 10);
-    });
-  });
+    })
 
-  const interpolations = state.markers.map((marker, index) => {
+}
+else{
+  _getPosts();
+}
+
+});
+
+  const interpolations = posts.map((marker, index) => {
     
     const inputRange = [
       (index - 1) * CARD_WIDTH,
@@ -104,11 +125,14 @@ const MapScreen = () => {
       extrapolate: "clamp",
     });
 
-   console.log('scalex', scale)
     return { scale };
   });
 
-  const onMarkerPress = (mapEventData, index) => {
+  const onMarkerPress = (mapEventData, index,postObject) => {
+    setMDest({
+      latitude: postObject.location.coords.latitude, 
+      longitude: postObject.location.coords.longitude
+    })
     setCurrentIndex(index)
     setShowMapCard(true)
     setLoading(true)
@@ -141,6 +165,10 @@ const MapScreen = () => {
       let location = await Location.getLastKnownPositionAsync();
       setLocation(location);
       setUserRegion({...userRegion,latitude: location.coords.latitude, longitude: location.coords.longitude});
+      setMDest({
+        latitude: location.coords.latitude, 
+        longitude: location.coords.longitude
+      })
     })();
   }, []);
 
@@ -170,6 +198,26 @@ const MapScreen = () => {
       {userRegion.latitude === null ? <View style={styles.loader}><Text>Getting Location...</Text></View> :
       <View>
        <MapView ref={_map} style={styles.map} region={{ latitude: location != null ? location.coords.latitude : userRegion.latitude, longitude: location != null ? location.coords.longitude : userRegion.longitude, latitudeDelta: location != null ? 0.2 : 0.01, longitudeDelta: location != null ? 0.1 : 0.01 }}>
+
+       <MapViewDirections
+       strokeWidth={3}
+       strokeColor="transparent"
+        origin={{latitude: location.coords.latitude, longitude: location.coords.longitude}}
+        destination={mdest}
+        apikey="AIzaSyAvwVXBZBx-CLXVRXh12x-turx4BkVnh-Y"
+        optimizeWaypoints={true}
+        onStart={(params) => {
+          console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
+        }}
+        onReady={result => {
+          // console.log(`Distance: ${result.distance} km`)
+          // console.log(`Duration: ${result.duration} min.`)
+          setDuration(result.duration)
+        }}
+        onError={(errorMessage) => {
+          console.log('GOT AN ERROR');
+        }}
+      />
         {location != null ?
           <Marker coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}>
             <View style={[styles.markerWrap]}>
@@ -186,7 +234,7 @@ const MapScreen = () => {
               />
             </View>
           </Marker> : null}
-        {state.markers.map((marker, index) => {
+        {posts.map((marker, index) => {
           const scaleStyle = {
             transform: [
               {
@@ -199,10 +247,10 @@ const MapScreen = () => {
             borderColor: "#44BFBA",
           };
           return (
-            <Marker key={index} coordinate={{"latitude": marker.location.coords.latitude,"longitude": marker.location.coords.longitude}} onPress={(e) => onMarkerPress(e, index)}>
+            <Marker key={index} coordinate={{"latitude": marker.location.coords.latitude,"longitude": marker.location.coords.longitude}} onPress={(e) => onMarkerPress(e, index,marker)}>
               <Animated.View style={[styles.markerWrap]}>
                 <Animated.View style={{ position: "absolute", top: 0, right: 0, backgroundColor: "#F18D33", borderRadius: "12px", padding: 5, zIndex: 3, elevation: 3, marginTop: -10, marginRight: -30 }}>
-                  <Text style={{ color: "white" }}>in {marker.timing}</Text>
+                  <Text style={{ color: "white" }}> {moment.unix(marker.startDateTime.seconds).endOf('hour').fromNow()}</Text>
                 </Animated.View>
                 <Animated.Image
                   source={{ uri: marker.user.photoUrl }}
@@ -224,6 +272,7 @@ const MapScreen = () => {
       <TouchableOpacity style={[styles.actionBox, styles.send]} onPress={getUserLocation}>
         <Image style={{ width: 20, height: 20 }} source={require('../../assets/images/assets/send.png')} />
       </TouchableOpacity>
+ 
 
 
       <ScrollView
@@ -246,14 +295,14 @@ const MapScreen = () => {
         }}
         
       >
-     { showMapCard ?  state.markers.map((marker, index) => {
+     { showMapCard ?  posts.map((marker, index) => {
           return (
             
             <TouchableOpacity key={index} onPress={()=>{handleJoin(marker)}}>
             <View style={styles.places}>
             {loading ? 
             <MapLoader/> : 
-            <MapCard marker={marker} />
+            <MapCard marker={marker} duration={duration} index={index} currentIndex={currentIndex}/>
                }
             </View>
             </TouchableOpacity>
@@ -263,6 +312,7 @@ const MapScreen = () => {
 
       </ScrollView>
       <JoinModal
+      duration={duration}
         visible={modalVisible}
         onCancel={() => handleCancel()}
         postObject={modalPost}
@@ -338,9 +388,8 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: "center",
     justifyContent: "center",
-    width: 50,
-    height: 50,
-
+    width: 70,
+    height: 70
   },
   marker: {
     width: 48,

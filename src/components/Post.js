@@ -18,6 +18,7 @@ import FastImage from 'react-native-fast-image'
 import { getusersWhoRequested } from '../store/Requests/Requests'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ExploreReport } from './Report'
+import moment from 'moment'
 var dayjs = require('dayjs')
 
 export default function Post({
@@ -62,7 +63,7 @@ export default function Post({
   )
 }
 
-export function PostModal({ post, onPressSend, setComment }) {
+export function PostModal({ post, onPressSend, setComment, duration }) {
   const dispatch = useDispatch()
   if (post === null || post === undefined) {
     return null
@@ -98,7 +99,7 @@ export function PostModal({ post, onPressSend, setComment }) {
         <PostTitle title={post.headline} />
         <PostDescription description={post.description} />
         <PostImage imageUrl={post.imageUrl} />
-        <PostTiming post={post} />
+        <PostTiming post={post} duration={duration} />
 
         <PostFooter
           startDateTime={post.startDateTime}
@@ -115,7 +116,6 @@ export function PostModal({ post, onPressSend, setComment }) {
               {post.screeningQuestion}
             </Text>
           ) : null}
-
           <NormalTextField
             placeholder={
               post.screeningQuestion
@@ -266,7 +266,7 @@ function PostImage({ imageUrl }) {
   }
 }
 
-function PostTiming(post) {
+function PostTiming({ post, duration }) {
   return (
     <View
       style={{
@@ -287,7 +287,11 @@ function PostTiming(post) {
           style={{ marginRight: 5 }}
           source={require('../assets/images/assets/Clock.png')}
         />
-        <Text>{`${post.post.startTime}-${post.post.endTime}`}</Text>
+        <Text>{`${moment
+          .unix(post.startDateTime.seconds)
+          .format('LT')} - ${moment
+          .unix(post.endDateTime.seconds)
+          .format('LT')}`}</Text>
       </View>
       <View
         style={{
@@ -309,9 +313,9 @@ function PostTiming(post) {
           source={require('../assets/images/assets/MapPin.png')}
         />
         <Text>
-          {post.post.duration / 60 > 20
-            ? `${post.post.duration / 60} mins drive`
-            : `${post.post.duration / 60} mins walk`}
+          {duration > 20
+            ? `${Math.round(duration)} mins drive`
+            : `${Math.round(duration)} mins walk`}
         </Text>
       </View>
     </View>
