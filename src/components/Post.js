@@ -525,11 +525,11 @@ function PostFooter({
 }) {
   return (
     <View style={{ ...styles.PostFooterView, flexDirection: 'row' }}>
-      {/* <PostTime
+      <PostTime
         time="time test"
         startDateTime={startDateTime}
         endDateTime={endDateTime}
-      /> */}
+      />
       {showJoinButton && (
         <PostJoinButton
           onPress={onPress}
