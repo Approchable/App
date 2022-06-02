@@ -1,32 +1,26 @@
-import { View, TextInput, StyleSheet } from 'react-native'
-import { useRef } from 'react'
+import {View, TextInput, StyleSheet} from 'react-native';
+import {useRef} from 'react';
 
-export function NormalTextField({
-  placeholder,
-  onChangeText,
-  onDelete,
-  value,
-  moreStyles,
-  autoFocus,
-}) {
-  var ref = useRef('null')
+export function NormalTextField({placeholder, onChangeText, onDelete, value , moreStyles , autoFocus}) {
+  var ref = useRef('null');
   return (
-    <View style={{ ...styles.textInputView, ...moreStyles }}>
+    <View style={{...styles.textInputView, ...moreStyles}}>
       <TextInput
         ref={ref}
-        autoFocus={autoFocus}
+        autoFocus={autoFocus} 
         value={value}
-        placeholderTextColor="#696969"
-        style={{ ...styles.textInput }}
+        placeholderStyle = {{color:"red"}}
+        placeholderTextColor="#696969" 
+        style={{...styles.textInput }}
         placeholder={placeholder}
         onChangeText={onChangeText}
         paddingStyle={styles.paddingStyle}
-        onKeyPress={(e) => {
-          e.nativeEvent.key === 'Backspace' ? null : null
+        onKeyPress={e => {
+          e.nativeEvent.key === 'Backspace' ? null : null;
         }}
       />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -49,4 +43,4 @@ const styles = StyleSheet.create({
   textInputView: {
     //marginVertical: 5,
   },
-})
+});

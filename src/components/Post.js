@@ -18,7 +18,7 @@ import FastImage from 'react-native-fast-image'
 import { getusersWhoRequested } from '../store/Requests/Requests'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ExploreReport } from './Report'
-import { ImageSet } from '..//components//config//Constant'
+import moment from 'moment'
 var dayjs = require('dayjs')
 
 export default function Post({
@@ -34,21 +34,14 @@ export default function Post({
   onPress,
   postId,
   usersWhoRequested,
-  handleModalOpen,
-  setCurrentReportPost,
-  post,
 }) {
-  
   return (
     <View style={styles.PostView}>
       <PostHeader
         userName={userName}
-        postId={postId}
         location={location}
         addressResult={addressResult}
         profileImage={profileImage}
-        handleModalOpen={handleModalOpen}
-        setCurrentReportPost={setCurrentReportPost}
         moreStyles={{
           marginBottom: 8,
           marginTop: 16,
@@ -65,13 +58,12 @@ export default function Post({
         showJoinButton={true}
         postId={postId}
         usersWhoRequested={usersWhoRequested}
-        post={post}
       />
     </View>
   )
 }
 
-export function PostModal({ post, onPressSend, setComment }) {
+export function PostModal({ post, onPressSend, setComment, duration }) {
   const dispatch = useDispatch()
   if (post === null || post === undefined) {
     return null
@@ -80,16 +72,17 @@ export function PostModal({ post, onPressSend, setComment }) {
   const [buttonActive, setButtonActive] = useState(false)
   const [hasJoined, setHasJoined] = useState(false)
 
-  const handleSendingRequest = () => {
-    onPressSend(post)
-  }
   const handleButtonActive = () => {
+    // if (description === null || description === '') {
+    //   setButtonActive(false);
+    // } else {
+    //   setButtonActive(true);
+    // }
     setButtonActive(true)
   }
   useEffect(() => {
     handleButtonActive()
   }, [description])
-  
   return (
     <KeyboardAwareScrollView extraHeight={60}>
       <View style={styles.PostView}>
@@ -106,26 +99,36 @@ export function PostModal({ post, onPressSend, setComment }) {
         <PostTitle title={post.headline} />
         <PostDescription description={post.description} />
         <PostImage imageUrl={post.imageUrl} />
+        <PostTiming post={post} duration={duration} />
+
         <PostFooter
           startDateTime={post.startDateTime}
           endDateTime={post.endDateTime}
           showJoinButton={false}
-          post={post}
         />
         <View
           style={{
             marginTop: 20,
             marginBottom: 10,
           }}>
+          {post.screeningQuestion ? (
+            <Text style={{ marginBottom: 10, fontWeight: '500', fontSize: 15 }}>
+              {post.screeningQuestion}
+            </Text>
+          ) : null}
           <NormalTextField
-            placeholder="Break the ice with a comment"
+            placeholder={
+              post.screeningQuestion
+                ? 'Response Required'
+                : 'Break the ice with a comment'
+            }
             moreStyles={{ marginBottom: 60 }}
             onChangeText={(text) => setComment(text)}
             autoFocus={false}
           />
           <NormalButton
             text={'Send Request'}
-            onPress={handleSendingRequest}
+            onPress={onPressSend}
             inActive={buttonActive}
             hollow={true}
             moreStyles={{
@@ -144,39 +147,30 @@ function PostHeader({
   addressResult = 'No location',
   profileImage,
   moreStyles,
-  handleModalOpen,
-  setCurrentReportPost,
-  postId,
 }) {
   return (
-    <KeyboardAwareScrollView extraHeight={100}>
-      <View
-        style={{
-          ...styles.PostHeaderView,
-          flexDirection: 'row',
-          ...moreStyles,
+    <View
+      style={{
+        ...styles.PostHeaderView,
+        flexDirection: 'row',
+        ...moreStyles,
 
-          justifyContent: 'space-between',
-        }}>
-        <View style={{ flexDirection: 'row' }}>
-          <PostProfileImage imageUrl={profileImage} />
-          <View style={{ marginLeft: 10 }}>
-            <PostUserName userName={userName} />
-            <PostLocation
-              location={location}
-              addressResult={addressResult}
-              showJoinButton
-            />
-          </View>
+        justifyContent: 'space-between',
+      }}>
+      <View style={{ flexDirection: 'row' }}>
+        <PostProfileImage imageUrl={profileImage} />
+        <View style={{ marginLeft: 10 }}>
+          <PostUserName userName={userName} />
+          <PostLocation
+            location={location}
+            addressResult={addressResult}
+            showJoinButton
+          />
         </View>
-
-        <ExploreReport
-          objectToReport={{ postId, userName }}
-          handleModalOpen={handleModalOpen}
-          setCurrentReportPost={setCurrentReportPost}
-        />
       </View>
-    </KeyboardAwareScrollView>
+
+      <ExploreReport moreStyles={{}} />
+    </View>
   )
 }
 
@@ -197,7 +191,7 @@ function PostLocation({ location, addressResult }) {
       return
     }
     let addressResult = await Location.reverseGeocodeAsync(location.coords)
-   
+    // console.log('addressResult', addressResult);
     setAddress(String(addressResult[0].name))
     setLoading(false)
   }, [location.coords])
@@ -240,11 +234,10 @@ function PostProfileImage({ imageUrl }) {
 
   return (
     <View style={styles.PostProfileImageView}>
-     
+      <LoadingScreen visible={loading} />
       <Image
         style={styles.postProfileImage}
         source={{ uri: imageUrl }}
-        defaultSource={ImageSet.profile}
         onLoadStart={() => setLoading(true)}
         onLoadEnd={() => setLoading(false)}
       />
@@ -271,6 +264,62 @@ function PostImage({ imageUrl }) {
       </View>
     )
   }
+}
+
+function PostTiming({ post, duration }) {
+  return (
+    <View
+      style={{
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'left',
+        alignItems: 'center',
+        marginTop: 20,
+      }}>
+      <View
+        style={{
+          flex: 0,
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginRight: 20,
+        }}>
+        <Image
+          style={{ marginRight: 5 }}
+          source={require('../assets/images/assets/Clock.png')}
+        />
+        <Text>{`${moment
+          .unix(post.startDateTime.seconds)
+          .format('LT')} - ${moment
+          .unix(post.endDateTime.seconds)
+          .format('LT')}`}</Text>
+      </View>
+      <View
+        style={{
+          flex: 0,
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginRight: 20,
+        }}>
+        <Image
+          style={{ marginRight: 5 }}
+          source={require('../assets/images/assets/flash.png')}
+        />
+        <Text>80%</Text>
+      </View>
+
+      <View style={{ flex: 0, flexDirection: 'row', alignItems: 'center' }}>
+        <Image
+          style={{ marginRight: 5 }}
+          source={require('../assets/images/assets/MapPin.png')}
+        />
+        <Text>
+          {duration > 20
+            ? `${Math.round(duration)} mins drive`
+            : `${Math.round(duration)} mins walk`}
+        </Text>
+      </View>
+    </View>
+  )
 }
 
 function LoadingScreen({ visible }) {
@@ -348,6 +397,9 @@ function PostTime({ startDateTime, endDateTime }) {
     return true
   }
   useEffect(() => {
+    // console.log(startDateTime , endDateTime , "end date time in posts");
+    // startDateTime = new Date(startDateTime)
+    // endDateTime = new Date(endDateTime)
     getStartTime()
     setStartTimeGreaterThanEndTime(isStartTimegreaterThanCurrentTime())
     formatAllTimes()
@@ -395,20 +447,10 @@ function PostJoinButton({ onPress, postId, usersWhoRequested }) {
   const [isUserRequested, setisUserRequested] = useState(false)
   const [message, setMessage] = useState('')
 
-  
-  const getUserId = async () => {
-    const user = await AsyncStorage.getItem('user')
-    return JSON.parse(user).id
-  }
-
-  const onclickJoin = (userWhoWantsToJoin) => {
-    onPress()
-    //usersWhoRequested.push(userWhoWantsToJoin)
-  }
   const checkIfUserRequested = async () => {
     const user = await AsyncStorage.getItem('user')
     const userId = JSON.parse(user).id
-   
+    console.log('user id is', userId)
 
     if (usersWhoRequested.includes(userId)) {
       setisUserRequested(true)
@@ -419,15 +461,15 @@ function PostJoinButton({ onPress, postId, usersWhoRequested }) {
     }
   }
 
-  useEffect(async() => {
-    await checkIfUserRequested()
+  useEffect(() => {
+    checkIfUserRequested()
   }, [])
   if (isUserRequested == true) {
     return (
       <View style={styles.PostJoinButtonView}>
         <NormalButton
           text={message}
-          onPress={() => null}
+          onPress={onPress}
           moreStyles={{
             height: 36,
             paddingLeft: 25,
@@ -445,12 +487,15 @@ function PostJoinButton({ onPress, postId, usersWhoRequested }) {
         />
       </View>
     )
+    // ngoId : 113992437978529065350
+    // ebuka egbunam : 101432345899135768743
+    //ebuka egb:107841417840884772453
   } else {
     return (
       <View style={styles.PostJoinButtonView}>
         <NormalButton
           text={message}
-          onPress={() => onclickJoin(getUserId())}
+          onPress={onPress}
           moreStyles={{
             height: 36,
             paddingLeft: 25,
@@ -477,38 +522,7 @@ function PostFooter({
   showJoinButton,
   postId,
   usersWhoRequested,
-  post,
 }) {
-  const [currUser, setCurrUser] = useState(null)
-  const getUserId = async () => {
-    const user = await AsyncStorage.getItem('user')
-    return JSON.parse(user).id
-  }
-  const userCreatedPost = async () => {
-    const userId = await getUserId()
-    setCurrUser(userId)
-    return userId == post.user.id
-  }
-  const shouldShowJoinButton =  () => {
-    if (currUser == null) {
-      return true
-    }
-    const sameUser = () => {
-      return currUser == post.user.id
-    }
-   
-
-    if (sameUser()) {
-      return false
-    }
-    if(showJoinButton){
-      return true
-    }
-    return false 
-  }
-  useEffect(async () => {
-    await userCreatedPost()
-  }, [])
   return (
     <View style={{ ...styles.PostFooterView, flexDirection: 'row' }}>
       <PostTime
@@ -516,7 +530,7 @@ function PostFooter({
         startDateTime={startDateTime}
         endDateTime={endDateTime}
       />
-      {shouldShowJoinButton() && (
+      {showJoinButton && (
         <PostJoinButton
           onPress={onPress}
           postId={postId}
