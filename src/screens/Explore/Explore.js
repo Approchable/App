@@ -21,20 +21,18 @@ import { getPosts } from '../../store/posts/posts'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import MyStatusBar from '../../components/MyStatusBar'
 import { sendJoinRequest } from '../../store/Requests/Requests'
-import * as Random from 'expo-random'
-import uuid from 'react-native-uuid'
+
 import ReportModal from '../../components/ReportModal'
 import SkeletonContent from 'react-native-skeleton-content'
-import {
-  screenWidth,
-} from '../../components/config/Constant'
+import LocationSearchBar from '../../components/LocationSearchBar'
+
+import { screenWidth } from '../../components/config/Constant'
 //GetPostsReducer
 function Explore({ navigation }) {
-
   // var posts = useMemo(() => {
   //   return useSelector((state) => state.GetPostsReducer.posts)
   // }, [posts])
-   //var posts = useSelector((state) => state.GetPostsReducer.posts)
+  //var posts = useSelector((state) => state.GetPostsReducer.posts)
 
   var posts = useSelector((state) => state.GetPostsReducer.posts)
   var loading = useSelector((state) => state.GetPostsReducer.loading)
@@ -89,65 +87,68 @@ function Explore({ navigation }) {
   return (
     <View style={styles.container}>
       <MyStatusBar backgroundColor="#F6F6F6" />
-      <AppHeader moreStyles={{ flex: 0.1 }} />
+      <AppHeader moreStyles={{ height:50 }} />
       <View style={{ flex: 1, borderRadius: 16 }}>
         {loading ? (
           <ExploreLoader loading={loading} />
         ) : (
-          <FlatList
-            style={{
-              marginTop: 20,
-              backgroundColor: 'white',
-              borderRadius: 16,
-            }}
-            data={posts}
-            keyExtractor={(item) => item.id}
-            refreshControl={
-              <RefreshControl refreshing={loading} onRefresh={onRefresh} />
-            }
-            refreshing={loading}
-            renderItem={({ item }) => (
-              <Post
-                post={item}
-                userName={item.user.name}
-                title={item.headline}
-                description={item.description}
-                imageUrl={item.imageUrl}
-                location={item.location}
-                screeningQuestion={item.screeningQuestion || ''}
-                startDateTime={item.startDateTime}
-                endDateTime={item.endDateTime}
-                addressResult={item.addressResult}
-                profileImage={item.user.photoUrl}
-                handleModalOpen={handleModalOpen}
-                setCurrentReportPost={setCurrentReportPost}
-                postId={item.postId}
-                onPress={() => {
-                  handleJoin(item)
-                }}
-                usersWhoRequested={item.usersWhoRequested}
-              />
-            )}
-          />
+          <>
+       
+
+            <FlatList
+              style={{
+                marginTop: 20,
+                backgroundColor: 'white',
+                borderRadius: 16,
+              }}
+              data={posts}
+              keyExtractor={(item) => item.id}
+              refreshControl={
+                <RefreshControl refreshing={loading} onRefresh={onRefresh} />
+              }
+              refreshing={loading}
+              renderItem={({ item }) => (
+                <Post
+                  post={item}
+                  userName={item.user.name}
+                  title={item.headline}
+                  description={item.description}
+                  imageUrl={item.imageUrl}
+                  location={item.location}
+                  screeningQuestion={item.screeningQuestion || ''}
+                  startDateTime={item.startDateTime}
+                  endDateTime={item.endDateTime}
+                  addressResult={item.addressResult}
+                  profileImage={item.user.photoUrl}
+                  handleModalOpen={handleModalOpen}
+                  setCurrentReportPost={setCurrentReportPost}
+                  postId={item.postId}
+                  onPress={() => {
+                    handleJoin(item)
+                  }}
+                  usersWhoRequested={item.usersWhoRequested}
+                />
+              )}
+            />
+          </>
         )}
 
-          <JoinModal
-            visible={modalVisible}
-            onCancel={() => handleCancel()}
-            postObject={modalPost}
-          />
-          <ReportModal
-            currentReportPost={currentReportPost}
-            visible={reportModalVisible}
-            onCancel={onCancelReportModal}
-          />
-        </View>
+        <JoinModal
+          visible={modalVisible}
+          onCancel={() => handleCancel()}
+          postObject={modalPost}
+        />
+        <ReportModal
+          currentReportPost={currentReportPost}
+          visible={reportModalVisible}
+          onCancel={onCancelReportModal}
+        />
       </View>
-    )
+    </View>
+  )
 }
 
 function NoPost({ navigation }) {
-
   const NavigateToCreateInExplore = () => {
     navigation.navigate('Create')
   }
@@ -163,8 +164,7 @@ function NoPost({ navigation }) {
 
           flex: 1,
           alignItems: 'center',
-        }}
-      >
+        }}>
         <EmptyCreatePost witdth="100%" />
       </View>
       <View style={{ flex: 0.8 }}>
@@ -189,9 +189,9 @@ function NoPost({ navigation }) {
 const JoinModal = ({ visible, postObject, onCancel }) => {
   const dispatch = useDispatch()
   const [comment, setComment] = useState('')
-  const handleSendRequest = (post , comment="") => {
-    dispatch(sendJoinRequest(post , comment))
-     onCancel()
+  const handleSendRequest = (post, comment = '') => {
+    dispatch(sendJoinRequest(post, comment))
+    onCancel()
   }
   const getUserId = async () => {
     const user = await AsyncStorage.getItem('user')
@@ -203,15 +203,14 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
       <View
         style={{
           ...styles.modal,
-        }}
-      >
+        }}>
         <ModalBarTop post={postObject} />
 
         <PostModal
           setComment={setComment}
           post={postObject}
           onPressSend={() => {
-            handleSendRequest(postObject , comment)
+            handleSendRequest(postObject, comment)
           }}
         />
       </View>
@@ -296,8 +295,7 @@ const ModalBarTop = () => {
         borderRadius: 13,
         alignSelf: 'center',
         marginTop: 10,
-      }}
-    ></View>
+      }}></View>
   )
 }
 

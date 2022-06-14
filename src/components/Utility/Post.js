@@ -33,6 +33,7 @@ export default function Post({
   onPress,
   postId,
   usersWhoRequested,
+  handleModalOpen
 }) {
   return (
     <View style={styles.PostView}>
@@ -45,6 +46,7 @@ export default function Post({
           marginBottom: 8,
           marginTop: 16,
         }}
+        handleModalOpen={handleModalOpen}
       />
       {/* <PostUserName userName={userName} /> */}
       <PostTitle title={title} />
@@ -134,6 +136,7 @@ function PostHeader({
   addressResult = 'No location',
   profileImage,
   moreStyles,
+  handleModalOpen = null,
 }) {
   return (
     <View
@@ -156,7 +159,7 @@ function PostHeader({
         </View>
       </View>
 
-      <ExploreReport moreStyles={{ }} />
+      <ExploreReport moreStyles={{ }} handleModalOpen={handleModalOpen} />
     </View>
   );
 }

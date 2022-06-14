@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native'
 import { NormalButton } from '../../components/Buttons'
-import HeadingStyle from '../../components/Utility/Styles/TextStyles'
 import { Dimensions } from 'react-native'
 import AppLoading from 'expo-app-loading'
 import {
@@ -30,12 +29,14 @@ export default function HowItWorks({ navigation }) {
         <View style={styles.innerContainer}>
           <Text
             style={{
-              ...HeadingStyle,
+              textAlign: 'center',
+              fontWeight: 'bold',
+              fontSize: 24,
+              lineHeight: 36,
               textAlign: 'left',
               marginVertical: 4,
               fontFamily: 'Poppins_700Bold',
-            }}
-          >
+            }}>
             Here's how it works
           </Text>
 
@@ -48,8 +49,7 @@ export default function HowItWorks({ navigation }) {
               lineHeight: 24,
               fontFamily: 'Poppins_400Regular',
               marginBottom: 32,
-            }}
-          >
+            }}>
             Amet minim mollit non deserunt ullamco est si t aliqua dolor do amet
             sint.Velit officia consequat duis enim velit mollit.Exercitation
             veniam conseq
