@@ -93,9 +93,7 @@ function Explore({ navigation }) {
           <ExploreLoader loading={loading} />
         ) : (
           <>
-          <LocationSearchBar
-          ClickLocation={ (location) => null}
-              />
+       
 
             <FlatList
               style={{

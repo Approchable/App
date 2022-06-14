@@ -65,8 +65,8 @@ export const ColorSet = {
 }
 
 export const ImageSet = {
-
-  defaultProfileImage: 'https://firebasestorage.googleapis.com/v0/b/approachablebackend.appspot.com/o/images%2Fdefault_profile_image.png?alt=media&token=2e6a9e79-a6bf-4580-986b-dc8d30aab4df',
+  defaultProfileImage:
+    'https://firebasestorage.googleapis.com/v0/b/approachablebackend.appspot.com/o/images%2Fdefault_profile_image.png?alt=media&token=2e6a9e79-a6bf-4580-986b-dc8d30aab4df',
 
   // --------- Icons ---------
   back: require('../../assets/images/icons/back_icon.png'),
@@ -88,6 +88,8 @@ export const ImageSet = {
   tick: require('../../assets/images/icons/tick.png'),
   location: require('../../assets/images/assets/send.png'),
   X: require('../../assets/images/icons/X.png'),
+  rightCaret: require('../../assets/images/icons/CaretRight.png'),
+  redirect: require('../../assets/images/icons/redirect.png'),
 }
 
 export const TabType = {
@@ -108,4 +110,4 @@ export const MessageTypeStatus = {
   systemRequestAccept: 'system_request_accept',
   user: 'user',
 }
-export  const googleApiKey = 'AIzaSyDNEZdKGtGmuL6jFRd4w4rK_JN1HeS4FYs'
+export const googleApiKey = 'AIzaSyDNEZdKGtGmuL6jFRd4w4rK_JN1HeS4FYs'

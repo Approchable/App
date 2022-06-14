@@ -63,6 +63,7 @@ export const getPosts = () => {
     })
     try {
       const posts = await getPostsFromFireStore()
+      console.log(posts, 'pst')
       if (posts !== null) {
         dispatch({
           type: GET_POSTS,
@@ -188,8 +189,7 @@ export const postsReducer = (state = initialPostObject, action) => {
 const getPostInitialState = {
   posts: [],
   loading: true,
-};
-
+}
 
 export function GetPostsReducer(state = getPostInitialState, action) {
   switch (action.type) {
@@ -198,19 +198,19 @@ export function GetPostsReducer(state = getPostInitialState, action) {
         ...state,
         posts: action.payload.posts,
         loading: action.payload.loading,
-      };
+      }
     case GET_POSTS_LOADING:
-      console.log('GET_POSTS_LOADING');
+      console.log('GET_POSTS_LOADING')
       return {
         ...state,
         loading: action.payload.loading,
-      };
+      }
     case GET_POSTS_ERROR:
       return {
         ...state,
         error: action.payload.error,
         loading: action.payload.loading,
-      };
+      }
     default:
       return state
   }

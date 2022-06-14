@@ -1,5 +1,6 @@
-import { View, TextInput, StyleSheet } from 'react-native'
-import { useRef } from 'react'
+import {View, TextInput, StyleSheet} from 'react-native';
+import {useRef} from 'react';
+
 
 export function NormalTextField({
   placeholder,
@@ -20,15 +21,16 @@ export function NormalTextField({
         value={value}
         placeholderTextColor="#696969"
         style={{ ...styles.textInput , ...moreStyles}}
+
         placeholder={placeholder}
         onChangeText={onChangeText}
         paddingStyle={styles.paddingStyle}
-        onKeyPress={(e) => {
-          e.nativeEvent.key === 'Backspace' ? null : null
+        onKeyPress={e => {
+          e.nativeEvent.key === 'Backspace' ? null : null;
         }}
       />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -53,4 +55,4 @@ const styles = StyleSheet.create({
   textInputView: {
     //marginVertical: 5,
   },
-})
+});

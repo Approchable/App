@@ -1,6 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-import Profile from '../screens/Profile/Profile'
 import CreatePost1 from '../screens/Create/CreatePost1'
 import Explore from '../screens/Explore/Explore'
 import Map from '../screens/Map/Map'
@@ -9,6 +8,7 @@ import { Icons, Icon } from '../components/Utility/Icons'
 import React, { useEffect, useRef } from 'react'
 import * as Animatable from 'react-native-animatable'
 import CreateStack from './CreateNavigator'
+import AccountStack from './AccountNavigator'
 import ChatStack from './ChatStackNavigation/ChatStackNavigator'
 import Chat from '../screens/Chat/Chat'
 import Connections from '../screens/Chat/Connections'
@@ -47,13 +47,14 @@ const TabArr = [
     component: Connections,
   },
   {
-    route: 'Profile',
-    label: 'Profile',
+    route: 'Account',
+    label: 'Account',
     type: Icons.Octicons,
     activeIcon: 'person',
     inActiveIcon: 'person',
-    component: Profile,
+    component: AccountStack,
   },
+
 ]
 const Tab = createMaterialBottomTabNavigator()
 

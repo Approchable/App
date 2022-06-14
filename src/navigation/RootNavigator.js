@@ -24,6 +24,7 @@ import { verifyToken } from '../store/WaitList/Waitlist'
 import ChatStack from './ChatStackNavigation/ChatStackNavigator'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Chat from '../screens/Chat/Chat'
+import Profile from '../screens/Profile/Profile'
 // import { createAppContainer, createSwitchNavigator } from '@react-navigation';
 
 function OnboardingNavigator({ userToken, isCorrectToken }) {
@@ -68,6 +69,7 @@ function AppNavigator() {
               headerShown: false,
             }}
           />
+
         </AppStack.Navigator>
       )}
     </NavigationContainer>
