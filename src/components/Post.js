@@ -34,6 +34,9 @@ export default function Post({
   onPress,
   postId,
   usersWhoRequested,
+  setCurrentReportPost,
+  handleModalOpen,
+  
 }) {
   return (
     <View style={styles.PostView}>
@@ -46,6 +49,8 @@ export default function Post({
           marginBottom: 8,
           marginTop: 16,
         }}
+        setCurrentReportPost={setCurrentReportPost}
+        handleModalOpen={handleModalOpen}
       />
       {/* <PostUserName userName={userName} /> */}
       <PostTitle title={title} />
@@ -147,6 +152,8 @@ function PostHeader({
   addressResult = 'No location',
   profileImage,
   moreStyles,
+  setCurrentReportPost = null,
+  handleModalOpen = null,
 }) {
   return (
     <View
@@ -155,11 +162,13 @@ function PostHeader({
         flexDirection: 'row',
         ...moreStyles,
 
+
         justifyContent: 'space-between',
+      //  backgroundColor: 'red'
       }}>
       <View style={{ flexDirection: 'row' }}>
         <PostProfileImage imageUrl={profileImage} />
-        <View style={{ marginLeft: 10 }}>
+        <View style={{ marginLeft: 10 , maxWidth: '85%' , }}>
           <PostUserName userName={userName} />
           <PostLocation
             location={location}
@@ -169,7 +178,11 @@ function PostHeader({
         </View>
       </View>
 
-      <ExploreReport moreStyles={{}} />
+      <ExploreReport
+        moreStyles={{}}
+        setCurrentReportPost={setCurrentReportPost}
+        handleModalOpen={handleModalOpen}
+      />
     </View>
   )
 }
@@ -179,28 +192,28 @@ function PostLocation({ location, addressResult }) {
   const [address, setAddress] = useState(addressResult)
 
   // perfom expensive calculation once
-  useMemo(async () => {
-    if (location === null || location === '' || location === undefined) {
-      setAddress('No Location!')
-      return
-    }
-    let { status } = await Location.requestForegroundPermissionsAsync()
-    if (status !== 'granted') {
-      setErrorMsg('Permission to access location was denied')
-      Alert.alert('Error', 'Permission to access location was denied')
-      return
-    }
-    let addressResult = await Location.reverseGeocodeAsync(location.coords)
-    // console.log('addressResult', addressResult);
-    setAddress(String(addressResult[0].name))
-    setLoading(false)
-  }, [location.coords])
+  // useMemo(async () => {
+  //   if (location === null || location === '' || location === undefined) {
+  //     setAddress('No Location!')
+  //     return
+  //   }
+  //   let { status } = await Location.requestForegroundPermissionsAsync()
+  //   if (status !== 'granted') {
+  //     setErrorMsg('Permission to access location was denied')
+  //     Alert.alert('Error', 'Permission to access location was denied')
+  //     return
+  //   }
+  //   let addressResult = await Location.reverseGeocodeAsync(location.coords)
+
+  //   setAddress(String(addressResult[0].name))
+  //   setLoading(false)
+  // }, [location.coords])
 
   return (
     <View style={styles.PostLocationView}>
       <SmallerText
-        content={address}
-        moreStyles={{ marginBottom: -3, marginTop: -3 }}
+        content={addressResult}
+        moreStyles={{ marginBottom: -3, marginTop: -3 , marginRight: 80 }}
       />
     </View>
   )
@@ -209,7 +222,7 @@ function PostDescription({ description }) {
   return (
     <View style={styles.PostDescriptionView}>
       <SmallerText
-        moreStyles={{ marginBottom: 8, marginTop: 4 }}
+        moreStyles={{ marginBottom: 8, marginTop: 4 , }}
         content={description}></SmallerText>
     </View>
   )
@@ -414,7 +427,8 @@ function PostTime({ startDateTime, endDateTime }) {
         justifyContent: 'center',
       }}>
       <View style={{ flexDirection: 'row' }}>
-        <View>
+        <View // View to hold clock image
+        >
           <Icon
             type={Icons.Entypo}
             name={'back-in-time'}

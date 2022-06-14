@@ -1,22 +1,28 @@
 import {
-   View,
-   Text,
-   StyleSheet,
-   Dimensions,
-   SafeAreaView,
-   TouchableOpacity,
-   Image,
-   ScrollView} from 'react-native'
+
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  SafeAreaView,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  ScrollView
+} from 'react-native'
+import React, { useState, useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+
 import AppHeader from '../../components/Utility/AppHeader'
 import { NormalButton } from '../../components/Buttons'
-import React, { useState, useEffect } from 'react'
 import { HeaderText } from '../../components/Texts'
 import CategoryItem from '../../components/CategoryItem'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useDispatch } from 'react-redux'
-import { ActivityIndicator } from 'react-native'
-import { logout } from '../../store/actions'
 import MyStatusBar from '../../components/MyStatusBar'
+
+import { useDispatch } from 'react-redux'
+import { logout } from '../../store/actions'
+
 
 const CategorieArr = [
   'Self development',
@@ -55,8 +61,7 @@ export default function Profile() {
 function NoUser() {
   return (
     <View
-      style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center' }}
-    >
+      style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center' }}>
       <ActivityIndicator size="large" color="#44BFBA" />
     </View>
   )
@@ -66,10 +71,11 @@ function UserExists({ user, deleteUser }) {
   const [showProfile, setShowProfile] = useState(false)
   console.log(user.photoUrl)
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
      
-      <MyStatusBar backgroundColor="white" />
+     <MyStatusBar backgroundColor="#F6F6F6" />
       <AppHeader moreStyles={{ height: 50 }} />
+
       <View style={{ flex: '1', marginHorizontal: 16, marginTop: 10 }}>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -105,8 +111,7 @@ function UserExists({ user, deleteUser }) {
    
         </View>
         <View
-          style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: -5 }}
-        >
+          style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: -5 }}>
           {user.interests.map((person, index) => (
             <CategoryItem
               content={person}
@@ -127,7 +132,7 @@ function UserExists({ user, deleteUser }) {
         </View>
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 
