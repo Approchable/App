@@ -2,40 +2,36 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   Alert,
-  ActivityIndicator,
   SafeAreaView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native'
 import React, { useState, useEffect } from 'react'
-import { NormalButton, TextButton } from '../../components/Buttons'
-import LocationSearch from '../../components/LocationSearch'
-import { NaviagteOutOfCreate, createPosts } from '../../store/actions'
 import { useDispatch } from 'react-redux'
+import * as Location from 'expo-location'
+
+import { NormalButton, TextButton } from '../../components/Buttons'
 import {
   HeaderText,
   RegularText,
   RegularBoldText,
 } from '../../components/Texts'
 import { NormalTextField } from '../../components/TextField'
-import AppHeader from '../../components/Utility/AppHeader'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { addToPostObject } from '..//../store//posts//posts'
-import * as Location from 'expo-location'
 import MyStatusBar from '../../components/MyStatusBar'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import LocationSearchBar from '../../components/LocationSearchBar'
 
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 export default function CreatePost2({ navigation, route }) {
   const selectedStartTime = 'start'
   const selectedEndTime = 'end'
 
   const dispatch = useDispatch()
-  const currenTime = new Date()
-  const googleApiKey = "AIzaSyDNEZdKGtGmuL6jFRd4w4rK_JN1HeS4FYs"
   const [description, setDescription] = useState(null)
   const [buttonActive, setButtonActive] = useState(false)
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
@@ -127,8 +123,8 @@ export default function CreatePost2({ navigation, route }) {
 
   useEffect(() => {
     _isButtonActiveController()
-    getLocationAndTurnToAdress()
-  }, [description])
+    // getLocationAndTurnToAdress()
+  }, [description, screeningQuestion, addressResult])
 
   const isDescriptionComplete = () => {
     if (
@@ -163,11 +159,20 @@ export default function CreatePost2({ navigation, route }) {
     return true
   }
   const _isButtonActiveController = () => {
+    console.log(description, addressResult)
     if (isDescriptionComplete() && isLocationComplete()) {
       setButtonActive(true)
     } else {
       setButtonActive(false)
     }
+  }
+
+  const handleSettingLocation = async (location) => {
+    console.log(location)
+    console.log('Location is setting create post 2 ')
+    setLocation(location.location)
+    console.log('Adress is : ' + location.location.vicinity)
+    setAddressResult(location.location.vicinity) // Using vicity property instead of adress property because vcicity property is shorter and easier to read.
   }
 
   const getLocationAndTurnToAdress = async () => {
@@ -196,9 +201,11 @@ export default function CreatePost2({ navigation, route }) {
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
       {/* <AppHeader moreStyles={{height: 50 }} /> */}
-      <KeyboardAwareScrollView style={styles.container}>
+      <TouchableWithoutFeedback
+        style={styles.container}
+        onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <View style={{ marginHorizontal: 16, flex: 0.5, marginTop: 40 }}>
+          <View style={{ marginHorizontal: 16, marginTop: 40 }}>
             <HeaderText
               content="Your hangout details"
               moreStyles={{ marginBottom: 10 }}
@@ -206,21 +213,23 @@ export default function CreatePost2({ navigation, route }) {
             <RegularBoldText content="Describe your hangout" />
             <NormalTextField
               placeholder="Required"
-              moreStyles={{ marginTop: -28 }}
+              moreStyles={{
+                marginTop: -28,
+                minHeight: 44,
+                maxHeight: 100,
+                height: null,
+              }}
               onChangeText={(text) => setDescription(text)}
+              multiline
             />
             <RegularBoldText content="Location" />
-            {addressResult === null ? (
-              <ActivityIndicator size="large" color="#44BFBA" />
-            ) : (
-              <NormalTextField
-                placeholder="Required"
-                value={addressResult}
-                moreStyles={{ marginTop: -28 }}
-                onChangeText={(text) => setAddressResult(text)}
-                autoFocus={false}
-              />
-            )}
+
+            <LocationSearchBar
+              moreStyles={{
+                marginTop: -28,
+              }}
+              onClickLocation={(location) => handleSettingLocation(location)}
+            />
 
             <RegularBoldText
               content="Time of hangout*"
@@ -229,8 +238,7 @@ export default function CreatePost2({ navigation, route }) {
             <View
               style={{
                 flexDirection: 'row',
-              }}
-            >
+              }}>
               <TouchableOpacity
                 onPress={() => showDatePicker()}
                 style={{
@@ -241,8 +249,7 @@ export default function CreatePost2({ navigation, route }) {
                   borderWidth: 1,
                   borderRadius: 10,
                   justifyContent: 'center',
-                }}
-              >
+                }}>
                 <Text
                   style={{
                     justifyContent: 'center',
@@ -251,8 +258,7 @@ export default function CreatePost2({ navigation, route }) {
                     fontSize: 14,
                     color: '#030E01',
                     fontWeight: 'bold',
-                  }}
-                >
+                  }}>
                   {startTime}
                 </Text>
               </TouchableOpacity>
@@ -263,8 +269,7 @@ export default function CreatePost2({ navigation, route }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: '#696969',
-                }}
-              >
+                }}>
                 <Text>-</Text>
               </View>
 
@@ -278,8 +283,7 @@ export default function CreatePost2({ navigation, route }) {
                   borderWidth: 1,
                   borderRadius: 10,
                   justifyContent: 'center',
-                }}
-              >
+                }}>
                 <Text
                   style={{
                     justifyContent: 'center',
@@ -288,8 +292,7 @@ export default function CreatePost2({ navigation, route }) {
                     fontSize: 14,
                     color: '#030E01',
                     fontWeight: 'bold',
-                  }}
-                >
+                  }}>
                   {endTime}
                 </Text>
               </TouchableOpacity>
@@ -327,8 +330,7 @@ export default function CreatePost2({ navigation, route }) {
               marginHorizontal: 16,
               justifyContent: 'flex-end',
               marginBottom: 20,
-            }}
-          >
+            }}>
             <NormalButton
               text="Next"
               onPress={() => (buttonActive ? finishCreatePost2() : null)}
@@ -340,7 +342,7 @@ export default function CreatePost2({ navigation, route }) {
             />
           </View>
         </View>
-      </KeyboardAwareScrollView>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   )
 }
@@ -358,8 +360,7 @@ const TimeHangout = () => {
             justifyContent: 'center',
             color: '#696969',
             alignItems: 'center',
-          }}
-        ></TextInput>
+          }}></TextInput>
         <Text
           style={{
             height: 40,
@@ -372,8 +373,7 @@ const TimeHangout = () => {
             alignItems: 'center',
             fontWeight: 'bold',
             fontSize: 20,
-          }}
-        >
+          }}>
           :
         </Text>
         <TextInput
@@ -384,8 +384,7 @@ const TimeHangout = () => {
             marginLeft: 2,
             justifyContent: 'center',
             color: '#696969',
-          }}
-        ></TextInput>
+          }}></TextInput>
       </View>
     </View>
   )

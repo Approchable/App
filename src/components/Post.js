@@ -185,27 +185,27 @@ function PostLocation({ location, addressResult }) {
   const [address, setAddress] = useState(addressResult)
 
   // perfom expensive calculation once
-  useMemo(async () => {
-    if (location === null || location === '' || location === undefined) {
-      setAddress('No Location!')
-      return
-    }
-    let { status } = await Location.requestForegroundPermissionsAsync()
-    if (status !== 'granted') {
-      setErrorMsg('Permission to access location was denied')
-      Alert.alert('Error', 'Permission to access location was denied')
-      return
-    }
-    let addressResult = await Location.reverseGeocodeAsync(location.coords)
+  // useMemo(async () => {
+  //   if (location === null || location === '' || location === undefined) {
+  //     setAddress('No Location!')
+  //     return
+  //   }
+  //   let { status } = await Location.requestForegroundPermissionsAsync()
+  //   if (status !== 'granted') {
+  //     setErrorMsg('Permission to access location was denied')
+  //     Alert.alert('Error', 'Permission to access location was denied')
+  //     return
+  //   }
+  //   let addressResult = await Location.reverseGeocodeAsync(location.coords)
    
-    setAddress(String(addressResult[0].name))
-    setLoading(false)
-  }, [location.coords])
+  //   setAddress(String(addressResult[0].name))
+  //   setLoading(false)
+  // }, [location.coords])
 
   return (
     <View style={styles.PostLocationView}>
       <SmallerText
-        content={address}
+        content={addressResult}
         moreStyles={{ marginBottom: -3, marginTop: -3 }}
       />
     </View>

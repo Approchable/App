@@ -86,6 +86,8 @@ export const ImageSet = {
   rejected: require('../../assets/images/icons/rejected.png'),
   ArrowRight: require('../../assets/images/icons/ArrowRight.png'),
   tick: require('../../assets/images/icons/tick.png'),
+  location: require('../../assets/images/assets/send.png'),
+  X: require('../../assets/images/icons/X.png'),
 }
 
 export const TabType = {
@@ -106,3 +108,4 @@ export const MessageTypeStatus = {
   systemRequestAccept: 'system_request_accept',
   user: 'user',
 }
+export  const googleApiKey = 'AIzaSyDNEZdKGtGmuL6jFRd4w4rK_JN1HeS4FYs'

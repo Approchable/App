@@ -1,14 +1,25 @@
-import { View, Text, StyleSheet, Dimensions, SafeAreaView } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  SafeAreaView,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+} from 'react-native'
+import React, { useState, useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import AppHeader from '../../components/Utility/AppHeader'
 import { NormalButton } from '../../components/Buttons'
-import React, { useState, useEffect } from 'react'
 import { HeaderText } from '../../components/Texts'
 import CategoryItem from '../../components/CategoryItem'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useDispatch } from 'react-redux'
-import { ActivityIndicator } from 'react-native'
-import { logout } from '../../store/actions'
 import MyStatusBar from '../../components/MyStatusBar'
+
+import { useDispatch } from 'react-redux'
+import { logout } from '../../store/actions'
+
 const CategorieArr = [
   'Self development',
   'Creativity',
@@ -45,8 +56,7 @@ export default function Profile() {
 function NoUser() {
   return (
     <View
-      style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center' }}
-    >
+      style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center' }}>
       <ActivityIndicator size="large" color="#44BFBA" />
     </View>
   )
@@ -57,12 +67,12 @@ function UserExists({ user, deleteUser }) {
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
       <AppHeader moreStyles={{ height: 50 }} />
+
       <View style={{ flex: '1', marginHorizontal: 16, marginTop: 10 }}>
         <HeaderText content={user.name} moreStyles={{ fontSize: 27 }} />
         <HeaderText content="Interests" moreStyles={{ fontSize: 18 }} />
         <View
-          style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: -5 }}
-        >
+          style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: -5 }}>
           {user.interests.map((person, index) => (
             <CategoryItem
               content={person}
@@ -89,8 +99,7 @@ function UserExists({ user, deleteUser }) {
           justifyContent: 'flex-end',
           marginVertical: 20,
           marginHorizontal: 16,
-        }}
-      >
+        }}>
         <NormalButton
           text="Delete Account"
           onPress={() => deleteUser()}

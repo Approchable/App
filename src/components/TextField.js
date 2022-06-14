@@ -8,16 +8,18 @@ export function NormalTextField({
   value,
   moreStyles,
   autoFocus,
+  multiline
 }) {
   var ref = useRef('null')
   return (
-    <View style={{ ...styles.textInputView, ...moreStyles }}>
+    <View style={{ ...styles.textInputView,  }}>
       <TextInput
         ref={ref}
+        multiline={multiline}
         autoFocus={autoFocus}
         value={value}
         placeholderTextColor="#696969"
-        style={{ ...styles.textInput }}
+        style={{ ...styles.textInput , ...moreStyles}}
         placeholder={placeholder}
         onChangeText={onChangeText}
         paddingStyle={styles.paddingStyle}
@@ -36,9 +38,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ECEEF2',
-    paddingLeft: 16,
-    paddingVertical: 10,
+    padding: 16,
+    paddingVertical: 10, 
     fontFamily: 'Poppins_400Regular',
+    
+    
   },
   placeholderStyle: {},
   mainView: {
