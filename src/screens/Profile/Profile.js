@@ -6,18 +6,22 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
-  ScrollView,
+  ActivityIndicator,
+  ScrollView
 } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+
 import AppHeader from '../../components/Utility/AppHeader'
 import { NormalButton } from '../../components/Buttons'
-import React, { useState, useEffect } from 'react'
 import { HeaderText } from '../../components/Texts'
 import CategoryItem from '../../components/CategoryItem'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useDispatch } from 'react-redux'
-import { ActivityIndicator } from 'react-native'
-import { logout } from '../../store/actions'
 import MyStatusBar from '../../components/MyStatusBar'
+
+import { useDispatch } from 'react-redux'
+import { logout } from '../../store/actions'
+
 
 const CategorieArr = [
   'Self development',
@@ -70,9 +74,11 @@ function UserExists({ navigation, user, deleteUser }) {
   const [showProfile, setShowProfile] = useState(false)
   console.log(user.photoUrl)
   return (
-    <SafeAreaView style={styles.container}>
-      <MyStatusBar backgroundColor="white" />
+    <View style={styles.container}>
+     
+     <MyStatusBar backgroundColor="#F6F6F6" />
       <AppHeader moreStyles={{ height: 50 }} />
+
       <View style={{ flex: '1', marginHorizontal: 16, marginTop: 10 }}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{ position: 'relative' }}>
@@ -86,17 +92,47 @@ function UserExists({ navigation, user, deleteUser }) {
             </View>
           </View>
 
-          <View
-            style={{
-              ...styles.mainView,
-              justifyContent: 'flex-end',
-              marginVertical: 20,
-            }}>
-            <NormalButton
-              text="Edit Profile"
-              onPress={() => navigation.navigate('ProfileFlow')}
-              inActive={true}
+   
+        <View
+          style={{
+            ...styles.mainView,
+            justifyContent: 'flex-end',
+            marginVertical: 20,
+          }}
+        >
+        <NormalButton
+          text="Edit Profile"
+          onPress={() => deleteUser()}
+          inActive={true}
+        />
+      </View>
+      <View  style={{ display:'flex', flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+          <HeaderText content="My interests" moreStyles={{ fontSize: 18 }} />
+          <TouchableOpacity>
+          <Text style={styles.AddButton}>
+             Add
+          </Text>
+          </TouchableOpacity>
+   
+        </View>
+        <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: -5 }}>
+          {user.interests.map((person, index) => (
+            <CategoryItem
+              content={person}
+              width={width}
+              onPress={() => null}
+              moreStyles={{
+                backgroundColor: 'white',
+                borderRadius: 5,
+                height: 50,
+                margin: 5,
+                width: null,
+                paddingHorizontal: 10,
+                borderWidth: 1,
+                borderColor: '#E5E5E5',
+              }}
             />
+         ) )}
           </View>
           <View
             style={{
@@ -132,7 +168,7 @@ function UserExists({ navigation, user, deleteUser }) {
           </View>
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 
