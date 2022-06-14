@@ -87,7 +87,7 @@ function Explore({ navigation }) {
   return (
     <View style={styles.container}>
       <MyStatusBar backgroundColor="#F6F6F6" />
-      <AppHeader moreStyles={{ flex: 0.1 }} />
+      <AppHeader moreStyles={{ height:50 }} />
       <View style={{ flex: 1, borderRadius: 16 }}>
         {loading ? (
           <ExploreLoader loading={loading} />

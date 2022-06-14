@@ -71,9 +71,9 @@ function UserExists({ user, deleteUser }) {
   const [showProfile, setShowProfile] = useState(false)
   console.log(user.photoUrl)
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
      
-      <MyStatusBar backgroundColor="white" />
+     <MyStatusBar backgroundColor="#F6F6F6" />
       <AppHeader moreStyles={{ height: 50 }} />
 
       <View style={{ flex: '1', marginHorizontal: 16, marginTop: 10 }}>
@@ -132,7 +132,7 @@ function UserExists({ user, deleteUser }) {
         </View>
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 

@@ -168,7 +168,7 @@ function PostHeader({
       }}>
       <View style={{ flexDirection: 'row' }}>
         <PostProfileImage imageUrl={profileImage} />
-        <View style={{ marginLeft: 10 , maxWidth: '85%' , backgroundColor: 'red'}}>
+        <View style={{ marginLeft: 10 , maxWidth: '85%' , }}>
           <PostUserName userName={userName} />
           <PostLocation
             location={location}
