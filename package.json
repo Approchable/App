@@ -58,7 +58,6 @@
     "react-native-google-places-autocomplete": "^2.4.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-maps": "0.26.1",
-    "react-native-maps-directions": "^1.8.0",
     "react-native-modal-datetime-picker": "^13.1.2",
     "react-native-pager-view": "5.4.9",
     "react-native-paper": "^4.12.1",
