@@ -3,36 +3,18 @@ import { HeaderText } from '../Texts';
 
 export function IceBreaker({user}) {
 
-    const IceBreaker = [
-        {
-            title: "I am known for ...",
-            value: "Passionate about music"
-        },
-        {
-            title: "",
-            value: "I love chatting about food!"
-        },
-        {
-            title: "Never haver have I ever...",
-            value: "Travelled out of the country"
-        },
-    ]
+
     return (
         <>     
         <HeaderText content="Ice Breaker" moreStyles={{fontSize: 18}} />
 
-     { IceBreaker.map((item, index) => {
-         return (
-            <View key={index} style={styles.IceBreaker}>
+            <View style={styles.IceBreaker}>
 
-            { item.title.length > 0 ? <Text style={styles.IceBreakerTitle}>{item.title}</Text> : null }
+             <Text style={styles.IceBreakerTitle}>{ user.iceBreaker !== null ? user.iceBreaker.label : null}</Text> 
      
-            <Text style={styles.IceBreakerText}>{item.value}</Text>
+            <Text style={styles.IceBreakerText}>{ user.iceBreaker !== null ? user.iceBreaker.value : null}</Text>
        
            </View>
-         );
-     }) 
-     }
 
         </>
 

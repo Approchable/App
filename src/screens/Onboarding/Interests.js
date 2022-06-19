@@ -117,6 +117,11 @@ export default function Interests({ navigation, route }) {
         finalId = finalResult.id
       }
       finalResult['interests'] = categories
+      finalResult['profileImages'] = []
+      finalResult['pronouns'] = null
+      finalResult['ethnicity'] = null
+      finalResult['iceBreaker'] = null
+      finalResult['isProfileCompleted'] = false
       //add default profle picture
       if (finalResult['photoUrl'] == undefined) {
         finalResult['photoUrl'] = ImageSet.defaultProfileImage

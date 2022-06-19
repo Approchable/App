@@ -43,6 +43,7 @@ function Explore({ navigation }) {
   const [reportModalVisible, setReportModalVisible] = useState(false)
   const [modalPost, setModalPost] = useState(null)
   const [currentReportPost, setCurrentReportPost] = useState(null)
+
   const onRefresh = () => {
     setRefreshing(true)
     _getPosts()
@@ -67,9 +68,25 @@ function Explore({ navigation }) {
   }
 
   const handleJoin = (postObject) => {
-    setModalVisible(true)
-    setModalPost(postObject)
+    console.log(user, 'com')
+    if (user.isProfileCompleted) {
+      setModalVisible(true)
+      setModalPost(postObject)
+    } else {
+      navigation.navigate('ProfileFlow')
+    }
   }
+
+  const _retriveUser = async () => {
+    var currUser = await AsyncStorage.getItem('user')
+    var currUser = JSON.parse(currUser)
+
+    setUser(currUser)
+  }
+
+  useEffect(() => {
+    _retriveUser()
+  }, [])
 
   const handleCancel = () => {
     _getPosts()
@@ -81,20 +98,19 @@ function Explore({ navigation }) {
       console.log('focsed on explore ')
       // _getPosts()
     })
+    _retriveUser()
     _getPosts()
   }, [navigation])
 
   return (
     <View style={styles.container}>
       <MyStatusBar backgroundColor="#F6F6F6" />
-      <AppHeader moreStyles={{ height:50 }} />
+      <AppHeader moreStyles={{ height: 50 }} />
       <View style={{ flex: 1, borderRadius: 16 }}>
         {loading ? (
           <ExploreLoader loading={loading} />
         ) : (
           <>
-       
-
             <FlatList
               style={{
                 marginTop: 20,

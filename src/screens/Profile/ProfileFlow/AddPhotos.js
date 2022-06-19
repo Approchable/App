@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {Text, View, Image, StyleSheet, Dimensions, ImageBackground, Modal,Pressable } from 'react-native';
 import { TouchableOpacity, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { BackButton } from '../../../components/BackButton';
@@ -10,10 +10,11 @@ import { HeaderText } from '../../../components/Texts';
 
 const width = (Dimensions.get('window').width - 36) / 3.5;
 
-export function AddPhotos({backHandler, nextHandler, actionHandler}) {
-
+export function AddPhotos({user, backHandler, nextHandler, actionHandler}) {
+  const new_arr = []
+  const concat_arr = new_arr.concat(user.profileImages)
   const [visible, setVisible] = useState(false)
-  const [images, setImages] = useState([]) 
+  const [images, setImages] = useState(concat_arr) 
 
   const pickedImageHandler = (img) => {
    
@@ -29,6 +30,7 @@ export function AddPhotos({backHandler, nextHandler, actionHandler}) {
    actionHandler(images)
    nextHandler()
   }
+
   return (
     <>
     <BackButton actionHandler={backHandler} />
@@ -54,11 +56,11 @@ export function AddPhotos({backHandler, nextHandler, actionHandler}) {
      null
     }
 
-   <Pressable style={styles.photosColAdd} onPress={()=>{setVisible(true)}}>
+   { images.length < 2 ? <Pressable style={styles.photosColAdd} onPress={()=>{setVisible(true)}}>
     <View>
     <Image  source={require('../../../assets/images/assets/plus.png')} />
     </View>
-    </Pressable>
+    </Pressable> : null }
    
 
     </View>

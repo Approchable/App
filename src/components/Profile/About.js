@@ -1,30 +1,33 @@
+import { useEffect, useState } from 'react';
 import {View, Image, Text, StyleSheet, Dimensions} from 'react-native';
 import { HeaderText } from '../Texts';
 
 export function About({user}) {
+
+
     return (
         <>     
-        <HeaderText content="About Me" moreStyles={{fontSize: 18}} />
+        { user.pronouns && user.ethnicity != null ? <HeaderText content="About Me" moreStyles={{fontSize: 18}} />  : null }
 
-      <View style={styles.about}>
+     { user.pronouns != null ?  <View style={styles.about}>
        <View style={{flex:0,justifyContent:'space-between',flexDirection:'row',alignItems: 'center'}}>
        <Image style={{marginRight:10}} source={require('../../assets/images/assets/arrow-line-up.png')} />
        <Text style={styles.aboutText}>Pronouns</Text>
        </View>
        <View>
-       <Text style={styles.aboutText}>Pronouns</Text>
+       <Text style={styles.aboutText}>{ user.pronouns != null ? user.pronouns : null }</Text>
        </View>
-      </View>
+      </View> : null }
 
-      <View style={styles.about}>
+     { user.ethnicity != null ? <View style={styles.about}>
        <View style={{flex:0,justifyContent:'space-between',flexDirection:'row',alignItems: 'center'}}>
        <Image style={{marginRight:10}} source={require('../../assets/images/assets/barbell.png')} />
        <Text style={styles.aboutText}>Ethnicity</Text>
        </View>
        <View>
-       <Text style={styles.aboutText}>White</Text>
+       <Text style={styles.aboutText}>{ user.ethnicity != null ? user.ethnicity : null }</Text>
        </View>
-      </View>
+      </View> : null }
 
         </>
 

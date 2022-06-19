@@ -9,18 +9,9 @@ import { BackButton } from '../../../components/BackButton';
 
 const width = (Dimensions.get('window').width - 36) / 3.5;
 
-export function AddEthnicity({backHandler, nextHandler, actionHandler}) {
+export function AddEthnicity({initialValue, radioProps, backHandler, nextHandler, actionHandler}) {
   const [eth , setEth] = useState("American Indian")
-    const radioProps = [
-        { label: 'American Indian', value: 'American Indian' },
-        { label: 'Black / African Descent', value: 'Black / African Descent' },
-        { label: 'East Asian', value: 'East Asian' },
-        { label: 'Hispanic/Latino', value: 'Hispanic/Latino' },
-        { label: 'Middle Eastern', value: 'Middle Eastern' },
-        { label: 'Pacific Islander', value: 'Pacific Islander' },
-        { label: 'South Asian', value: 'South Asian' },
-        { label: 'I prefer not to say', value: 'I prefer not to say ' }
-      ];
+
 
 
       const saveAndProceed = () => {
@@ -42,7 +33,7 @@ export function AddEthnicity({backHandler, nextHandler, actionHandler}) {
                   radioStyle={{paddingTop:25}}
                   selectedButtonColor="#44BFBA"
                   radio_props={radioProps}
-                  initial={0}
+                  initial={initialValue}
                   animation={false}
                   onPress={(value) => { setEth(value)}}
                   labelStyle={{color:"#696969"}}

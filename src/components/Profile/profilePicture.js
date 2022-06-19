@@ -4,7 +4,7 @@ import {View, Text, StyleSheet, Dimensions, ImageBackground} from 'react-native'
 export function ProfilePicture({user}) {
     return (
         <>     
-      <ImageBackground imageStyle={{ borderRadius: 12}}  style={[styles.profilePicture,styles.afterMargin]} resizeMode="cover"  source={{ uri: "https://i.pinimg.com/474x/a3/ac/1e/a3ac1ed5abaedffd9947face7901e14c.jpg" }}>
+      <ImageBackground imageStyle={{ borderRadius: 12}}  style={[styles.profilePicture,styles.afterMargin]} resizeMode="cover"  source={{ uri: user.profileImages !== null ? user.profileImages[0] : "https://i.pinimg.com/474x/a3/ac/1e/a3ac1ed5abaedffd9947face7901e14c.jpg" }}>
         <View style={styles.profileDetails}>
          <Text style={styles.profileHeader}>{user.name}</Text>
          <Text style={styles.profileSub}>Wells St, Chicago</Text>
