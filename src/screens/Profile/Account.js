@@ -36,7 +36,7 @@ export default function Account() {
     { name: 'Community Guidelines', icon: 'redirect' },
     { name: 'Privacy Policy', icon: 'redirect' },
     { name: 'Settings', icon: 'arrow' },
-    { name: 'Logout', icon: 'arrow' },
+    // { name: 'Logout', icon: 'arrow' },
   ]
   function _deleteAccount() {
     console.log('deleting user')
@@ -79,6 +79,10 @@ export default function Account() {
               {menu.map(({ name, icon, func }) => (
                 <MenuOptions name={name} icon={icon} func={func} />
               ))}
+              <TouchableOpacity style={styles.options} onPress={_deleteAccount}>
+                <Text style={styles.menuText}>Logout</Text>
+                <Image source={ImageSet.rightCaret} />
+              </TouchableOpacity>
             </View>
           </ScrollView>
         </View>

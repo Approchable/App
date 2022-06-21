@@ -1,48 +1,66 @@
-import {Text, View, Image, StyleSheet, Dimensions, ImageBackground } from 'react-native';
-import { NormalButton } from '../../../components/Buttons';
-import { HeaderText } from '../../../components/Texts';
-import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
-import { useState } from 'react';
-import { BackButton } from '../../../components/BackButton';
+import {
+  Text,
+  View,
+  Image,
+  StyleSheet,
+  Dimensions,
+  ImageBackground,
+} from 'react-native'
+import { NormalButton } from '../../../components/Buttons'
+import { HeaderText } from '../../../components/Texts'
+import RadioForm, {
+  RadioButton,
+  RadioButtonInput,
+  RadioButtonLabel,
+} from 'react-native-simple-radio-button'
+import { useState } from 'react'
+import { BackButton } from '../../../components/BackButton'
 
+const width = (Dimensions.get('window').width - 36) / 3.5
 
+export function AddEthnicity({
+  initialValue,
+  radioProps,
+  backHandler,
+  nextHandler,
+  actionHandler,
+}) {
+  const [eth, setEth] = useState('American Indian')
 
-const width = (Dimensions.get('window').width - 36) / 3.5;
-
-export function AddEthnicity({initialValue, radioProps, backHandler, nextHandler, actionHandler}) {
-  const [eth , setEth] = useState("American Indian")
-
-
-
-      const saveAndProceed = () => {
-        actionHandler(eth)
-        nextHandler()
-       }
+  const saveAndProceed = () => {
+    actionHandler(eth)
+    nextHandler()
+  }
 
   return (
     <>
-    <View style={styles.container}>
+      <View style={styles.container}>
         <View>
-        <BackButton actionHandler={backHandler} /> 
-        <HeaderText content="What’s your ethnicity?" moreStyles={{fontSize: 27}} />
-        <View style={{height:10}}></View> 
-    <View style={styles.pronounsRow}>
-    <RadioForm
-                  buttonColor="#ECEEF2"
-                  buttonSize={15}
-                  radioStyle={{paddingTop:25}}
-                  selectedButtonColor="#44BFBA"
-                  radio_props={radioProps}
-                  initial={initialValue}
-                  animation={false}
-                  onPress={(value) => { setEth(value)}}
-                  labelStyle={{color:"#696969"}}
-                />
-    </View>
+          <BackButton actionHandler={backHandler} />
+          <HeaderText
+            content="What’s your ethnicity?"
+            moreStyles={{ fontSize: 27 }}
+          />
+          <View style={{ height: 10 }}></View>
+          <View style={styles.pronounsRow}>
+            <RadioForm
+              buttonColor="#ECEEF2"
+              buttonSize={15}
+              radioStyle={{ paddingTop: 25 }}
+              selectedButtonColor="#44BFBA"
+              radio_props={radioProps}
+              initial={initialValue}
+              animation={false}
+              onPress={(value) => {
+                setEth(value)
+              }}
+              labelStyle={{ color: '#696969' }}
+            />
+          </View>
         </View>
 
-        <View>
-        <NormalButton
+        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <NormalButton
             text={'Next'}
             onPress={saveAndProceed}
             inActive={true}
@@ -51,56 +69,48 @@ export function AddEthnicity({initialValue, radioProps, backHandler, nextHandler
               marginBottom: 20,
             }}
           />
-          <NormalButton
-          text="Skip"
-          onPress={nextHandler}
-          inActive={true}
-    
-        />
+          <NormalButton text="Skip" onPress={nextHandler} inActive={true} />
         </View>
-    </View>
-
+      </View>
     </>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    flexDirection:'column',
-    justifyContent:'space-between',
-    height:Dimensions.get('screen').height * 0.8,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    height: Dimensions.get('screen').height * 0.85,
   },
 
   textStyle: {
     fontSize: 14,
     fontWeight: '400',
-    color: "#696969",
-    marginBottom: 10
+    color: '#696969',
+    marginBottom: 10,
   },
-  pronounsRow:{
-  flex: 0,
-  flexDirection: 'column',
-  justifyContent: "space-between",
-  flexWrap: 'wrap'
+  pronounsRow: {
+    flex: 0,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
   },
 
   pronounsCol: {
-      flex: 0,
-  width: "48%",
-  height: Dimensions.get('screen').height * 0.18,
-  backgroundColor: "#44bfba1a",
-  borderRadius: 12,
-  alignItems: 'center',
-  justifyContent: "center",
-  marginBottom: 20
+    flex: 0,
+    width: '48%',
+    height: Dimensions.get('screen').height * 0.18,
+    backgroundColor: '#44bfba1a',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
   },
-  deletePhotos:{
-  position: 'absolute',
-  top:-10,
-  right: -10,
-  }
-
-});
-
+  deletePhotos: {
+    position: 'absolute',
+    top: -10,
+    right: -10,
+  },
+})

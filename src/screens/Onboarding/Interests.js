@@ -126,6 +126,11 @@ export default function Interests({ navigation, route }) {
       if (finalResult['photoUrl'] == undefined) {
         finalResult['photoUrl'] = ImageSet.defaultProfileImage
       }
+      // if (finalResult.profileImages[0] == undefined) {
+      //   console.log('profile image is empty')
+      //   finalResult['profileImages'].push(ImageSet.defaultProfileImage)
+      //   console.log(finalResult['profileImages'], 'image')
+      // }
       console.log('finalResult', finalResult)
 
       navigation.navigate('Waitlist', finalResult)
