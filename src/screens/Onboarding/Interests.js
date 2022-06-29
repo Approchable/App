@@ -117,10 +117,20 @@ export default function Interests({ navigation, route }) {
         finalId = finalResult.id
       }
       finalResult['interests'] = categories
+      finalResult['profileImages'] = []
+      finalResult['pronouns'] = null
+      finalResult['ethnicity'] = null
+      finalResult['iceBreaker'] = null
+      finalResult['isProfileCompleted'] = false
       //add default profle picture
       if (finalResult['photoUrl'] == undefined) {
         finalResult['photoUrl'] = ImageSet.defaultProfileImage
       }
+      // if (finalResult.profileImages[0] == undefined) {
+      //   console.log('profile image is empty')
+      //   finalResult['profileImages'].push(ImageSet.defaultProfileImage)
+      //   console.log(finalResult['profileImages'], 'image')
+      // }
       console.log('finalResult', finalResult)
 
       navigation.navigate('Waitlist', finalResult)
