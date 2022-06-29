@@ -26,7 +26,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Chat from '../screens/Chat/Chat'
 import Profile from '../screens/Profile/Profile'
 // import { createAppContainer, createSwitchNavigator } from '@react-navigation';
-
+import ProfileFlow from '../screens/Profile/ProfileFlow/ProfileFlow'
 function OnboardingNavigator({ userToken, isCorrectToken }) {
   console.log('userToken in onboarding', userToken)
 
@@ -69,7 +69,13 @@ function AppNavigator() {
               headerShown: false,
             }}
           />
-
+          <AppStack.Screen
+            name="ProfileFlow"
+            component={ProfileFlow}
+            options={{
+              headerShown: false,
+            }}
+          />
         </AppStack.Navigator>
       )}
     </NavigationContainer>

@@ -14,9 +14,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native'
 import MyStatusBar from '../../components/MyStatusBar'
 import AppHeader from '../../components/Utility/AppHeader'
-
+import { useDispatch } from 'react-redux'
+import { logout } from '../../store/actions'
 export default function Account() {
   const [user, setUser] = useState(null)
+  const dispatch = useDispatch()
   const navigation = useNavigation()
   const _retriveUser = async () => {
     var currUser = await AsyncStorage.getItem('user')
@@ -34,8 +36,13 @@ export default function Account() {
     { name: 'Community Guidelines', icon: 'redirect' },
     { name: 'Privacy Policy', icon: 'redirect' },
     { name: 'Settings', icon: 'arrow' },
+    // { name: 'Logout', icon: 'arrow' },
   ]
-  const MenuOptions = ({ name, icon }) => {
+  function _deleteAccount() {
+    console.log('deleting user')
+    dispatch(logout())
+  }
+  const MenuOptions = ({ name, icon, func }) => {
     return (
       <TouchableOpacity style={styles.options}>
         <Text style={styles.menuText}>{name}</Text>
@@ -69,9 +76,13 @@ export default function Account() {
           </TouchableOpacity>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View>
-              {menu.map(({ name, icon }) => (
-                <MenuOptions name={name} icon={icon} />
+              {menu.map(({ name, icon, func }) => (
+                <MenuOptions name={name} icon={icon} func={func} />
               ))}
+              <TouchableOpacity style={styles.options} onPress={_deleteAccount}>
+                <Text style={styles.menuText}>Logout</Text>
+                <Image source={ImageSet.rightCaret} />
+              </TouchableOpacity>
             </View>
           </ScrollView>
         </View>
