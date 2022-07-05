@@ -54,7 +54,6 @@ const TabArr = [
     inActiveIcon: 'person',
     component: AccountStack,
   },
-
 ]
 const Tab = createMaterialBottomTabNavigator()
 
@@ -65,7 +64,7 @@ export default function BottomTabNavigator() {
       activeColor="#696969"
       inactiveColor="#D3D3D3"
       barStyle={{
-        height: 70,
+        // height: 80,
         // marginHorizontal: 60,
         elevation: 0,
         shadowColor: '#000000',
@@ -76,19 +75,31 @@ export default function BottomTabNavigator() {
         borderColor: 'white',
         borderWidth: 2,
       }}
-      screenOptions={{
-        headerShown: false,
-      }}>
+      shifting={false}
+      screenOptions={({ route }) => ({
+        tabBarIcon: (props) => {
+          
+          const { focused, color, size } = props
+          // You can return any component that you like here!
+          const item = TabArr.find((item) => item.route === route.name)
+          return <TabButton {...props} item={item} />
+        },
+
+      })}>
       {TabArr.map((item, index, route) => {
         return (
           <Tab.Screen
             key={index}
             name={item.route}
             component={item.component}
-            options={{
-              tabBarLabel: item.label,
-              tabBarIcon: (props) => <TabButton {...props} item={item} />,
-            }}
+            
+            options={
+              {
+                // tabBarLabel: item.label,
+                // tabBarIcon: (props) => <TabButton {...props} item={item} />,
+                // make tabbar label vsisble on all labels
+              }
+            }
           />
         )
       })}
@@ -127,6 +138,7 @@ const TabButton = (props) => {
           //color={focused ?"#696969" : "#D3D3D3"}
           color={getColor(item.route, focused)}
         />
+        {/* <Text> Hellp</Text> */}
       </Animatable.View>
     </TouchableOpacity>
   )
@@ -138,7 +150,6 @@ const getColor = (route, focused) => {
   } else {
     return focused ? '#696969' : '#D3D3D3'
   }
-  return 'green'
 }
 
 const styles = StyleSheet.create({

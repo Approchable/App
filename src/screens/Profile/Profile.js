@@ -65,8 +65,8 @@ function UserExists({navigation, user, deleteUser}) {
 
   
   return (
-    <SafeAreaView style={styles.container}>
-    <MyStatusBar backgroundColor="black" />
+    <View style={styles.container}>
+    {/* <MyStatusBar backgroundColor="black" /> */}
     <ScrollView>
     <MyStatusBar backgroundColor="#F6F6F6" />
     <AppHeader moreStyles={{height: 50 }} />
@@ -95,7 +95,7 @@ function UserExists({navigation, user, deleteUser}) {
         }}>
       </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
