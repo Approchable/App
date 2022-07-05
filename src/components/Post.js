@@ -36,7 +36,6 @@ export default function Post({
   usersWhoRequested,
   setCurrentReportPost,
   handleModalOpen,
-  
 }) {
   return (
     <View style={styles.PostView}>
@@ -104,7 +103,7 @@ export function PostModal({ post, onPressSend, setComment, duration }) {
         <PostTitle title={post.headline} />
         <PostDescription description={post.description} />
         <PostImage imageUrl={post.imageUrl} />
-        <PostTiming post={post} duration={duration} />
+        {/* <PostTiming post={post} duration={duration} /> */}
 
         <PostFooter
           startDateTime={post.startDateTime}
@@ -162,13 +161,12 @@ function PostHeader({
         flexDirection: 'row',
         ...moreStyles,
 
-
         justifyContent: 'space-between',
-      //  backgroundColor: 'red'
+        //  backgroundColor: 'red'
       }}>
       <View style={{ flexDirection: 'row' }}>
         <PostProfileImage imageUrl={profileImage} />
-        <View style={{ marginLeft: 10 , maxWidth: '85%' , }}>
+        <View style={{ marginLeft: 10, maxWidth: '85%' }}>
           <PostUserName userName={userName} />
           <PostLocation
             location={location}
@@ -213,7 +211,7 @@ function PostLocation({ location, addressResult }) {
     <View style={styles.PostLocationView}>
       <SmallerText
         content={addressResult}
-        moreStyles={{ marginBottom: -3, marginTop: -3 , marginRight: 80 }}
+        moreStyles={{ marginBottom: -3, marginTop: -3, marginRight: 80 }}
       />
     </View>
   )
@@ -222,7 +220,7 @@ function PostDescription({ description }) {
   return (
     <View style={styles.PostDescriptionView}>
       <SmallerText
-        moreStyles={{ marginBottom: 8, marginTop: 4 , }}
+        moreStyles={{ marginBottom: 8, marginTop: 4 }}
         content={description}></SmallerText>
     </View>
   )
@@ -296,7 +294,7 @@ function PostTiming({ post, duration }) {
           alignItems: 'center',
           marginRight: 20,
         }}>
-        <Image
+        {/* <Image
           style={{ marginRight: 5 }}
           source={require('../assets/images/assets/Clock.png')}
         />
@@ -304,7 +302,7 @@ function PostTiming({ post, duration }) {
           .unix(post.startDateTime.seconds)
           .format('LT')} - ${moment
           .unix(post.endDateTime.seconds)
-          .format('LT')}`}</Text>
+          .format('LT')}`}</Text> */}
       </View>
       <View
         style={{
@@ -313,11 +311,11 @@ function PostTiming({ post, duration }) {
           alignItems: 'center',
           marginRight: 20,
         }}>
-        <Image
+        {/* <Image
           style={{ marginRight: 5 }}
           source={require('../assets/images/assets/flash.png')}
         />
-        <Text>80%</Text>
+        <Text>80%</Text> */}
       </View>
 
       <View style={{ flex: 0, flexDirection: 'row', alignItems: 'center' }}>

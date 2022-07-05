@@ -24,9 +24,10 @@ import { verifyToken } from '../store/WaitList/Waitlist'
 import ChatStack from './ChatStackNavigation/ChatStackNavigator'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Chat from '../screens/Chat/Chat'
-import Profile from '../screens/Profile/Profile'
+import Profile from '../screens/Account/Profile'
+import MyHangouts from '../screens/Account/MyHangouts/MyHangouts'
 // import { createAppContainer, createSwitchNavigator } from '@react-navigation';
-import ProfileFlow from '../screens/Profile/ProfileFlow/ProfileFlow'
+import ProfileFlow from '../screens/Account/ProfileFlow/ProfileFlow'
 function OnboardingNavigator({ userToken, isCorrectToken }) {
   console.log('userToken in onboarding', userToken)
 
@@ -72,6 +73,14 @@ function AppNavigator() {
           <AppStack.Screen
             name="ProfileFlow"
             component={ProfileFlow}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <AppStack.Screen
+            name="MyHangouts"
+            component={MyHangouts}
             options={{
               headerShown: false,
             }}

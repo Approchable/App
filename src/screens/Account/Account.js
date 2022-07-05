@@ -31,20 +31,54 @@ export default function Account() {
   }, [])
   const goToProfile = () => navigation.navigate('Profile')
   const menu = [
-    { name: 'My Hangouts', icon: 'arrow' },
-    { name: 'Block List', icon: 'arrow' },
-    { name: 'Community Guidelines', icon: 'redirect' },
-    { name: 'Privacy Policy', icon: 'redirect' },
-    { name: 'Settings', icon: 'arrow' },
-    // { name: 'Logout', icon: 'arrow' },
+    {
+      name: 'My Hangouts',
+      icon: 'arrow',
+      onPress: () => navigation.navigate('MyHangouts'),
+    },
+    {
+      name: 'Block List',
+      icon: 'arrow',
+      onPress: () => {
+        null
+      },
+    },
+    {
+      name: 'Community Guidelines',
+      icon: 'redirect',
+      onPress: () => {
+        null
+      },
+    },
+    {
+      name: 'Privacy Policy',
+      icon: 'redirect',
+      onPress: () => {
+        null
+      },
+    },
+    {
+      name: 'Settings',
+      icon: 'arrow',
+      onPress: () => {
+        null
+      },
+    },
+    {
+      name: 'Logout',
+      icon: 'arrow',
+      onPress: () => {
+        null
+      },
+    },
   ]
   function _deleteAccount() {
     console.log('deleting user')
     dispatch(logout())
   }
-  const MenuOptions = ({ name, icon, func }) => {
+  const MenuOptions = ({ name, icon, func, onPress }) => {
     return (
-      <TouchableOpacity style={styles.options}>
+      <TouchableOpacity style={styles.options} onPress={onPress}>
         <Text style={styles.menuText}>{name}</Text>
         <Image
           source={icon == 'arrow' ? ImageSet.rightCaret : ImageSet.redirect}
@@ -56,7 +90,7 @@ export default function Account() {
     return (
       <View style={styles.container}>
         <MyStatusBar backgroundColor="#F6F6F6" />
-        <AppHeader moreStyles={{height: 50 }} />
+        <AppHeader moreStyles={{ height: 50 }} />
         <View style={{ flex: '1', marginHorizontal: 16, marginTop: 10 }}>
           <TouchableOpacity style={styles.profileSection} onPress={goToProfile}>
             <Image
@@ -76,13 +110,18 @@ export default function Account() {
           </TouchableOpacity>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View>
-              {menu.map(({ name, icon, func }) => (
-                <MenuOptions name={name} icon={icon} func={func} />
+              {menu.map(({ name, icon, func, onPress }) => (
+                <MenuOptions
+                  name={name}
+                  icon={icon}
+                  func={func}
+                  onPress={onPress}
+                />
               ))}
-              <TouchableOpacity style={styles.options} onPress={_deleteAccount}>
+              {/* <TouchableOpacity style={styles.options} onPress={_deleteAccount}>
                 <Text style={styles.menuText}>Logout</Text>
                 <Image source={ImageSet.rightCaret} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </ScrollView>
         </View>

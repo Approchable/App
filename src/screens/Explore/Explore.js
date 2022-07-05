@@ -27,6 +27,8 @@ import SkeletonContent from 'react-native-skeleton-content'
 import LocationSearchBar from '../../components/LocationSearchBar'
 
 import { screenWidth } from '../../components/config/Constant'
+
+import {getUserDataById } from './/..//..//..//firebase'
 //GetPostsReducer
 function Explore({ navigation }) {
   // var posts = useMemo(() => {
@@ -67,9 +69,16 @@ function Explore({ navigation }) {
     dispatch(getPosts())
   }
 
-  const handleJoin = (postObject) => {
-    console.log(user, 'com')
-    if (user.isProfileCompleted) {
+  const handleJoin = async (postObject) => {
+    
+
+    const newUserData = await getUserDataById(user.id)
+
+    console.log("new User" , newUserData)
+
+
+    // check if post object is  updated 
+    if (newUserData.isProfileCompleted) {
       setModalVisible(true)
       setModalPost(postObject)
     } else {
@@ -139,8 +148,8 @@ function Explore({ navigation }) {
                   handleModalOpen={handleModalOpen}
                   setCurrentReportPost={setCurrentReportPost}
                   postId={item.postId}
-                  onPress={() => {
-                    handleJoin(item)
+                  onPress={ async () => {
+                    await handleJoin(item)
                   }}
                   usersWhoRequested={item.usersWhoRequested}
                 />

@@ -71,7 +71,8 @@ export default function ProfileFlow({navigation}) {
     newUser["isProfileCompleted"] = true
    }
   dispatch(login(newUser));
-  navigation.navigate('Profile')
+  
+  navigation.navigate('Explore')
   }
  const backHandler = () => {
    let newStep = step - 1;

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from 'react-native'
 
 import { useDispatch, useSelector } from 'react-redux'
@@ -142,8 +143,9 @@ export default function Connections({ navigation }) {
     const userId = JSON.parse(user).id
     if (userId) {
       // console.log(`trying to fetch the current logged in user(${userId}) requests`)
-      dispatch(getRequests(userId))
+      // dispatch(getRequests(userId))
       const requestsData = await getActiveUserRequests(userId)
+      
       setRequestsArray(requestsData)
       setTimeout(() => {
         let checker = requestsData.every(
@@ -309,7 +311,7 @@ export default function Connections({ navigation }) {
 
       {connectionTab ? (
         connectionsArray.length > 0 ? (
-          <View style={styles.mainView}>
+          <ScrollView style={styles.mainView}>
             {connectionsArray.map((item, index) => {
               // console.log(item)
               const time = dateDifference(item.updatedAt.seconds)
@@ -397,7 +399,7 @@ export default function Connections({ navigation }) {
                 </SkeletonContent>
               )
             })}
-          </View>
+          </ScrollView>
         ) : (
           <View style={styles.noMessageView}>
             <Image style={styles.noMessageIcon} source={ImageSet.noMessage} />
@@ -623,6 +625,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     paddingHorizontal: 16,
+   
+   
   },
   skeletonContentStyle: {
     flexDirection: 'row',

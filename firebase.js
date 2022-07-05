@@ -311,7 +311,7 @@ export async function getAllMessagesForConnectionId(conId) {
 
 export async function sendChatMessage(messageObject) {
   try {
-    await setDoc(doc(fireStore, 'connections', messageObject.connectionId, 'messages', messageObject.id), messageObject)
+    const docRef = await setDoc(doc(fireStore, 'connections', messageObject.connectionId, 'messages', messageObject.id), messageObject)
     return docRef
   } catch (error) {
     console.log('sendChatMessage message ==> ', error)
