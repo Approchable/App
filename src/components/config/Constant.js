@@ -90,6 +90,7 @@ export const ImageSet = {
   X: require('../../assets/images/icons/X.png'),
   rightCaret: require('../../assets/images/icons/CaretRight.png'),
   redirect: require('../../assets/images/icons/redirect.png'),
+  logo:require('../../assets/images/icons/logo.png'),
 }
 
 export const TabType = {

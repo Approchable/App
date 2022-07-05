@@ -83,14 +83,21 @@ export default function Name({ route, navigation }) {
           }}>
           <NormalButton // next button
             text="Next"
-            onPress={() =>
-              buttonActive
-                ? navigation.navigate('Interests', {
+            onPress={() =>{
+
+              if(buttonActive){
+
+
+               
+                navigation.navigate('Interests', {
                     result,
                     lastName,
                     firstname,
                   })
-                : null
+              }
+              
+            }
+            
             }
             inActive={buttonActive}
           />

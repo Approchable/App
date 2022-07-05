@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet, StatusBar, SafeAreaView } from 'react-native'
+import { View, Text, StyleSheet, StatusBar, SafeAreaView, Image } from 'react-native'
 import React from 'react'
+import { ImageSet} from '../../components/config/Constant'
 import NavigationLogo from '../../assets/images/assets/NavigationLogo.svg'
 
 export default function AppHeader({ moreStyles }) {
@@ -13,10 +14,9 @@ export default function AppHeader({ moreStyles }) {
           justifyContent: 'center',
 
           backgroundColor: '#F6F6F6',
-        }}
-      >
-        <View style={{ marginLeft: 16 }}>
-          <NavigationLogo witdth="100%" />
+        }}>
+        <View style={{ marginLeft: 16  ,}}>
+          <Image style={{ width: 44, height: 44 }} source={ImageSet.logo} />
         </View>
       </View>
     </View>
