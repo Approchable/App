@@ -26,38 +26,24 @@ export default function Name({ route, navigation }) {
   const [firstname, setFirstName] = useState(givenName)
   const [lastName, setLastName] = useState(familyName)
   const [buttonActive, setButtonActive] = useState(false)
+
+  const firstNameRef = useRef(null)
   // tells me how many renders i am having.. fix this later with useMemo
 
-  console.log(result)
-  function checkTextInputs() {
-    console.log('firstname lenght', firstname.length)
-    if (firstname.length <= 1) {
-      setButtonActive(false)
-    } else {
+ 
+  useEffect(() => {
+   console.log(firstname)
+   // check if first name's lengh is greater than 1 
+    if (firstname.length >= 1) {
       setButtonActive(true)
     }
-  }
-  useEffect(() => {
-    updateFirstNameandCheckTextInputs(givenName)
-    updateLastNameandCheckTextInputs(familyName)
-  }, [])
-  function updateFirstNameandCheckTextInputs(name) {
-    givenName = name
-    setFirstName((prev) => {
-      prev = name
+    else {
+      setButtonActive(false)
+    }
 
-      console.log(name)
-      console.log(firstname)
-      checkTextInputs()
-    })
-    setFirstName(name)
-  }
-  function updateLastNameandCheckTextInputs(name) {
-    familyName = name
-
-    setLastName(name)
-    // checkTextInputs();
-  }
+  
+  }, [firstname])
+ 
   return (
     <SafeAreaView style={styles.container}>
       <MyStatusBar backgroundColor="white" />
@@ -76,16 +62,16 @@ export default function Name({ route, navigation }) {
             }}>
             What's your name?
           </Text>
-          <NormalTextField
+          <FowardNormalTextField // firstname
+            ref = {firstNameRef}
             value={firstname}
             placeholder="Add first Name(Required)"
-            onChangeText={(text) => updateFirstNameandCheckTextInputs(text)}
-            onDelete={() => console.log('deletikkkdfng')}
+            onChangeText={(text) => setFirstName(text)}
           />
-          <NormalTextField
+          <FowardNormalTextField // lastname
             placeholder="Add last Name"
             value={lastName}
-            onChangeText={(text) => updateLastNameandCheckTextInputs(text)}
+            onChangeText={(text) => setLastName(text)}
           />
         </View>
 
@@ -95,7 +81,7 @@ export default function Name({ route, navigation }) {
             justifyContent: 'flex-end',
             marginVertical: 20,
           }}>
-          <NormalButton
+          <NormalButton // next button
             text="Next"
             onPress={() =>
               buttonActive
@@ -140,8 +126,11 @@ const styles = StyleSheet.create({
   },
 })
 
-function NormalTextField({ placeholder, onChangeText, onDelete, value }) {
-  var ref = useRef('null')
+function NormalTextField({ placeholder, onChangeText, onDelete, value } , ref) {
+  
+  
+
+  
   return (
     <View style={styles.textInputView}>
       <TextInput
@@ -158,3 +147,5 @@ function NormalTextField({ placeholder, onChangeText, onDelete, value }) {
     </View>
   )
 }
+
+const FowardNormalTextField = React.forwardRef(NormalTextField) // forwardRef is used to access the ref of the component

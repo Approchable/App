@@ -78,13 +78,11 @@ export default function BottomTabNavigator() {
       shifting={false}
       screenOptions={({ route }) => ({
         tabBarIcon: (props) => {
-          
           const { focused, color, size } = props
           // You can return any component that you like here!
           const item = TabArr.find((item) => item.route === route.name)
           return <TabButton {...props} item={item} />
         },
-
       })}>
       {TabArr.map((item, index, route) => {
         return (
@@ -92,14 +90,6 @@ export default function BottomTabNavigator() {
             key={index}
             name={item.route}
             component={item.component}
-            
-            options={
-              {
-                // tabBarLabel: item.label,
-                // tabBarIcon: (props) => <TabButton {...props} item={item} />,
-                // make tabbar label vsisble on all labels
-              }
-            }
           />
         )
       })}
