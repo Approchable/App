@@ -32,51 +32,6 @@ import { getRequests } from '../../store/Requests/Requests'
 import { dateDifference } from '../../components/Utility/Helper'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const DataArray = [
-  //   {
-  //     name: 'Jane',
-  //     lastMassage: 'hi!',
-  //     time: '2h',
-  //     count: 8,
-  //   },
-  //   {
-  //     name: 'Leslie',
-  //     lastMassage: 'In general, everything is fine, but..',
-  //     time: '14h',
-  //     count: 1,
-  //   },
-  //   {
-  //     name: 'Kristin',
-  //     lastMassage: 'Amet minim mollit non desseermo..',
-  //     time: '14h',
-  //     count: 0,
-  //   },
-  //   {
-  //     name: 'Dianne',
-  //     lastMassage: 'Amet minim mollit non desseermo..',
-  //     time: '12h',
-  //     count: 0,
-  //   },
-]
-const RequestsDataArray = [
-  {
-    name: 'Kristin',
-    lastMassage:
-      'That sounds fun! I’d love to join That sounds fun! I’d love to join That sounds fun! I’d love to join ',
-    time: '14h',
-  },
-  {
-    name: 'Ralph',
-    lastMassage: null,
-    time: '14h',
-  },
-  {
-    name: 'Jane',
-    lastMassage: null,
-    time: '14h',
-  },
-]
-
 export default function Connections({ navigation }) {
   const requests = useSelector((state) => state.getAllRequestsReducer.requests)
   const connections = useSelector(
@@ -112,7 +67,7 @@ export default function Connections({ navigation }) {
   const getCurrentUserData = async () => {
     var user = await AsyncStorage.getItem('user')
     const u = JSON.parse(user)
-    console.log('user id is', u.id)
+
     setUser(u)
   }
 
@@ -145,7 +100,7 @@ export default function Connections({ navigation }) {
       // console.log(`trying to fetch the current logged in user(${userId}) requests`)
       // dispatch(getRequests(userId))
       const requestsData = await getActiveUserRequests(userId)
-      
+
       setRequestsArray(requestsData)
       setTimeout(() => {
         let checker = requestsData.every(
@@ -169,6 +124,7 @@ export default function Connections({ navigation }) {
   }
 
   const onClickRequestButton = async (request, index) => {
+   
     const requestStatus = request.requestStatus
     const requestID = request.requestID
 
@@ -206,7 +162,7 @@ export default function Connections({ navigation }) {
       setRequestTab(false)
       setTimeout(() => {
         setIsFetched(false)
-      }, 2000)
+      }, 500)
     }
     if (tabType == TabType.requests) {
       setIsFetchedRequest(true)
@@ -215,7 +171,8 @@ export default function Connections({ navigation }) {
       setRequestsArray(requests)
       setTimeout(() => {
         setIsFetchedRequest(false)
-      }, 2000)
+      }, 1000)
+      _getRequests()
     }
   }
 
@@ -412,6 +369,7 @@ export default function Connections({ navigation }) {
         requestArray.length > 0 ? (
           <View style={styles.mainView}>
             {requestArray.map((item, index) => {
+              
               const request = item
               const data = request.userSendingRequest
               const time = dateDifference(request.createdAt.seconds)
@@ -625,8 +583,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     paddingHorizontal: 16,
-   
-   
   },
   skeletonContentStyle: {
     flexDirection: 'row',

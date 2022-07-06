@@ -90,17 +90,15 @@ function Posts({ active }) {
       const oldPosts = filteredPosts.filter((post) => {
         const postDate = new Date(post.endDateTime.toDate())
         const currentDate = new Date()
-        return postDate > currentDate
+        return postDate < currentDate
       })
 
       const currentPost = filteredPosts.filter((post) => {
         const postDate = new Date(post.endDateTime.toDate())
         const currentDate = new Date()
-        return postDate < currentDate
+        return postDate > currentDate
       })
 
-      console.log('Old Posts', oldPosts)
-      console.log('Current Posts', currentPost)
 
       if (active) {
         setPosts(currentPost)

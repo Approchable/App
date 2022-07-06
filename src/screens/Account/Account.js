@@ -91,7 +91,7 @@ export default function Account() {
       <View style={styles.container}>
         <MyStatusBar backgroundColor="#F6F6F6" />
         <AppHeader moreStyles={{ height: 50 }} />
-        <View style={{ flex: '1', marginHorizontal: 16, marginTop: 10 }}>
+        <View style={{ flex: '1', marginHorizontal: 16, marginTop: 0 }}>
           <TouchableOpacity style={styles.profileSection} onPress={goToProfile}>
             <Image
               style={styles.profileImage}
@@ -118,10 +118,6 @@ export default function Account() {
                   onPress={onPress}
                 />
               ))}
-              {/* <TouchableOpacity style={styles.options} onPress={_deleteAccount}>
-                <Text style={styles.menuText}>Logout</Text>
-                <Image source={ImageSet.rightCaret} />
-              </TouchableOpacity> */}
             </View>
           </ScrollView>
         </View>
@@ -164,8 +160,8 @@ const styles = StyleSheet.create({
   },
 
   profileImage: {
-    width: 110,
-    height: 110,
+    width: 90,
+    height: 90,
     borderRadius: 8,
   },
   options: {

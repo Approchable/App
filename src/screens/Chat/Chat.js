@@ -116,6 +116,8 @@ const Chat = ({ route, navigation }) => {
     return unsub
   }, [])
 
+  
+
   const getCurrentUserData = async () => {
     var user = await AsyncStorage.getItem('user')
     const u = JSON.parse(user)
@@ -221,6 +223,21 @@ const Chat = ({ route, navigation }) => {
     setAccepted(true)
     setIsSendMsgEnabled(false)
     getCurrentUserData()
+  }
+
+  const onRequestRejectButtonAction = async () => {
+    setLoading(true)
+    // 1. Update the request status to `rejected
+    await updateRequestStatus(
+      request.userReciving.id,
+      request.requestID,
+      RequestStatus.rejected
+    )
+
+    // 2. Update UI
+    setRejected(true)
+    
+    setLoading(false)
   }
 
   return (
@@ -434,7 +451,7 @@ const Chat = ({ route, navigation }) => {
                   accepted={accepted}
                   rejected={rejected}
                   onAccepted={onRequestAcceptBtnAction}
-                  // onRejected={() => setRejected(true)}
+                  onRejected={onRequestRejectButtonAction}
                 />
               </>
             )}

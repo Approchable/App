@@ -62,6 +62,7 @@ export const ColorSet = {
   dimGray: '#696969',
   textBlack: '#030E01',
   white: '#fff',
+  lightGreen:"#44BFBA33"
 }
 
 export const ImageSet = {
