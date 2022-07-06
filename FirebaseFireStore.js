@@ -133,6 +133,7 @@ export async function getAllRequest(userId) {
 export async function getPostsFromFireStore() {
   const collectionRef = collection(fireStore, 'posts');
   try {
+    
     const querySnapshot = await getDocs(collectionRef);
     const data = querySnapshot.docs.map(doc => doc.data());
 

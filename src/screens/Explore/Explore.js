@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   StyleSheet,
@@ -8,27 +8,27 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import SkeletonContent from 'react-native-skeleton-content'
+
 import { RegularBoldText } from '../../components/Texts'
 import { NormalButton } from '../../components/Buttons'
 import EmptyCreatePost from '../../assets/images/assets/EmptyCreatePost.svg'
-import { useDispatch } from 'react-redux'
 import SucessLogo from '../../assets/images/assets/SucessLogo.svg'
 import { NavigateToCreate } from '../../store/actions'
 import Post, { PostModal } from '../../components/Post'
 import AppHeader from '../../components/Utility/AppHeader'
-import { useSelector } from 'react-redux'
-import { getPosts } from '../../store/posts/posts'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import MyStatusBar from '../../components/MyStatusBar'
 import { sendJoinRequest } from '../../store/Requests/Requests'
-
 import ReportModal from '../../components/ReportModal'
-import SkeletonContent from 'react-native-skeleton-content'
-import LocationSearchBar from '../../components/LocationSearchBar'
-
 import { screenWidth } from '../../components/config/Constant'
+import { getUserDataById } from './/..//..//..//firebase'
 
-import {getUserDataById } from './/..//..//..//firebase'
+import { useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
+
+import { getPosts } from '../../store/posts/posts'
+
 //GetPostsReducer
 function Explore({ navigation }) {
   // var posts = useMemo(() => {
@@ -39,6 +39,8 @@ function Explore({ navigation }) {
   var posts = useSelector((state) => state.GetPostsReducer.posts)
   var loading = useSelector((state) => state.GetPostsReducer.loading)
   var error = useSelector((state) => state.GetPostsReducer.error)
+
+  //sort post by timestamp
 
   const [refreshing, setRefreshing] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
@@ -70,14 +72,11 @@ function Explore({ navigation }) {
   }
 
   const handleJoin = async (postObject) => {
-    
-
     const newUserData = await getUserDataById(user.id)
 
-    console.log("new User" , newUserData)
+    console.log('new User', newUserData)
 
-
-    // check if post object is  updated 
+    // check if post object is  updated
     if (newUserData.isProfileCompleted) {
       setModalVisible(true)
       setModalPost(postObject)
@@ -148,7 +147,7 @@ function Explore({ navigation }) {
                   handleModalOpen={handleModalOpen}
                   setCurrentReportPost={setCurrentReportPost}
                   postId={item.postId}
-                  onPress={ async () => {
+                  onPress={async () => {
                     await handleJoin(item)
                   }}
                   usersWhoRequested={item.usersWhoRequested}
@@ -173,7 +172,7 @@ function Explore({ navigation }) {
   )
 }
 
-function NoPost({ navigation }) {
+export function NoPost({ navigation }) {
   const NavigateToCreateInExplore = () => {
     navigation.navigate('Create')
   }
@@ -211,7 +210,7 @@ function NoPost({ navigation }) {
   )
 }
 
-const JoinModal = ({ visible, postObject, onCancel }) => {
+export const JoinModal = ({ visible, postObject, onCancel }) => {
   const dispatch = useDispatch()
   const [comment, setComment] = useState('')
   const handleSendRequest = (post, comment = '') => {
@@ -246,7 +245,7 @@ const JoinModal = ({ visible, postObject, onCancel }) => {
   )
 }
 
-const ExploreLoader = (props) => {
+export const ExploreLoader = (props) => {
   const { loading } = props
 
   const itemArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

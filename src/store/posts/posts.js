@@ -63,7 +63,7 @@ export const getPosts = () => {
     })
     try {
       const posts = await getPostsFromFireStore()
-      console.log(posts, 'pst')
+      
       if (posts !== null) {
         dispatch({
           type: GET_POSTS,

@@ -96,6 +96,8 @@ export const ImageSet = {
 export const TabType = {
   connections: 'connections',
   requests: 'requests',
+  active: 'active',
+  inActive: 'inActive',
 }
 
 export const RequestStatus = {
