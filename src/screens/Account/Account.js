@@ -68,7 +68,7 @@ export default function Account() {
       name: 'Logout',
       icon: 'arrow',
       onPress: () => {
-        null
+        dispatch(logout())
       },
     },
   ]
