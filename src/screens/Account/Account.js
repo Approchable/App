@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Linking,
 } from 'react-native'
 import { ImageSet } from '../../components/config/Constant'
 import { ActivityIndicator } from 'react-native'
@@ -20,15 +21,19 @@ export default function Account() {
   const [user, setUser] = useState(null)
   const dispatch = useDispatch()
   const navigation = useNavigation()
+
   const _retriveUser = async () => {
     var currUser = await AsyncStorage.getItem('user')
     var currUser = JSON.parse(currUser)
     console.log(currUser)
     setUser(currUser)
   }
+
   useEffect(() => {
     _retriveUser()
   }, [])
+  const communityGuidelinesUrl =  "https://www.approachable.ai/community-guidelines"
+  const privacyPolicyUrl = "https://www.approachable.ai/privacy-policy"
   const goToProfile = () => navigation.navigate('Profile')
   const menu = [
     {
@@ -47,14 +52,14 @@ export default function Account() {
       name: 'Community Guidelines',
       icon: 'redirect',
       onPress: () => {
-        null
+        openUrl(communityGuidelinesUrl)
       },
     },
     {
       name: 'Privacy Policy',
       icon: 'redirect',
       onPress: () => {
-        null
+        openUrl(privacyPolicyUrl)
       },
     },
     {
@@ -72,6 +77,14 @@ export default function Account() {
       },
     },
   ]
+  const openUrl = async (url) => {
+    const isSupported = await Linking.canOpenURL(url)
+    if (isSupported) {
+      await Linking.openURL(url)
+    } else {
+      Alert.alert('Error', 'Could not open url')
+    }
+  }
   function _deleteAccount() {
     console.log('deleting user')
     dispatch(logout())
