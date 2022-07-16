@@ -88,7 +88,12 @@ const RequestHangout = (props) => {
                   : 'Do you want to connect'}
               </Text>
             </View>
-            <Image style={{ width: 20, height: 20 }} source={ImageSet.X} />
+            {
+              rejected == false && (
+                <Image style={{ width: 20, height: 20 }} source={ImageSet.X} />
+              )
+            }
+           
           </View>
           <View style={styles.rightMessageView}>
             <Image style={styles.userImage} source={source} />

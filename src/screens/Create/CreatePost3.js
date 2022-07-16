@@ -45,6 +45,7 @@ export default function CreatePost3({ navigation }) {
       localImageUrl: image || '',
       user: user,
       usersWhoRequested: [user.id],
+      createdAt: new Date(),
     }
     const newPostObject = {
       ...prevPostObject,
