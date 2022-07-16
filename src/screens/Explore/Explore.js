@@ -7,6 +7,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   ScrollView,
+  Alert,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import SkeletonContent from 'react-native-skeleton-content'
@@ -81,7 +82,27 @@ function Explore({ navigation }) {
       setModalVisible(true)
       setModalPost(postObject)
     } else {
-      navigation.navigate('ProfileFlow')
+      // show alert to users
+
+      Alert.alert(
+        "You can't join this post just yet!",
+        'You need to complete your profile first',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => {
+              console.log('The profie completion flow was canceled')
+            },
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              navigation.navigate('ProfileFlow')
+            },
+          },
+        ]
+      )
     }
   }
 
