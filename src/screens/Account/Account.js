@@ -112,8 +112,13 @@ export default function Account() {
             />
             <View style={styles.profileIdentity}>
               <View style={{ marginRight: 10 }}>
-                <Text style={styles.name}>{user?.name}, 21</Text>
-                <Text style={styles.address}>Wells St, Chicago</Text>
+                <Text style={styles.name}>{user?.name}</Text> 
+                {
+                  /* 
+                  // Fix and add user current location 
+                  */
+                }
+                <Text style={styles.address}>{user?.currentLocation}</Text> 
               </View>
               <Image
                 style={{ width: 10, height: 18 }}
