@@ -127,8 +127,14 @@ export async function getPostsFromFireStore() {
   const collectionRef = collection(fireStore, 'posts')
   try {
     const querySnapshot = await getDocs(collectionRef)
-    const data = querySnapshot.docs.map((doc) => doc.data())
+    var data = querySnapshot.docs.map((doc) => doc.data())
+    data = data.filter((post) => {
+      return post.startDateTime.toDate() > new Date()
+    })
 
+    data.sort((a, b) => {
+      return b.createdAt - a.createdAt
+    })
     return data
   } catch (error) {
     console.log('Error getting posts from firebase ', error)
@@ -221,7 +227,7 @@ export async function getActiveUserRequests(userId) {
     )
     const querySnapshot = await getDocs(q)
     const data = querySnapshot.docs.map((doc) => doc.data())
-   
+
     data.sort((a, b) => {
       return a.createdAt - b.createdAt
     })

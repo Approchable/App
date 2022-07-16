@@ -39,19 +39,6 @@ function Explore({ navigation }) {
 
   var posts = useSelector((state) => {
     var posts = state.GetPostsReducer.posts
-
-    posts = posts.filter((post) => {
-      return post.startDateTime.toDate() > new Date()
-    })
-
-    posts.sort((a, b) => {
-      return b.createdAt - a.createdAt
-    })
-
-    posts.map((post) => {
-      console.log('Posts time ==>>', post.startDateTime.toDate() > new Date())
-    })
-
     return posts
   })
   var loading = useSelector((state) => state.GetPostsReducer.loading)
