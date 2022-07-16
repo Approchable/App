@@ -367,7 +367,7 @@ export default function Connections({ navigation }) {
 
       {requestTab ? (
         requestArray.length > 0 ? (
-          <View style={styles.mainView}>
+          <ScrollView style={styles.mainView}>
             {requestArray.map((item, index) => {
               
               const request = item
@@ -433,7 +433,7 @@ export default function Connections({ navigation }) {
                 </SkeletonContent>
               )
             })}
-          </View>
+          </ScrollView>
         ) : (
           <View style={styles.noMessageView}>
             <Image style={styles.noMessageIcon} source={ImageSet.noMessage} />
